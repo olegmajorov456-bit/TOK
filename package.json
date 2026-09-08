@@ -1,0 +1,21 @@
+{
+  "name": "tok-ispu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ТОК — знакомства для студентов ИГЭУ",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.114.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.2.2"
+  },
+  "type": "module"
+}
