@@ -30,7 +30,6 @@ function Auth() {
     <div className="auth-page">
       <div className="auth-card">
         <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
-        <div className="auth-brand">ТОК</div>
         <h2>{isLogin ? "Вход" : "Регистрация"}</h2>
         <p className="auth-subtitle">Знакомства внутри ИГЭУ</p>
         <form onSubmit={handleSubmit}>
