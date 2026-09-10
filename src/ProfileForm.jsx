@@ -4,18 +4,23 @@ import "./ProfileForm.css";
 
 function getMaxBirthDate() {
   const date = new Date();
-
   date.setFullYear(date.getFullYear() - 16);
-
   return date.toISOString().split("T")[0];
 }
 
 function getMinBirthDate() {
   const date = new Date();
-
   date.setFullYear(date.getFullYear() - 100);
-
   return date.toISOString().split("T")[0];
+}
+
+function getAge(birthDate) {
+  const today = new Date();
+  const birth = new Date(`${birthDate}T00:00:00`);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDifference = today.getMonth() - birth.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
 }
 
 function ProfileForm({ user, onProfileCreated }) {
@@ -28,52 +33,37 @@ function ProfileForm({ user, onProfileCreated }) {
   const [description, setDescription] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   function handleAvatarChange(event) {
-    const file = event.target.files[0];
-
-    if (!file) {
-      return;
-    }
-
+    const file = event.target.files?.[0];
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       setError("Можно загружать только изображения.");
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       setError("Фотография должна быть меньше 5 МБ.");
       return;
     }
-
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
     setError("");
   }
+
   async function handleSubmit(event) {
     event.preventDefault();
-    const today = new Date();
-    const birth = new Date(birthDate);
-
-    let age = today.getFullYear() - birth.getFullYear();
-
-    const monthDifference = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDifference < 0 ||
-      (monthDifference === 0 &&
-        today.getDate() < birth.getDate())
-    ) {
-      age--;
+    if (!birthDate) {
+      setError("Укажите дату рождения.");
+      return;
     }
 
+    const age = getAge(birthDate);
     if (age < 16) {
       setError("Регистрация доступна только с 16 лет.");
       return;
     }
-
     if (age > 100) {
       setError("Проверьте дату рождения.");
       return;
@@ -81,177 +71,125 @@ function ProfileForm({ user, onProfileCreated }) {
 
     setLoading(true);
     setError("");
-    let avatarUrl = null;
 
-    if (avatarFile) {
-      const fileExtension = avatarFile.name.split(".").pop();
+    try {
+      // Сначала создаём профиль. Это важно: политики Storage могут
+      // проверять наличие профиля перед разрешением загрузки файла.
+      const { data: createdProfile, error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          name: name.trim(),
+          birth_date: birthDate,
+          gender,
+          looking_for: lookingFor,
+          faculty: faculty.trim(),
+          course: course ? Number(course) : null,
+          description: description.trim(),
+          avatar_url: null,
+        })
+        .select()
+        .single();
 
-      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExtension}`;
-
-      const { error: uploadError } = await supabase
-        .storage
-        .from("avatars")
-        .upload(filePath, avatarFile, {
-          contentType: avatarFile.type,
-          upsert: true,
-        });
-
-      if (uploadError) {
-        console.error(uploadError);
-        setError(uploadError.message);
+      if (profileError) {
+        console.error(profileError);
+        setError(profileError.message);
         setLoading(false);
         return;
       }
 
-      const { data: publicUrlData } = supabase
-        .storage
-        .from("avatars")
-        .getPublicUrl(filePath);
+      let finalProfile = createdProfile;
 
-      avatarUrl = publicUrlData.publicUrl;
-    }
-    const { data, error } = await supabase
-      .from("profiles")
-      .insert({
-        id: user.id,
-        name: name,
-        birth_date: birthDate,
-        gender: gender,
-        looking_for: lookingFor,
-        faculty: faculty,
-        course: course ? Number(course) : null,
-        description: description,
-      })
-      .select()
-      .single();
+      if (avatarFile) {
+        const extension = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+        const filePath = `${user.id}/${crypto.randomUUID()}.${extension}`;
 
-    if (error) {
-      console.error(error);
-      setError(error.message);
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(filePath, avatarFile, {
+            contentType: avatarFile.type,
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error(uploadError);
+          setError("Анкета создана, но фотографию загрузить не удалось. Её можно добавить позже в профиле.");
+          onProfileCreated(createdProfile);
+          setLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(filePath);
+
+        const { data: updatedProfile, error: avatarUpdateError } = await supabase
+          .from("profiles")
+          .update({ avatar_url: publicUrlData.publicUrl })
+          .eq("id", user.id)
+          .select()
+          .single();
+
+        if (avatarUpdateError) {
+          console.error(avatarUpdateError);
+          setError("Фото загружено, но не удалось сохранить ссылку на него.");
+          finalProfile = createdProfile;
+        } else {
+          finalProfile = updatedProfile;
+        }
+      }
+
+      onProfileCreated(finalProfile);
+    } catch (submitError) {
+      console.error(submitError);
+      setError("Произошла ошибка. Попробуйте ещё раз.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    onProfileCreated(data);
-    setLoading(false);
   }
 
   return (
     <div className="profile-page">
       <div className="profile-card">
-
         <h1>Создай свою анкету ❤️</h1>
-
-        <p className="profile-subtitle">
-          Расскажи немного о себе
-        </p>
+        <p className="profile-subtitle">Расскажи немного о себе</p>
 
         <form onSubmit={handleSubmit}>
+          <input type="text" placeholder="Имя" value={name} onChange={(event) => setName(event.target.value)} required />
 
-          <input
-            type="text"
-            placeholder="Имя"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
+          <label>Дата рождения</label>
+          <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} min={getMinBirthDate()} max={getMaxBirthDate()} required />
 
-          <label>
-            Дата рождения
-          </label>
-
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(event) => setBirthDate(event.target.value)}
-            min={getMinBirthDate()}
-            max={getMaxBirthDate()}
-            required
-          />
-
-          <select
-            value={gender}
-            onChange={(event) => setGender(event.target.value)}
-            required
-          >
+          <select value={gender} onChange={(event) => setGender(event.target.value)} required>
             <option value="">Твой пол</option>
             <option value="male">Парень</option>
             <option value="female">Девушка</option>
             <option value="other">Другое</option>
           </select>
 
-          <select
-            value={lookingFor}
-            onChange={(event) => setLookingFor(event.target.value)}
-            required
-          >
+          <select value={lookingFor} onChange={(event) => setLookingFor(event.target.value)} required>
             <option value="">Кого ищешь?</option>
             <option value="male">Парня</option>
             <option value="female">Девушку</option>
             <option value="any">Неважно</option>
           </select>
 
-          <input
-            type="text"
-            placeholder="Факультет"
-            value={faculty}
-            onChange={(event) => setFaculty(event.target.value)}
-          />
-
-          <input
-            type="number"
-            placeholder="Курс"
-            value={course}
-            onChange={(event) => setCourse(event.target.value)}
-            min="1"
-            max="10"
-          />
+          <input type="text" placeholder="Факультет" value={faculty} onChange={(event) => setFaculty(event.target.value)} />
+          <input type="number" placeholder="Курс" value={course} onChange={(event) => setCourse(event.target.value)} min="1" max="10" />
 
           <div className="avatar-upload">
-
-            <label className="avatar-label">
-              Фотография
-            </label>
-
-            {avatarPreview && (
-              <img
-                src={avatarPreview}
-                alt="Предпросмотр"
-                className="avatar-preview"
-              />
-            )}
-
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-            />
-
-            <small>
-              JPG, PNG или другое изображение до 5 МБ
-            </small>
-
+            <label className="avatar-label">Фотография</label>
+            {avatarPreview && <img src={avatarPreview} alt="Предпросмотр" className="avatar-preview" />}
+            <input type="file" accept="image/*" onChange={handleAvatarChange} />
+            <small>JPG, PNG или другое изображение до 5 МБ</small>
           </div>
 
-          <textarea
-            placeholder="Расскажи о себе"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows="4"
-          />
+          <textarea placeholder="Расскажи о себе" value={description} onChange={(event) => setDescription(event.target.value)} rows="4" />
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Сохраняем..." : "Создать анкету"}
-          </button>
-
+          <button type="submit" disabled={loading}>{loading ? "Сохраняем..." : "Создать анкету"}</button>
         </form>
 
-        {error && (
-          <p className="profile-error">
-            {error}
-          </p>
-        )}
-
+        {error && <p className="profile-error">{error}</p>}
       </div>
     </div>
   );
