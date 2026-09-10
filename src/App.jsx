@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 
 import Auth from "./Auth";
 import PasswordReset from "./PasswordReset";
+import PrivacyPolicy from "./PrivacyPolicy";
 import ProfileForm from "./ProfileForm";
 import Home from "./Home";
 import Profile from "./Profile";
@@ -22,8 +23,11 @@ function App() {
   const [page, setPage] = useState("home");
   const [selectedChat, setSelectedChat] = useState(null);
   const [blocked, setBlocked] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(() =>
+    window.location.hash.includes("type=recovery")
+  );
 
-  const isRecovery = window.location.hash.includes("type=recovery");
+  const isPrivacyPage = window.location.pathname === "/privacy";
 
   useEffect(() => {
     let mounted = true;
@@ -62,8 +66,13 @@ function App() {
 
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
+
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+      }
+
       setSession(newSession);
       if (!newSession) {
         setProfile(null);
@@ -104,7 +113,11 @@ function App() {
     setSelectedChat(null);
   }
 
-  if (isRecovery) return <PasswordReset />;
+  if (isPrivacyPage) return <PrivacyPolicy />;
+
+  // Восстановление пароля должно иметь приоритет над обычным приложением.
+  // Режим сохраняется даже после того, как Supabase очистит hash из адреса.
+  if (recoveryMode) return <PasswordReset />;
 
   if (loading) {
     return (
