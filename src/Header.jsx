@@ -1,25 +1,6 @@
-import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
 import "./Header.css";
 
 function Header({ onHome, onSupport, onProfile, profile }) {
-  const [headerProfile, setHeaderProfile] = useState(profile || null);
-
-  useEffect(() => {
-    setHeaderProfile(profile || null);
-  }, [profile]);
-
-  useEffect(() => {
-    if (profile?.avatar_url || !profile?.id) return;
-
-    async function loadAvatar() {
-      const { data } = await supabase.from("profiles").select("avatar_url, name").eq("id", profile.id).maybeSingle();
-      if (data) setHeaderProfile((current) => ({ ...current, ...data }));
-    }
-
-    loadAvatar();
-  }, [profile]);
-
   return (
     <header className="app-header">
       <button className="app-header-logo" onClick={onHome} aria-label="ТОК — главная">
@@ -38,11 +19,13 @@ function Header({ onHome, onSupport, onProfile, profile }) {
         </button>
 
         <button className="header-profile-button" onClick={onProfile} title="Мой профиль" aria-label="Мой профиль">
-          {headerProfile?.avatar_url ? (
-            <img src={headerProfile.avatar_url} alt="Мой профиль" className="header-profile-avatar" />
-          ) : (
-            <span className="header-profile-placeholder">👤</span>
-          )}
+          <span className="header-profile-ring">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Мой профиль" className="header-profile-avatar" />
+            ) : (
+              <span className="header-profile-placeholder">👤</span>
+            )}
+          </span>
         </button>
       </div>
     </header>
