@@ -25,6 +25,7 @@ function Discovery({ user, onHome }) {
   const [reportOpen, setReportOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
+  const [replayLoading, setReplayLoading] = useState(false);
 
   useEffect(() => { loadProfiles(); }, []);
 
@@ -43,6 +44,48 @@ function Discovery({ user, onHome }) {
     const freshProfiles = (data || []).filter((profile) => !viewedIds.includes(profile.id));
     setAllProfiles(freshProfiles);
     setProfiles(freshProfiles);
+    setLoading(false);
+  }
+
+  async function replaySkippedProfiles() {
+    if (replayLoading) return;
+    setReplayLoading(true);
+    setLoading(true);
+
+    const { data: myProfile, error: myProfileError } = await supabase.from("profiles").select("gender, looking_for").eq("id", user.id).single();
+    if (myProfileError) {
+      console.error("Ошибка загрузки своего профиля:", myProfileError);
+      setReplayLoading(false);
+      setLoading(false);
+      return;
+    }
+
+    const { data: viewed, error: viewedError } = await supabase.from("profile_views").select("viewed_profile_id").eq("viewer_id", user.id);
+    if (viewedError) {
+      console.error("Ошибка загрузки просмотров:", viewedError);
+      setReplayLoading(false);
+      setLoading(false);
+      return;
+    }
+
+    const viewedIds = (viewed || []).map((item) => item.viewed_profile_id);
+    let query = supabase.from("profiles").select("*").neq("id", user.id).eq("is_blocked", false);
+    if (myProfile.looking_for === "male" || myProfile.looking_for === "female") query = query.eq("gender", myProfile.looking_for);
+    const { data: candidates, error } = await query;
+    if (error) {
+      console.error("Ошибка загрузки анкет для повтора:", error);
+      setReplayLoading(false);
+      setLoading(false);
+      return;
+    }
+
+    const replayProfiles = (candidates || []).filter((profile) => viewedIds.includes(profile.id));
+    setAllProfiles(replayProfiles);
+    setProfiles(replayProfiles);
+    setCurrentIndex(0);
+    setFilters({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
+    setFiltersOpen(false);
+    setReplayLoading(false);
     setLoading(false);
   }
 
@@ -104,7 +147,7 @@ function Discovery({ user, onHome }) {
   }
 
   const activeFiltersCount = useMemo(() => Object.values(filters).filter(Boolean).length, [filters]);
-  if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>Загрузка анкет...</p></div></main></div>;
+  if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{replayLoading ? "Возвращаем анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
 
   const profile = profiles[currentIndex];
   return <div className="discovery-page"><main className="discovery-container">
@@ -116,11 +159,12 @@ function Discovery({ user, onHome }) {
       <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
       <label>Возраст до<input type="number" min="16" max="100" placeholder="100" value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} /></label>
     </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
-    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Мы показали тебе всех подходящих пользователей. Загляни позже — возможно, появятся новые анкеты."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={loadProfiles}>Обновить анкеты</button></div> : <div className="discovery-card">
+    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Мы показали тебе всех подходящих пользователей. Загляни позже — возможно, появятся новые анкеты."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={loadProfiles}>Обновить анкеты</button><button className="replay-button" onClick={replaySkippedProfiles} disabled={replayLoading}>↻ {replayLoading ? "Возвращаем..." : "Посмотреть заново"}</button></div> : <div className="discovery-card">
       <div className="discovery-photo">{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
       <div className="discovery-content">{profile.hobbies && <div className="hobbies">{profile.hobbies.split(",").map((hobby) => <span key={hobby.trim()}>{hobby.trim()}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
       <div className="discovery-actions"><button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading}>✕</button><button className="discovery-report-button" onClick={() => setReportOpen(true)}>🚩 Пожаловаться</button><button className="discovery-button like" onClick={handleLike} disabled={actionLoading}>♥</button></div>
     </div>}
+    {profile && <button className="replay-small-button" onClick={replaySkippedProfiles} disabled={replayLoading}>↻ Посмотреть заново</button>}
   </main>{reportOpen && profile && <ReportModal user={user} profile={profile} onClose={() => setReportOpen(false)} />}</div>;
 }
 
