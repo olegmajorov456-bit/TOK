@@ -23,9 +23,7 @@ function App() {
   const [page, setPage] = useState("home");
   const [selectedChat, setSelectedChat] = useState(null);
   const [blocked, setBlocked] = useState(false);
-  const [recoveryMode, setRecoveryMode] = useState(() =>
-    window.location.hash.includes("type=recovery")
-  );
+  const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
 
   const isPrivacyPage = window.location.pathname === "/privacy";
 
@@ -33,18 +31,12 @@ function App() {
     let mounted = true;
 
     async function loadUserProfile(userId) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .maybeSingle();
-
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
       if (!mounted) return null;
       if (error) {
         console.error("Ошибка загрузки профиля:", error);
         return null;
       }
-
       setProfile(data);
       setBlocked(data?.is_blocked === true);
       return data;
@@ -68,11 +60,7 @@ function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
-
-      if (event === "PASSWORD_RECOVERY") {
-        setRecoveryMode(true);
-      }
-
+      if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
       setSession(newSession);
       if (!newSession) {
         setProfile(null);
@@ -114,9 +102,6 @@ function App() {
   }
 
   if (isPrivacyPage) return <PrivacyPolicy />;
-
-  // Восстановление пароля должно иметь приоритет над обычным приложением.
-  // Режим сохраняется даже после того, как Supabase очистит hash из адреса.
   if (recoveryMode) return <PasswordReset />;
 
   if (loading) {
@@ -148,25 +133,15 @@ function App() {
     );
   }
 
-  if (!profile) {
-    return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
-  }
+  if (!profile) return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
 
-  if (page === "chat" && selectedChat) {
-    return <Chat user={session.user} match={selectedChat.match} profile={selectedChat.profile} onBack={() => setPage("matches")} />;
-  }
-
-  if (page === "support") {
-    return <Support user={session.user} onBack={() => setPage("home")} />;
-  }
-
-  if (page === "admin") {
-    return <Admin user={session.user} onBack={() => setPage("profile")} />;
-  }
+  if (page === "chat" && selectedChat) return <Chat user={session.user} match={selectedChat.match} profile={selectedChat.profile} onBack={() => setPage("matches")} />;
+  if (page === "support") return <Support user={session.user} onBack={() => setPage("home")} />;
+  if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
   return (
     <div className="app-shell">
-      <Header onHome={goHome} onSupport={() => setPage("support")} />
+      <Header profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} />
       <main className="app-content">
         {page === "home" && <Home user={session.user} profile={profile} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
