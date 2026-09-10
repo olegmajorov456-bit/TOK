@@ -1,6 +1,5 @@
--- ТОК / ИГЭУ — миграция поддержки, жалоб и главной страницы
+-- ТОК / ИГЭУ — миграция поддержки, жалоб, главной страницы и модерации
 
--- Проверка администратора (безопасно для RLS)
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -16,8 +15,8 @@ $$;
 
 grant execute on function public.is_admin() to authenticated;
 
-
 alter table public.profiles add column if not exists hobbies text;
+alter table public.profiles add column if not exists is_blocked boolean not null default false;
 
 create table if not exists public.app_settings (
   key text primary key,
@@ -26,18 +25,12 @@ create table if not exists public.app_settings (
 );
 
 alter table public.app_settings enable row level security;
-
 drop policy if exists "Authenticated users can view app settings" on public.app_settings;
-create policy "Authenticated users can view app settings"
-on public.app_settings for select to authenticated using (true);
-
+create policy "Authenticated users can view app settings" on public.app_settings for select to authenticated using (true);
 drop policy if exists "Admins can insert app settings" on public.app_settings;
-create policy "Admins can insert app settings"
-on public.app_settings for insert to authenticated with check (public.is_admin());
-
+create policy "Admins can insert app settings" on public.app_settings for insert to authenticated with check (public.is_admin());
 drop policy if exists "Admins can update app settings" on public.app_settings;
-create policy "Admins can update app settings"
-on public.app_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "Admins can update app settings" on public.app_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
 insert into public.app_settings (key,value) values
 ('home_title','Общайся. Знакомься. Находи своих.'),
@@ -74,44 +67,49 @@ alter table public.support_messages enable row level security;
 alter table public.reports enable row level security;
 
 drop policy if exists "Users can view own support conversation" on public.support_conversations;
-create policy "Users can view own support conversation"
-on public.support_conversations for select to authenticated
-using (user_id = auth.uid() or public.is_admin());
-
+create policy "Users can view own support conversation" on public.support_conversations for select to authenticated using (user_id = auth.uid() or public.is_admin());
 drop policy if exists "Users can create own support conversation" on public.support_conversations;
-create policy "Users can create own support conversation"
-on public.support_conversations for insert to authenticated
-with check (user_id = auth.uid());
-
+create policy "Users can create own support conversation" on public.support_conversations for insert to authenticated with check (user_id = auth.uid());
 drop policy if exists "Users can view support messages" on public.support_messages;
-create policy "Users can view support messages"
-on public.support_messages for select to authenticated
-using (exists (select 1 from public.support_conversations sc where sc.id = support_messages.conversation_id and (sc.user_id = auth.uid() or public.is_admin())));
-
+create policy "Users can view support messages" on public.support_messages for select to authenticated using (exists (select 1 from public.support_conversations sc where sc.id = support_messages.conversation_id and (sc.user_id = auth.uid() or public.is_admin())));
 drop policy if exists "Users can send support messages" on public.support_messages;
-create policy "Users can send support messages"
-on public.support_messages for insert to authenticated
-with check (sender_id = auth.uid() and exists (select 1 from public.support_conversations sc where sc.id = support_messages.conversation_id and (sc.user_id = auth.uid() or public.is_admin())));
+create policy "Users can send support messages" on public.support_messages for insert to authenticated with check (sender_id = auth.uid() and exists (select 1 from public.support_conversations sc where sc.id = support_messages.conversation_id and (sc.user_id = auth.uid() or public.is_admin())));
 
 drop policy if exists "Users can create reports" on public.reports;
-create policy "Users can create reports"
-on public.reports for insert to authenticated
-with check (reporter_id = auth.uid() and reported_user_id <> auth.uid());
-
+create policy "Users can create reports" on public.reports for insert to authenticated with check (reporter_id = auth.uid() and reported_user_id <> auth.uid());
 drop policy if exists "Users and admins can view reports" on public.reports;
 drop policy if exists "Admins can view all reports" on public.reports;
-create policy "Users and admins can view reports"
-on public.reports for select to authenticated
-using (reporter_id = auth.uid() or public.is_admin());
-
+create policy "Users and admins can view reports" on public.reports for select to authenticated using (reporter_id = auth.uid() or public.is_admin());
 drop policy if exists "Admins can update reports" on public.reports;
-create policy "Admins can update reports"
-on public.reports for update to authenticated
-using (public.is_admin()) with check (public.is_admin());
+create policy "Admins can update reports" on public.reports for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- Администратор может видеть и модерировать все анкеты.
+drop policy if exists "Admins can view all profiles" on public.profiles;
+create policy "Admins can view all profiles" on public.profiles for select to authenticated using (public.is_admin());
+drop policy if exists "Admins can update all profiles" on public.profiles;
+create policy "Admins can update all profiles" on public.profiles for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- Доступ администратора к ручному созданию мэтчей.
+drop policy if exists "Admins can insert matches" on public.matches;
+create policy "Admins can insert matches" on public.matches for insert to authenticated with check (public.is_admin());
+drop policy if exists "Admins can view matches" on public.matches;
+create policy "Admins can view matches" on public.matches for select to authenticated using (public.is_admin());
+
+-- Загрузка аватара в папку собственного пользователя.
+drop policy if exists "Users can upload own avatar" on storage.objects;
+create policy "Users can upload own avatar" on storage.objects for insert to authenticated
+with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "Users can update own avatar" on storage.objects;
+create policy "Users can update own avatar" on storage.objects for update to authenticated
+using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text)
+with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "Users can view avatars" on storage.objects;
+create policy "Users can view avatars" on storage.objects for select to authenticated using (bucket_id = 'avatars');
 
 alter table public.support_messages replica identity full;
 alter table public.reports replica identity full;
 alter table public.app_settings replica identity full;
+alter table public.profiles replica identity full;
 
 do $$
 begin
@@ -123,5 +121,8 @@ begin
   end if;
   if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'app_settings') then
     alter publication supabase_realtime add table public.app_settings;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'profiles') then
+    alter publication supabase_realtime add table public.profiles;
   end if;
 end $$;
