@@ -2,6 +2,8 @@ import { useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./ProfileForm.css";
 
+const FACULTIES = ["ФЭУ", "ИВТФ", "ИФФ", "ЭМФ", "ТЭФ", "ЭЭФ"];
+
 function getMaxBirthDate() {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 16);
@@ -73,8 +75,6 @@ function ProfileForm({ user, onProfileCreated }) {
     setError("");
 
     try {
-      // Сначала создаём профиль. Это важно: политики Storage могут
-      // проверять наличие профиля перед разрешением загрузки файла.
       const { data: createdProfile, error: profileError } = await supabase
         .from("profiles")
         .insert({
@@ -83,7 +83,7 @@ function ProfileForm({ user, onProfileCreated }) {
           birth_date: birthDate,
           gender,
           looking_for: lookingFor,
-          faculty: faculty.trim(),
+          faculty: faculty || null,
           course: course ? Number(course) : null,
           description: description.trim(),
           avatar_url: null,
@@ -174,8 +174,24 @@ function ProfileForm({ user, onProfileCreated }) {
             <option value="any">Неважно</option>
           </select>
 
-          <input type="text" placeholder="Факультет" value={faculty} onChange={(event) => setFaculty(event.target.value)} />
-          <input type="number" placeholder="Курс" value={course} onChange={(event) => setCourse(event.target.value)} min="1" max="10" />
+          <select value={faculty} onChange={(event) => setFaculty(event.target.value)}>
+            <option value="">Выберите факультет</option>
+            {FACULTIES.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+
+          <select value={course} onChange={(event) => setCourse(event.target.value)}>
+            <option value="">Выберите курс</option>
+            <option value="1">1 курс</option>
+            <option value="2">2 курс</option>
+            <option value="3">3 курс</option>
+            <option value="4">4 курс</option>
+            <option value="5">5 курс</option>
+            <option value="6">6 курс</option>
+          </select>
 
           <div className="avatar-upload">
             <label className="avatar-label">Фотография</label>
