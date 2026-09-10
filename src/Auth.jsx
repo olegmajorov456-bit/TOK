@@ -9,6 +9,7 @@ function Auth() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [forgotMode, setForgotMode] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -19,6 +20,12 @@ function Auth() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setMessage(error.message);
     } else {
+      if (!privacyAccepted) {
+        setMessage("Для регистрации необходимо принять Политику конфиденциальности.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setMessage(error.message);
       else setMessage("Регистрация прошла успешно! Проверьте почту, если подтверждение включено.");
@@ -78,11 +85,28 @@ function Auth() {
         <form onSubmit={handleSubmit}>
           <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} minLength="6" required />
+
+          {!isLogin && (
+            <label className="privacy-check">
+              <input
+                type="checkbox"
+                checked={privacyAccepted}
+                onChange={(e) => setPrivacyAccepted(e.target.checked)}
+              />
+              <span>
+                Я принимаю{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  Политику конфиденциальности
+                </a>
+              </span>
+            </label>
+          )}
+
           <button type="submit" disabled={loading}>{loading ? "Подождите..." : isLogin ? "Войти" : "Зарегистрироваться"}</button>
         </form>
         {isLogin && <button className="switch-button" onClick={() => { setForgotMode(true); setMessage(""); }}>Забыли пароль?</button>}
         {message && <p className="auth-message">{message}</p>}
-        <button className="switch-button" onClick={() => { setIsLogin(!isLogin); setMessage(""); }}>
+        <button className="switch-button" onClick={() => { setIsLogin(!isLogin); setPrivacyAccepted(false); setMessage(""); }}>
           {isLogin ? "Нет аккаунта? Зарегистрироваться" : "Уже есть аккаунт? Войти"}
         </button>
       </div>
