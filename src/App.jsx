@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
-
 import Auth from "./Auth";
 import PasswordReset from "./PasswordReset";
 import PrivacyPolicy from "./PrivacyPolicy";
@@ -16,6 +15,11 @@ import Header from "./Header";
 import BottomNav from "./BottomNav";
 import "./App.css";
 
+const DEFAULT_HOME_SETTINGS = {
+  title: "Общайся. Знакомься. Находи своих.",
+  description: "ТОК создан специально для студентов ИГЭУ. Здесь всё начинается с обычной симпатии.",
+};
+
 function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -23,6 +27,7 @@ function App() {
   const [page, setPage] = useState("home");
   const [selectedChat, setSelectedChat] = useState(null);
   const [blocked, setBlocked] = useState(false);
+  const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
 
   const isPrivacyPage = window.location.pathname === "/privacy";
@@ -42,13 +47,35 @@ function App() {
       return data;
     }
 
+    async function loadHomeSettings() {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("key,value")
+        .in("key", ["home_title", "home_description"]);
+
+      if (error) {
+        console.error("Ошибка загрузки текста главной:", error);
+        return;
+      }
+
+      const next = { ...DEFAULT_HOME_SETTINGS };
+      for (const item of data || []) {
+        if (item.key === "home_title" && item.value) next.title = item.value;
+        if (item.key === "home_description" && item.value) next.description = item.value;
+      }
+      if (mounted) setHomeSettings(next);
+    }
+
     async function initialize() {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         if (!mounted) return;
         setSession(currentSession);
-        if (currentSession?.user) await loadUserProfile(currentSession.user.id);
-        else setProfile(null);
+        if (currentSession?.user) {
+          await Promise.all([loadUserProfile(currentSession.user.id), loadHomeSettings()]);
+        } else {
+          setProfile(null);
+        }
       } catch (error) {
         console.error("Ошибка инициализации:", error);
       } finally {
@@ -73,7 +100,7 @@ function App() {
 
       async function loadAfterAuth() {
         setLoading(true);
-        await loadUserProfile(newSession.user.id);
+        await Promise.all([loadUserProfile(newSession.user.id), loadHomeSettings()]);
         if (mounted) setLoading(false);
       }
       loadAfterAuth();
@@ -143,7 +170,7 @@ function App() {
     <div className="app-shell">
       <Header profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} />
       <main className="app-content">
-        {page === "home" && <Home user={session.user} profile={profile} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
+        {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} />}
         {page === "profile" && <Profile user={session.user} profile={profile} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
