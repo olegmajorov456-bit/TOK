@@ -9,61 +9,63 @@ const COURSES = ["1", "2", "3", "4", "5", "6"];
 function calculateAge(birthDate) {
   if (!birthDate) return "";
   const today = new Date();
-  const birth = new Date(birthDate);
+  const birth = new Date(`${birthDate}T00:00:00`);
   let age = today.getFullYear() - birth.getFullYear();
   const monthDifference = today.getMonth() - birth.getMonth();
   if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) age--;
   return age;
 }
 
+function getHobbies(profile) {
+  if (!profile?.hobbies) return [];
+  if (Array.isArray(profile.hobbies)) return profile.hobbies.filter(Boolean).map(String).map((item) => item.trim()).filter(Boolean);
+  return String(profile.hobbies).split(",").map((item) => item.trim()).filter(Boolean);
+}
+
 function Discovery({ user, onHome }) {
   const [allProfiles, setAllProfiles] = useState([]);
   const [profiles, setProfiles] = useState([]);
+  const [likedBy, setLikedBy] = useState(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
-  const [replayLoading, setReplayLoading] = useState(false);
+  const [showAllViewed, setShowAllViewed] = useState(false);
+  const [refreshLoading, setRefreshLoading] = useState(false);
 
-  useEffect(() => { loadProfiles(); }, []);
+  useEffect(() => { loadProfiles(false); }, []);
 
-  async function loadProfiles() {
-    setLoading(true);
-    setCurrentIndex(0);
-    const { data: myProfile, error: myProfileError } = await supabase.from("profiles").select("gender, looking_for").eq("id", user.id).single();
-    if (myProfileError) { console.error("Ошибка загрузки своего профиля:", myProfileError); setLoading(false); return; }
-    const { data: viewed, error: viewedError } = await supabase.from("profile_views").select("viewed_profile_id").eq("viewer_id", user.id);
-    if (viewedError) { console.error("Ошибка загрузки просмотренных анкет:", viewedError); setLoading(false); return; }
-    const viewedIds = (viewed || []).map((item) => item.viewed_profile_id);
-    let query = supabase.from("profiles").select("*").neq("id", user.id).eq("is_blocked", false);
-    if (myProfile.looking_for === "male" || myProfile.looking_for === "female") query = query.eq("gender", myProfile.looking_for);
-    const { data, error } = await query;
-    if (error) { console.error("Ошибка загрузки анкет:", error); setLoading(false); return; }
-    const freshProfiles = (data || []).filter((profile) => !viewedIds.includes(profile.id));
-    setAllProfiles(freshProfiles);
-    setProfiles(freshProfiles);
-    setLoading(false);
+  async function loadIncomingLikes() {
+    const { data, error } = await supabase
+      .from("likes")
+      .select("user_id")
+      .eq("liked_user_id", user.id);
+
+    if (error) {
+      console.error("Ошибка загрузки входящих лайков:", error);
+      return;
+    }
+
+    setLikedBy(new Set((data || []).map((item) => item.user_id)));
   }
 
-  async function replaySkippedProfiles() {
-    if (replayLoading) return;
-    setReplayLoading(true);
+  async function loadProfiles(includeViewed = false) {
     setLoading(true);
+    setCurrentIndex(0);
+    setShowAllViewed(includeViewed);
 
     const { data: myProfile, error: myProfileError } = await supabase.from("profiles").select("gender, looking_for").eq("id", user.id).single();
     if (myProfileError) {
       console.error("Ошибка загрузки своего профиля:", myProfileError);
-      setReplayLoading(false);
       setLoading(false);
       return;
     }
 
     const { data: viewed, error: viewedError } = await supabase.from("profile_views").select("viewed_profile_id").eq("viewer_id", user.id);
     if (viewedError) {
-      console.error("Ошибка загрузки просмотров:", viewedError);
-      setReplayLoading(false);
+      console.error("Ошибка загрузки просмотренных анкет:", viewedError);
       setLoading(false);
       return;
     }
@@ -71,21 +73,21 @@ function Discovery({ user, onHome }) {
     const viewedIds = (viewed || []).map((item) => item.viewed_profile_id);
     let query = supabase.from("profiles").select("*").neq("id", user.id).eq("is_blocked", false);
     if (myProfile.looking_for === "male" || myProfile.looking_for === "female") query = query.eq("gender", myProfile.looking_for);
-    const { data: candidates, error } = await query;
+
+    const { data, error } = await query;
     if (error) {
-      console.error("Ошибка загрузки анкет для повтора:", error);
-      setReplayLoading(false);
+      console.error("Ошибка загрузки анкет:", error);
       setLoading(false);
       return;
     }
 
-    const replayProfiles = (candidates || []).filter((profile) => viewedIds.includes(profile.id));
-    setAllProfiles(replayProfiles);
-    setProfiles(replayProfiles);
-    setCurrentIndex(0);
-    setFilters({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
-    setFiltersOpen(false);
-    setReplayLoading(false);
+    const resultProfiles = includeViewed
+      ? (data || []).filter((profile) => viewedIds.includes(profile.id))
+      : (data || []).filter((profile) => !viewedIds.includes(profile.id));
+
+    setAllProfiles(resultProfiles);
+    setProfiles(resultProfiles);
+    await loadIncomingLikes();
     setLoading(false);
   }
 
@@ -118,17 +120,13 @@ function Discovery({ user, onHome }) {
     if (error && error.code !== "23505") console.error("Ошибка сохранения просмотра:", error);
   }
 
-  async function nextProfile() {
-    const profile = profiles[currentIndex];
-    if (!profile) return;
-    await markProfileAsViewed(profile.id);
-    setCurrentIndex((index) => index + 1);
-  }
-
   async function handleSkip() {
     if (actionLoading) return;
+    const profile = profiles[currentIndex];
+    if (!profile) return;
     setActionLoading(true);
-    await nextProfile();
+    await markProfileAsViewed(profile.id);
+    setCurrentIndex((index) => index + 1);
     setActionLoading(false);
   }
 
@@ -138,18 +136,32 @@ function Discovery({ user, onHome }) {
     setActionLoading(true);
     await markProfileAsViewed(profile.id);
     const { error: likeError } = await supabase.from("likes").insert({ user_id: user.id, liked_user_id: profile.id });
-    if (likeError && likeError.code !== "23505") { console.error("Ошибка лайка:", likeError); setActionLoading(false); return; }
+    if (likeError && likeError.code !== "23505") {
+      console.error("Ошибка лайка:", likeError);
+      setActionLoading(false);
+      return;
+    }
     const { data: matchId, error: matchError } = await supabase.rpc("create_match_if_mutual", { target_user_id: profile.id });
     if (matchError) console.error("Ошибка создания мэтча:", matchError);
     if (matchId) alert(`💕 У вас взаимная симпатия с ${profile.name}!`);
+    setLikedBy((current) => new Set(current).add(profile.id));
     setCurrentIndex((index) => index + 1);
     setActionLoading(false);
   }
 
+  async function handleRefreshAll() {
+    if (refreshLoading) return;
+    setRefreshLoading(true);
+    await loadProfiles(true);
+    setRefreshLoading(false);
+  }
+
   const activeFiltersCount = useMemo(() => Object.values(filters).filter(Boolean).length, [filters]);
-  if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{replayLoading ? "Возвращаем анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
+  if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{refreshLoading ? "Обновляем все анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
 
   const profile = profiles[currentIndex];
+  const profileHobbies = getHobbies(profile);
+
   return <div className="discovery-page"><main className="discovery-container">
     <div className="discovery-header"><div><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div>
     {filtersOpen && <section className="filters-panel"><div className="filter-grid">
@@ -159,12 +171,11 @@ function Discovery({ user, onHome }) {
       <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
       <label>Возраст до<input type="number" min="16" max="100" placeholder="100" value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} /></label>
     </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
-    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Мы показали тебе всех подходящих пользователей. Загляни позже — возможно, появятся новые анкеты."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={loadProfiles}>Обновить анкеты</button><button className="replay-button" onClick={replaySkippedProfiles} disabled={replayLoading}>↻ {replayLoading ? "Возвращаем..." : "Посмотреть заново"}</button></div> : <div className="discovery-card">
-      <div className="discovery-photo">{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
-      <div className="discovery-content">{profile.hobbies && <div className="hobbies">{profile.hobbies.split(",").map((hobby) => <span key={hobby.trim()}>{hobby.trim()}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
+    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : showAllViewed ? "Просмотренных анкет пока нет." : "Мы показали тебе всех подходящих пользователей. Загляни позже — возможно, появятся новые анкеты."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card">
+      <div className="discovery-photo">{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}{likedBy.has(profile.id) && <div className="incoming-like-badge">💗 Вам поставили лайк</div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
+      <div className="discovery-content">{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
       <div className="discovery-actions"><button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading}>✕</button><button className="discovery-report-button" onClick={() => setReportOpen(true)}>🚩 Пожаловаться</button><button className="discovery-button like" onClick={handleLike} disabled={actionLoading}>♥</button></div>
     </div>}
-    {profile && <button className="replay-small-button" onClick={replaySkippedProfiles} disabled={replayLoading}>↻ Посмотреть заново</button>}
   </main>{reportOpen && profile && <ReportModal user={user} profile={profile} onClose={() => setReportOpen(false)} />}</div>;
 }
 
