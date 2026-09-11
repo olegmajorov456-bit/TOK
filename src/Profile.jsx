@@ -26,6 +26,12 @@ function getMinBirthDate() {
   return date.toISOString().split("T")[0];
 }
 
+function getHobbies(profile) {
+  if (!profile?.hobbies) return [];
+  if (Array.isArray(profile.hobbies)) return profile.hobbies.filter(Boolean);
+  return String(profile.hobbies).split(",").map((item) => item.trim()).filter(Boolean);
+}
+
 function Profile({ user, onAdmin, onProfileUpdated }) {
   const [profile, setProfile] = useState(null);
   const [name, setName] = useState("");
@@ -35,6 +41,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
   const [faculty, setFaculty] = useState("");
   const [course, setCourse] = useState("");
   const [description, setDescription] = useState("");
+  const [hobbies, setHobbies] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -71,6 +78,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
     setFaculty(data.faculty || "");
     setCourse(data.course || "");
     setDescription(data.description || "");
+    setHobbies(getHobbies(data).join(", "));
     setAvatarPreview(data.avatar_url || "");
     setLoading(false);
   }
@@ -143,6 +151,12 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
         avatarUrl = publicUrlData.publicUrl;
       }
 
+      const hobbiesValue = hobbies
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+
       const { data, error } = await supabase
         .from("profiles")
         .update({
@@ -153,6 +167,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
           faculty: faculty || null,
           course: course ? Number(course) : null,
           description: description.trim(),
+          hobbies: hobbiesValue,
           avatar_url: avatarUrl,
         })
         .eq("id", user.id)
@@ -169,6 +184,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
       setProfile(data);
       setAvatarFile(null);
       setAvatarPreview(data.avatar_url || "");
+      setHobbies(getHobbies(data).join(", "));
       setIsEditing(false);
       setMessage("Профиль сохранён ✓");
 
@@ -190,6 +206,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
     setFaculty(profile.faculty || "");
     setCourse(profile.course || "");
     setDescription(profile.description || "");
+    setHobbies(getHobbies(profile).join(", "));
     setAvatarFile(null);
     setAvatarPreview(profile.avatar_url || "");
     setMessage("");
@@ -225,6 +242,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
   const age = calculateAge(profile.birth_date);
   const genderText = profile.gender === "male" ? "Парень" : profile.gender === "female" ? "Девушка" : "Другое";
   const lookingForText = profile.looking_for === "male" ? "парня" : profile.looking_for === "female" ? "девушку" : "кого угодно";
+  const profileHobbies = getHobbies(profile);
 
   return (
     <div className="profile-page">
@@ -260,6 +278,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
               <div className="profile-tags">
                 {profile.gender && <div className="profile-tag">{profile.gender === "male" ? "👨" : profile.gender === "female" ? "👩" : "🧑"} {genderText}</div>}
                 {profile.looking_for && <div className="profile-tag">❤️ Ищет {lookingForText}</div>}
+                {profileHobbies.map((hobby) => <div className="profile-tag hobby-tag" key={hobby}>✨ {hobby}</div>)}
               </div>
 
               {profile.description ? (
@@ -291,7 +310,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
             <form className="profile-edit-form" onSubmit={handleSave}>
               <div className="profile-form-title">
                 <h2>Редактирование</h2>
-                <p>Расскажи о себе немного больше</p>
+                <p>Обнови информацию о себе</p>
               </div>
 
               <label>
@@ -304,45 +323,55 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
                 <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} min={getMinBirthDate()} max={getMaxBirthDate()} required />
               </label>
 
-              <label>
-                Пол
-                <select value={gender} onChange={(event) => setGender(event.target.value)} required>
-                  <option value="">Выберите пол</option>
-                  <option value="male">Парень</option>
-                  <option value="female">Девушка</option>
-                  <option value="other">Другое</option>
-                </select>
-              </label>
+              <div className="profile-form-row">
+                <label>
+                  Пол
+                  <select value={gender} onChange={(event) => setGender(event.target.value)} required>
+                    <option value="">Выберите пол</option>
+                    <option value="male">Парень</option>
+                    <option value="female">Девушка</option>
+                    <option value="other">Другое</option>
+                  </select>
+                </label>
+
+                <label>
+                  Кого ищешь?
+                  <select value={lookingFor} onChange={(event) => setLookingFor(event.target.value)} required>
+                    <option value="">Выберите</option>
+                    <option value="male">Парня</option>
+                    <option value="female">Девушку</option>
+                    <option value="any">Неважно</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="profile-form-row">
+                <label>
+                  Факультет
+                  <select value={faculty} onChange={(event) => setFaculty(event.target.value)}>
+                    <option value="">Выберите факультет</option>
+                    {FACULTIES.map((item) => <option key={item} value={item}>{item}</option>)}
+                  </select>
+                </label>
+
+                <label>
+                  Курс
+                  <select value={course} onChange={(event) => setCourse(event.target.value)}>
+                    <option value="">Не указан</option>
+                    <option value="1">1 курс</option>
+                    <option value="2">2 курс</option>
+                    <option value="3">3 курс</option>
+                    <option value="4">4 курс</option>
+                    <option value="5">5 курс</option>
+                    <option value="6">6 курс</option>
+                  </select>
+                </label>
+              </div>
 
               <label>
-                Кого ищешь?
-                <select value={lookingFor} onChange={(event) => setLookingFor(event.target.value)} required>
-                  <option value="">Выберите</option>
-                  <option value="male">Парня</option>
-                  <option value="female">Девушку</option>
-                  <option value="any">Неважно</option>
-                </select>
-              </label>
-
-              <label>
-                Факультет
-                <select value={faculty} onChange={(event) => setFaculty(event.target.value)}>
-                  <option value="">Выберите факультет</option>
-                  {FACULTIES.map((item) => <option key={item} value={item}>{item}</option>)}
-                </select>
-              </label>
-
-              <label>
-                Курс
-                <select value={course} onChange={(event) => setCourse(event.target.value)}>
-                  <option value="">Не указан</option>
-                  <option value="1">1 курс</option>
-                  <option value="2">2 курс</option>
-                  <option value="3">3 курс</option>
-                  <option value="4">4 курс</option>
-                  <option value="5">5 курс</option>
-                  <option value="6">6 курс</option>
-                </select>
+                Увлечения
+                <input type="text" value={hobbies} onChange={(event) => setHobbies(event.target.value)} placeholder="Музыка, спорт, игры, кино..." maxLength="300" />
+                <span className="profile-field-hint">Разделяй увлечения запятыми</span>
               </label>
 
               <label>
@@ -355,7 +384,7 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
 
               <div className="profile-edit-buttons">
                 <button type="button" className="profile-cancel-button" onClick={handleCancel}>Отмена</button>
-                <button type="submit" className="profile-primary-button" disabled={saving}>{saving ? "Сохраняем..." : "Сохранить"}</button>
+                <button type="submit" className="profile-save-button" disabled={saving}>{saving ? "Сохраняем..." : "Сохранить"}</button>
               </div>
             </form>
           )}
