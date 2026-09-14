@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2467c9"/>
+      <stop offset="1" stop-color="#123f93"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff3f78"/>
+      <stop offset="1" stop-color="#d91f63"/>
+    </linearGradient>
+    <clipPath id="heartClip">
+      <path d="M256 458C235 437 91 343 91 211C91 145 138 104 194 104C224 104 247 119 256 142C265 119 288 104 318 104C374 104 421 145 421 211C421 343 277 437 256 458Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#heartClip)">
+    <rect width="256" height="512" fill="url(#blue)"/>
+    <rect x="256" width="256" height="512" fill="url(#pink)"/>
+  </g>
+  <path d="M256 408C243 394 157 337 157 272C157 239 180 218 208 218C229 218 246 229 256 247C266 229 283 218 304 218C332 218 355 239 355 272C355 337 269 394 256 408Z" fill="#fff"/>
+</svg>
