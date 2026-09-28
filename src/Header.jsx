@@ -1,17 +1,16 @@
 import "./Header.css";
+import NotificationBell from "./NotificationBell";
 
-function Header({ onHome, onSupport, onProfile, profile }) {
+function Header({ onHome, onSupport, onProfile, profile, user }) {
   return (
     <header className="app-header">
-      <button
-        className="app-header-logo"
-        onClick={onHome}
-        aria-label="ТОК — главная"
-      >
+      <button className="app-header-logo" onClick={onHome} aria-label="ТОК — главная">
         <img src="/tok-logo.png" alt="ТОК — Знакомства ИГЭУ" />
       </button>
 
       <div className="app-header-actions">
+        {user && <NotificationBell user={user} />}
+
         <button
           className="header-action support"
           onClick={onSupport}
@@ -38,19 +37,10 @@ function Header({ onHome, onSupport, onProfile, profile }) {
           <span className="header-action-text">Поддержать</span>
         </button>
 
-        <button
-          className="header-profile-button"
-          onClick={onProfile}
-          title="Мой профиль"
-          aria-label="Мой профиль"
-        >
+        <button className="header-profile-button" onClick={onProfile} title="Мой профиль" aria-label="Мой профиль">
           <span className="header-profile-avatar-wrap">
             {profile?.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt="Мой профиль"
-                className="header-profile-avatar"
-              />
+              <img src={profile.avatar_url} alt="Мой профиль" className="header-profile-avatar" />
             ) : (
               <span className="header-profile-placeholder">👤</span>
             )}
