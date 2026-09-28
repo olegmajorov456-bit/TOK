@@ -70,6 +70,17 @@ function Discovery({ user, onHome }) {
     const viewedIds = new Set((viewed || []).map((item) => item.viewed_profile_id));
     const incomingLikeIds = await loadIncomingLikes();
 
+    const { data: outgoingLikes, error: outgoingLikesError } = await supabase
+      .from("likes")
+      .select("liked_user_id")
+      .eq("user_id", user.id);
+
+    if (outgoingLikesError) {
+      console.error("Ошибка загрузки поставленных лайков:", outgoingLikesError);
+    }
+
+    const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
+
     let query = supabase.from("profiles").select("*").neq("id", user.id).eq("is_blocked", false);
     if (myProfile.looking_for === "male" || myProfile.looking_for === "female") query = query.eq("gender", myProfile.looking_for);
 
@@ -84,10 +95,19 @@ function Discovery({ user, onHome }) {
     let resultProfiles;
 
     if (includeViewed) {
-      resultProfiles = candidates.filter((profile) => viewedIds.has(profile.id));
+      resultProfiles = candidates.filter(
+        (profile) => viewedIds.has(profile.id) && !outgoingLikeIds.has(profile.id)
+      );
     } else {
-      const incomingLikes = candidates.filter((profile) => incomingLikeIds.has(profile.id));
-      const freshProfiles = candidates.filter((profile) => !viewedIds.has(profile.id) && !incomingLikeIds.has(profile.id));
+      const incomingLikes = candidates.filter(
+        (profile) => incomingLikeIds.has(profile.id) && !outgoingLikeIds.has(profile.id)
+      );
+      const freshProfiles = candidates.filter(
+        (profile) =>
+          !viewedIds.has(profile.id) &&
+          !incomingLikeIds.has(profile.id) &&
+          !outgoingLikeIds.has(profile.id)
+      );
       resultProfiles = [...incomingLikes, ...freshProfiles];
     }
 
