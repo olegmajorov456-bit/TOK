@@ -37,3 +37,13 @@
 
 @media(max-width:600px){.app-content{min-height:calc(100vh - 68px);padding-bottom:105px}.site-loading-logo{width:92vw;max-width:360px;height:150px}.site-loading-title{font-size:16px}.site-loading-subtitle{font-size:11px}.profile-page{padding:14px 10px 125px}.profile-card{border-radius:25px}.profile-photo-wrapper{height:440px}.profile-identity{flex-direction:column;gap:16px;padding:23px 20px 20px}.profile-name-block h1{font-size:30px}.profile-study{width:100%;max-width:none;flex:0 0 auto}.profile-details{margin:0 20px;padding:16px;border-radius:19px}.profile-detail-grid{grid-template-columns:1fr;gap:9px}.profile-section{margin:14px 20px 0;padding:18px;border-radius:19px}.profile-actions{padding:24px 20px 25px}.profile-success{margin:0 20px 22px}.profile-edit-form{padding:24px 20px 26px}.profile-form-title{margin-bottom:23px}.profile-form-title h2{font-size:25px}.profile-form-row{grid-template-columns:1fr;gap:0}.profile-edit-form label{margin-bottom:17px}.profile-edit-buttons{gap:9px;margin-top:21px}}
 @media(max-width:390px){.site-loading-logo{width:94vw;height:130px}.site-loading-loader{margin-top:0;margin-bottom:14px}.profile-page{padding-left:8px;padding-right:8px}.profile-photo-wrapper{height:400px}.profile-identity{padding-left:17px;padding-right:17px}.profile-details,.profile-section{margin-left:17px;margin-right:17px}.profile-actions{padding-left:17px;padding-right:17px}.profile-success{margin-left:17px;margin-right:17px}.profile-edit-form{padding-left:17px;padding-right:17px}}
+
+/* Общая доводка интерфейса */
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{
+  outline:3px solid rgba(47,72,104,.22);
+  outline-offset:3px;
+}
+::selection{background:rgba(238,47,103,.16);color:#20242b}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
