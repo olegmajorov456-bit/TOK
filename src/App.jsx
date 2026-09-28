@@ -135,11 +135,10 @@ function App() {
     return (
       <div className="site-loading">
         <div className="site-loading-content">
-          <div className="site-loading-logo"><img src="/tok-logo.png" alt="ТОК — Знакомства в ИГЭУ" /></div>
-          <div className="site-loading-loader"><div className="site-loading-spinner" /></div>
-          <p className="site-loading-title">Загружаем ТОК</p>
-          <p className="site-loading-subtitle">Знакомства в ИГЭУ</p>
-          <div className="site-loading-dots"><span /><span /><span /></div>
+          <div className="site-loading-logo">
+            <img src="/tok-logo.png" alt="ТОК — Знакомства в ИГЭУ" />
+          </div>
+          <div className="site-loading-spinner" aria-label="Загрузка" />
         </div>
       </div>
     );
