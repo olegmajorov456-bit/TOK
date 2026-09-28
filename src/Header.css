@@ -3,3 +3,5 @@
 @media(max-width:600px){
   .app-header-actions{gap:5px}
 }
+
+.app-header{min-height:76px;padding:8px max(22px,calc((100vw - 1180px)/2));box-shadow:0 4px 18px rgba(18,31,54,.045)}.app-header-logo{width:290px;height:58px}.app-header-actions{gap:8px}@media(max-width:800px){.app-header{padding:8px 18px}}
