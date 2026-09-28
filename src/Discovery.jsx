@@ -32,10 +32,9 @@ function Discovery({ user, onHome }) {
   const [reportOpen, setReportOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
-  const [showAllViewed, setShowAllViewed] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
 
-  useEffect(() => { loadProfiles(false); }, []);
+  useEffect(() => { loadProfiles(); }, []);
 
   async function loadIncomingLikes() {
     const { data, error } = await supabase.from("likes").select("user_id").eq("liked_user_id", user.id);
@@ -48,10 +47,18 @@ function Discovery({ user, onHome }) {
     return ids;
   }
 
-  async function loadProfiles(includeViewed = false) {
+  function shuffleProfiles(items) {
+    const result = [...items];
+    for (let index = result.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [result[index], result[randomIndex]] = [result[randomIndex], result[index]];
+    }
+    return result;
+  }
+
+  async function loadProfiles() {
     setLoading(true);
     setCurrentIndex(0);
-    setShowAllViewed(includeViewed);
 
     const { data: myProfile, error: myProfileError } = await supabase.from("profiles").select("gender, looking_for").eq("id", user.id).single();
     if (myProfileError) {
@@ -60,14 +67,6 @@ function Discovery({ user, onHome }) {
       return;
     }
 
-    const { data: viewed, error: viewedError } = await supabase.from("profile_views").select("viewed_profile_id").eq("viewer_id", user.id);
-    if (viewedError) {
-      console.error("Ошибка загрузки просмотренных анкет:", viewedError);
-      setLoading(false);
-      return;
-    }
-
-    const viewedIds = new Set((viewed || []).map((item) => item.viewed_profile_id));
     const incomingLikeIds = await loadIncomingLikes();
 
     const { data: outgoingLikes, error: outgoingLikesError } = await supabase
@@ -92,27 +91,13 @@ function Discovery({ user, onHome }) {
     }
 
     const candidates = data || [];
-    let resultProfiles;
+    const resultProfiles = candidates.filter(
+      (profile) => !outgoingLikeIds.has(profile.id)
+    );
 
-    if (includeViewed) {
-      resultProfiles = candidates.filter(
-        (profile) => viewedIds.has(profile.id) && !outgoingLikeIds.has(profile.id)
-      );
-    } else {
-      const incomingLikes = candidates.filter(
-        (profile) => incomingLikeIds.has(profile.id) && !outgoingLikeIds.has(profile.id)
-      );
-      const freshProfiles = candidates.filter(
-        (profile) =>
-          !viewedIds.has(profile.id) &&
-          !incomingLikeIds.has(profile.id) &&
-          !outgoingLikeIds.has(profile.id)
-      );
-      resultProfiles = [...incomingLikes, ...freshProfiles];
-    }
-
+    const shuffledProfiles = shuffleProfiles(resultProfiles);
     setAllProfiles(resultProfiles);
-    setProfiles(resultProfiles);
+    setProfiles(shuffledProfiles);
     setLoading(false);
   }
 
@@ -128,14 +113,14 @@ function Discovery({ user, onHome }) {
       if (maxAge !== null && (!age || age > maxAge)) return false;
       return true;
     });
-    setProfiles(filtered);
+    setProfiles(shuffleProfiles(filtered));
     setCurrentIndex(0);
     setFiltersOpen(false);
   }
 
   function resetFilters() {
     setFilters({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
-    setProfiles(allProfiles);
+    setProfiles(shuffleProfiles(allProfiles));
     setCurrentIndex(0);
     setFiltersOpen(false);
   }
@@ -151,7 +136,19 @@ function Discovery({ user, onHome }) {
     if (!profile) return;
     setActionLoading(true);
     await markProfileAsViewed(profile.id);
-    setCurrentIndex((index) => index + 1);
+
+    setProfiles((current) => {
+      if (current.length <= 1) return shuffleProfiles(current);
+      if (currentIndex < current.length - 1) return current;
+
+      const reshuffled = shuffleProfiles(current);
+      return reshuffled;
+    });
+
+    setCurrentIndex((index) => {
+      if (profiles.length <= 1) return 0;
+      return index < profiles.length - 1 ? index + 1 : 0;
+    });
     setActionLoading(false);
   }
 
@@ -170,14 +167,26 @@ function Discovery({ user, onHome }) {
     if (matchError) console.error("Ошибка создания мэтча:", matchError);
     if (matchId) alert(`💕 У вас взаимная симпатия с ${profile.name}!`);
     setLikedBy((current) => new Set(current).add(profile.id));
-    setCurrentIndex((index) => index + 1);
+
+    setAllProfiles((current) => current.filter((item) => item.id !== profile.id));
+    setProfiles((current) => {
+      const next = current.filter((item) => item.id !== profile.id);
+      if (next.length === 0) return [];
+      const nextIndex = currentIndex >= next.length ? 0 : currentIndex;
+      if (nextIndex === 0 && current.length > 1) return [next[0], ...shuffleProfiles(next.slice(1))];
+      return next;
+    });
+    setCurrentIndex((index) => {
+      const remaining = profiles.length - 1;
+      return remaining <= 0 || index >= remaining ? 0 : index;
+    });
     setActionLoading(false);
   }
 
   async function handleRefreshAll() {
     if (refreshLoading) return;
     setRefreshLoading(true);
-    await loadProfiles(true);
+    await loadProfiles();
     setRefreshLoading(false);
   }
 
@@ -197,7 +206,7 @@ function Discovery({ user, onHome }) {
       <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
       <label>Возраст до<input type="number" min="16" max="100" placeholder="100" value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} /></label>
     </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
-    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : showAllViewed ? "Просмотренных анкет пока нет." : "Мы показали тебе всех подходящих пользователей. Загляни позже — возможно, появятся новые анкеты."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card">
+    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Ты просмотрел все доступные анкеты. Продолжай листать — порядок анкет перемешается заново."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card">
       <div className="discovery-photo">{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}{hasIncomingLike && <div className="incoming-like-badge">💗 Вам поставили лайк</div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
       <div className="discovery-content">{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
       <div className="discovery-actions"><button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading}>✕</button><button className="discovery-report-button" onClick={() => setReportOpen(true)}>🚩 Пожаловаться</button><button className="discovery-button like" onClick={handleLike} disabled={actionLoading}>♥</button></div>
