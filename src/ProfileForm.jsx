@@ -149,10 +149,10 @@ function ProfileForm({ user, onProfileCreated }) {
   }
 
   return (
-    <div className="profile-page">
-      <div className="profile-card">
+    <div className="onboarding-page">
+      <div className="onboarding-card">
         <h1>Создай свою анкету ❤️</h1>
-        <p className="profile-subtitle">Расскажи немного о себе</p>
+        <p className="onboarding-subtitle">Расскажи немного о себе</p>
 
         <form onSubmit={handleSubmit}>
           <input type="text" placeholder="Имя" value={name} onChange={(event) => setName(event.target.value)} required />
@@ -205,7 +205,7 @@ function ProfileForm({ user, onProfileCreated }) {
           <button type="submit" disabled={loading}>{loading ? "Сохраняем..." : "Создать анкету"}</button>
         </form>
 
-        {error && <p className="profile-error">{error}</p>}
+        {error && <p className="onboarding-error">{error}</p>}
       </div>
     </div>
   );
