@@ -18,6 +18,19 @@ function Auth() {
     event.preventDefault();
     setLoading(true);
     setMessage("");
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !normalizedEmail.includes("@")) {
+      setMessage("Введите корректный email.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("Пароль должен содержать минимум 6 символов.");
+      setLoading(false);
+      return;
+    }
 
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
