@@ -8,3 +8,7 @@
 .auth-password-toggle:hover{background:#292c35!important;color:#fff!important;transform:none!important;filter:none!important}
 .tok-auth-light .auth-password-toggle{background:#fff!important;border-color:#dfe2e7!important;color:#5d6470!important}
 .tok-auth-light .auth-password-toggle:hover{background:#f5f6f8!important;color:#dc3565!important}
+
+/* Stable password toggle: reserve its width so the input never shifts */
+.auth-password-toggle{width:62px;height:30px;display:flex;align-items:center;justify-content:center;padding:0!important;white-space:nowrap;transform:translateY(-50%)!important}
+.auth-password-toggle:hover{transform:translateY(-50%)!important}
