@@ -125,30 +125,24 @@ function Discovery({ user, onHome }) {
     setFiltersOpen(false);
   }
 
-  async function markProfileAsViewed(profileId) {
-    const { error } = await supabase.from("profile_views").insert({ viewer_id: user.id, viewed_profile_id: profileId });
-    if (error && error.code !== "23505") console.error("Ошибка сохранения просмотра:", error);
-  }
-
   async function handleSkip() {
     if (actionLoading) return;
     const profile = profiles[currentIndex];
     if (!profile) return;
+
     setActionLoading(true);
-    await markProfileAsViewed(profile.id);
-
-    setProfiles((current) => {
-      if (current.length <= 1) return shuffleProfiles(current);
-      if (currentIndex < current.length - 1) return current;
-
-      const reshuffled = shuffleProfiles(current);
-      return reshuffled;
-    });
 
     setCurrentIndex((index) => {
       if (profiles.length <= 1) return 0;
       return index < profiles.length - 1 ? index + 1 : 0;
     });
+
+    setProfiles((current) => {
+      if (current.length <= 1) return current;
+      if (currentIndex < current.length - 1) return current;
+      return shuffleProfiles(current);
+    });
+
     setActionLoading(false);
   }
 
