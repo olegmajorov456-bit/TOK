@@ -29,6 +29,9 @@ function App() {
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
+  const [theme, setTheme] = useState(() => localStorage.getItem("tok-theme") || "neon");
+
+  useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
   const isPrivacyPage = window.location.pathname === "/privacy";
 
@@ -166,13 +169,13 @@ function App() {
   if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell tok-theme-${theme}`}>
       <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} />
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} />}
-        {page === "profile" && <Profile user={session.user} profile={profile} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
+        {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
       <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
