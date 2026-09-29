@@ -170,7 +170,7 @@ function App() {
 
   return (
     <div className={`app-shell tok-theme-${theme}`}>
-      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} />
+      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} />
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
