@@ -150,7 +150,6 @@ function Discovery({ user, onHome }) {
     const profile = profiles[currentIndex];
     if (!profile || actionLoading) return;
     setActionLoading(true);
-    await markProfileAsViewed(profile.id);
     const { error: likeError } = await supabase.from("likes").insert({ user_id: user.id, liked_user_id: profile.id });
     if (likeError && likeError.code !== "23505") {
       console.error("Ошибка лайка:", likeError);
