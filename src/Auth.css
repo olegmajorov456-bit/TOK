@@ -2,3 +2,9 @@
 .auth-password-wrap{position:relative}.auth-password-wrap input{padding-right:78px}.auth-password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#8f929d;font-size:10px;font-weight:750;cursor:pointer}.auth-password-toggle:hover{color:#ff6a99}
 .auth-card form button:disabled{opacity:.6;cursor:wait;transform:none}.auth-message{overflow-wrap:anywhere}
 .tok-auth-light{background:linear-gradient(180deg,#fbfbfc 0%,#eef0f3 100%)}.tok-auth-light .auth-card{background:#fff;border-color:#e1e4e8;box-shadow:0 20px 60px rgba(31,36,45,.1)}.tok-auth-light .auth-card h2{color:#20232a}.tok-auth-light .auth-subtitle{color:#737984}.tok-auth-light .auth-card input{background:#f8f9fa;border-color:#dfe2e7;color:#20232a}.tok-auth-light .auth-card input:focus{background:#fff;border-color:#e83c6d;box-shadow:0 0 0 3px rgba(232,60,109,.1)}.tok-auth-light .privacy-check{color:#737984}.tok-auth-light .switch-button,.tok-auth-light .privacy-check a,.tok-auth-light .auth-password-toggle{color:#dc3565}.tok-auth-light .auth-message{color:#656c76}.tok-auth-light .auth-logo{filter:drop-shadow(0 8px 22px rgba(31,36,45,.08))}
+
+/* Password visibility control */
+.auth-password-toggle{z-index:2;min-height:30px!important;padding:5px 9px!important;border:1px solid #3a3d47!important;border-radius:8px!important;background:#20222a!important;color:#e7e8ec!important;box-shadow:none!important;font-size:10px!important;line-height:1!important}
+.auth-password-toggle:hover{background:#292c35!important;color:#fff!important;transform:none!important;filter:none!important}
+.tok-auth-light .auth-password-toggle{background:#fff!important;border-color:#dfe2e7!important;color:#5d6470!important}
+.tok-auth-light .auth-password-toggle:hover{background:#f5f6f8!important;color:#dc3565!important}
