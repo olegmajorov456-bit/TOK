@@ -15,7 +15,7 @@ function formatNotificationTime(value) {
   return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
 }
 
-function NotificationBell({ user }) {
+function NotificationBell({ user, onMatches }) {
   const [notifications, setNotifications] = useState([]);
   const [actors, setActors] = useState({});
   const [open, setOpen] = useState(false);
@@ -178,7 +178,7 @@ function NotificationBell({ user }) {
                     <button
                       key={item.id}
                       className={"notification-item " + (item.is_read ? "" : "unread")}
-                      onClick={() => !item.is_read && markRead(item.id)}
+                      onClick={() => { markRead(item.id); if (item.type === "message") { setOpen(false); onMatches?.(); } }}
                     >
                       <div className="notification-avatar">
                         {actor?.avatar_url ? <img src={actor.avatar_url} alt="" /> : <span>👤</span>}
