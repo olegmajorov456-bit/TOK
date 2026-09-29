@@ -37,6 +37,7 @@ function ProfileForm({ user, onProfileCreated }) {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const theme = localStorage.getItem("tok-theme") || "neon";
 
   function handleAvatarChange(event) {
     const file = event.target.files?.[0];
@@ -149,13 +150,13 @@ function ProfileForm({ user, onProfileCreated }) {
   }
 
   return (
-    <div className="onboarding-page">
+    <div className={`onboarding-page tok-onboarding-${theme}`}>
       <div className="onboarding-card">
         <h1>Создай свою анкету ❤️</h1>
         <p className="onboarding-subtitle">Расскажи немного о себе</p>
 
         <form onSubmit={handleSubmit}>
-          <input type="text" placeholder="Имя" value={name} onChange={(event) => setName(event.target.value)} required />
+          <input type="text" placeholder="Имя" value={name} onChange={(event) => setName(event.target.value)} minLength="2" maxLength="50" required />
 
           <label>Дата рождения</label>
           <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} min={getMinBirthDate()} max={getMaxBirthDate()} required />
@@ -200,7 +201,7 @@ function ProfileForm({ user, onProfileCreated }) {
             <small>JPG, PNG или другое изображение до 5 МБ</small>
           </div>
 
-          <textarea placeholder="Расскажи о себе" value={description} onChange={(event) => setDescription(event.target.value)} rows="4" />
+          <textarea placeholder="Расскажи о себе" value={description} onChange={(event) => setDescription(event.target.value)} maxLength="500" rows="4" />
 
           <button type="submit" disabled={loading}>{loading ? "Сохраняем..." : "Создать анкету"}</button>
         </form>
