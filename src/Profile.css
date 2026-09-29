@@ -66,3 +66,38 @@
   .profile-success{margin:0 19px 20px}
   .profile-edit-form{padding:22px 19px 24px}
 }
+
+/* Profile layout alignment — keep every inner block on one vertical grid */
+.profile-card > .profile-identity,
+.profile-card > .profile-details,
+.profile-card > .profile-section,
+.profile-card > .profile-theme-section,
+.profile-card > .profile-actions,
+.profile-card > .profile-success,
+.profile-card > .profile-edit-form{width:auto;max-width:none}
+.profile-card > .profile-details,
+.profile-card > .profile-section,
+.profile-card > .profile-theme-section,
+.profile-card > .profile-success{margin-left:27px;margin-right:27px}
+.profile-card > .profile-identity{margin-left:0;margin-right:0}
+.profile-card > .profile-actions{margin-left:0;margin-right:0}
+.profile-card > .profile-edit-form{margin-left:0;margin-right:0}
+.profile-details{margin-top:0;margin-bottom:13px}
+.profile-section + .profile-section,
+.profile-details + .profile-section,
+.profile-theme-section + .profile-actions{margin-top:13px}
+.profile-theme-section + .profile-actions{margin-top:0}
+.profile-actions{box-sizing:border-box}
+.profile-actions > button{width:100%;display:block}
+.profile-edit-form{box-sizing:border-box}
+.profile-edit-form > label,.profile-edit-form .profile-form-row{width:100%}
+@media(max-width:600px){
+  .profile-card > .profile-details,
+  .profile-card > .profile-section,
+  .profile-card > .profile-theme-section,
+  .profile-card > .profile-success{margin-left:19px;margin-right:19px}
+  .profile-details{margin-bottom:12px}
+  .profile-section + .profile-section,
+  .profile-details + .profile-section{margin-top:12px}
+  .profile-theme-section + .profile-actions{margin-top:0}
+}
