@@ -5,6 +5,7 @@ import "./Matches.css";
 function Matches({ user, onHome, onOpenChat }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [chatPreview, setChatPreview] = useState({});
 
   useEffect(() => {
     loadMatches();
@@ -93,6 +94,17 @@ function Matches({ user, onHome, onOpenChat }) {
     );
 
     setMatches(result);
+    const matchIds = matchList.map((match) => match.id);
+    const { data: conversations } = await supabase.from("conversations").select("id,match_id").in("match_id", matchIds);
+    const conversationIds = (conversations || []).map((item) => item.id);
+    if (conversationIds.length) {
+      const { data: recentMessages } = await supabase.from("messages").select("conversation_id,body,created_at,sender_id").in("conversation_id", conversationIds).order("created_at", { ascending: false });
+      const previews = {};
+      for (const message of recentMessages || []) if (!previews[message.conversation_id]) previews[message.conversation_id] = message;
+      const previewByMatch = {};
+      for (const conversation of conversations || []) if (previews[conversation.id]) previewByMatch[conversation.match_id] = previews[conversation.id];
+      setChatPreview(previewByMatch);
+    }
     setLoading(false);
   }
 
@@ -118,11 +130,10 @@ function Matches({ user, onHome, onOpenChat }) {
               ОБЩАЯ СИМПАТИЯ
             </span>
 
-            <h1>Мои мэтчи 💕</h1>
+            <h1>Чаты <span className="matches-title-heart">♡</span></h1>
 
             <p>
-              Здесь люди, с которыми
-              у вас взаимная симпатия.
+              Общайтесь с людьми, с которыми у вас взаимная симпатия.
             </p>
           </div>
         </div>
@@ -195,20 +206,10 @@ function Matches({ user, onHome, onOpenChat }) {
                   </div>
 
                   <div className="match-info">
-
-                    <strong>
-                      {profile.name}
-                    </strong>
-
-                    <span>
-                      Начать общение
-                    </span>
-
+                    <div className="match-name-row"><strong>{profile.name}</strong><span className="match-online-dot" /></div>
+                    <span>{chatPreview[match.id]?.body || "Начать общение"}</span>
                   </div>
-
-                  <div className="match-arrow">
-                    →
-                  </div>
+                  <div className="match-chat-icon">›</div>
 
                 </button>
               );
