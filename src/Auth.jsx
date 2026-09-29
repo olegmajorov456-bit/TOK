@@ -10,6 +10,9 @@ function Auth() {
   const [message, setMessage] = useState("");
   const [forgotMode, setForgotMode] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const theme = localStorage.getItem("tok-theme") || "neon";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -17,7 +20,7 @@ function Auth() {
     setMessage("");
 
     if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
       if (error) setMessage(error.message);
     } else {
       if (!privacyAccepted) {
@@ -26,7 +29,7 @@ function Auth() {
         return;
       }
 
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ email: normalizedEmail, password });
       if (error) setMessage(error.message);
       else setMessage("Регистрация прошла успешно! Проверьте почту, если подтверждение включено.");
     }
@@ -60,7 +63,7 @@ function Auth() {
 
   if (forgotMode) {
     return (
-      <div className="auth-page">
+      <div className={`auth-page tok-auth-${theme}`}>
         <div className="auth-card">
           <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
           <h2>Восстановление пароля</h2>
@@ -84,7 +87,7 @@ function Auth() {
         <p className="auth-subtitle">Знакомства внутри ИГЭУ</p>
         <form onSubmit={handleSubmit}>
           <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} minLength="6" required />
+          <div className="auth-password-wrap"><input type={showPassword ? "text" : "password"} placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} minLength="6" required /><button type="button" className="auth-password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}>{showPassword ? "Скрыть" : "Показать"}</button></div>
 
           {!isLogin && (
             <label className="privacy-check">
