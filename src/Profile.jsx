@@ -185,7 +185,18 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
   }
 
   if (loading) {
-    return <div className="profile-loading"><div className="profile-spinner"></div><p>Загружаем профиль...</p></div>;
+    return <div className="profile-loading" aria-label="Загрузка профиля">
+      <div className="profile-loading-card">
+        <div className="profile-loading-photo"><span /></div>
+        <div className="profile-loading-line profile-loading-name" />
+        <div className="profile-loading-line profile-loading-short" />
+        <div className="profile-loading-grid"><span /><span /><span /><span /></div>
+        <div className="profile-loading-section">
+          <div className="profile-loading-line profile-loading-title" />
+          <div className="profile-loading-tags"><span /><span /><span /></div>
+        </div>
+      </div>
+    </div>;
   }
 
   if (!profile) {
