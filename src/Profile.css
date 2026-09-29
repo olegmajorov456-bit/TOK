@@ -101,3 +101,32 @@
   .profile-details + .profile-section{margin-top:12px}
   .profile-theme-section + .profile-actions{margin-top:0}
 }
+
+/* Final profile structure fixes */
+.profile-no-photo{flex-direction:column;gap:8px}
+.profile-no-photo p{margin:0;color:inherit;font-size:12px}
+.profile-study{display:flex;align-items:center;gap:9px;box-sizing:border-box}
+.profile-study-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;border-radius:9px;background:#22242c;font-size:14px}
+.profile-study>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.profile-study strong,.profile-study span:last-child{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-details-heading{display:flex;align-items:center;min-height:18px}
+.profile-detail-item{display:flex;align-items:center;gap:9px;min-width:0}
+.profile-detail-item>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.profile-detail-item small,.profile-detail-item strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.profile-section-heading h3{margin:0}
+.profile-hobbies{display:flex;flex-wrap:wrap;align-items:center}
+.profile-about-section>h3{margin:0 0 10px}
+.profile-empty-description{display:flex;align-items:flex-start;gap:10px;padding:13px;border:1px solid #343640;border-radius:13px}
+.profile-empty-description>span{flex:0 0 auto;font-size:18px}
+.profile-empty-description strong{display:block;font-size:12px}
+.profile-empty-description p{margin:3px 0 0;color:#7c818b;font-size:11px;line-height:1.5}
+.profile-actions{gap:9px}
+.profile-actions button{font-family:inherit;cursor:pointer}
+@media(max-width:600px){
+  .profile-study{width:100%}
+  .profile-detail-item{padding:11px}
+  .profile-theme-option{min-height:58px}
+}
+.tok-theme-light .profile-study-icon{background:#fff0f4}
+.tok-theme-light .profile-empty-description{background:#f8f9fa;border-color:#e1e4e8}
