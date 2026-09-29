@@ -32,7 +32,7 @@ function getHobbies(profile) {
   return String(profile.hobbies).split(",").map((item) => item.trim()).filter(Boolean);
 }
 
-function Profile({ user, onAdmin, onProfileUpdated }) {
+function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChange }) {
   const [profile, setProfile] = useState(null);
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -238,6 +238,13 @@ function Profile({ user, onAdmin, onProfileUpdated }) {
                 {profile.description ? <p className="profile-description">{profile.description}</p> : <div className="profile-empty-description"><span>✍️</span><div><strong>Расскажи о себе</strong><p>Добавь немного информации, чтобы другим было проще начать разговор.</p></div></div>}
               </div>
 
+              <div className="profile-theme-section">
+                <div className="profile-theme-title"><div><strong>Оформление</strong><span>Выбери стиль приложения</span></div><span className="profile-theme-spark">✦</span></div>
+                <div className="profile-theme-options">
+                  <button type="button" className={`profile-theme-option ${theme === "light" ? "active" : ""}`} onClick={() => onThemeChange?.("light")}><span className="theme-preview theme-preview-light"><i></i><b></b><em></em></span><span><strong>Классический</strong><small>Светлый</small></span>{theme === "light" && <mark>✓</mark>}</button>
+                  <button type="button" className={`profile-theme-option ${theme === "neon" ? "active" : ""}`} onClick={() => onThemeChange?.("neon")}><span className="theme-preview theme-preview-neon"><i></i><b></b><em></em></span><span><strong>Неоновый</strong><small>Новый TOK</small></span>{theme === "neon" && <mark>✓</mark>}</button>
+                </div>
+              </div>
               <div className="profile-actions">
                 <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
                 {profile.is_admin === true && <button className="profile-admin-button" onClick={onAdmin}>🛡️ Панель администратора</button>}
