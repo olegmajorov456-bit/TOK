@@ -136,7 +136,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="site-loading">
+      <div className={`site-loading tok-theme-${theme}`}>
         <div className="site-loading-content">
           <div className="site-loading-logo">
             <img src="/tok-logo.png" alt="ТОК — Знакомства в ИГЭУ" />
