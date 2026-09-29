@@ -44,3 +44,25 @@
 .tok-theme-light .profile-error-card{background:#fff;border-color:#e1e4e8;box-shadow:0 12px 35px rgba(31,36,45,.06)}
 .tok-theme-light .profile-error-card h2{color:#20232a}
 .tok-theme-light .profile-error-card p{color:#737984}
+
+/* Normalize profile spacing */
+.profile-page{box-sizing:border-box}
+.profile-page *{box-sizing:border-box}
+.profile-card{padding:0}
+.profile-identity{margin:0;padding:24px 27px 20px}
+.profile-details{margin:0 27px 13px}
+.profile-section{margin:13px 27px 0}
+.profile-theme-section{margin:13px 27px 0}
+.profile-actions{margin:0;padding:23px 27px 27px}
+.profile-success{margin:0 27px 23px}
+.profile-edit-form{margin:0;padding:27px}
+@media(max-width:600px){
+  .profile-page{padding:14px 9px 120px}
+  .profile-identity{padding:21px 19px 18px}
+  .profile-details{margin:0 19px 12px}
+  .profile-section{margin:12px 19px 0}
+  .profile-theme-section{margin:12px 19px 0}
+  .profile-actions{padding:20px 19px 24px}
+  .profile-success{margin:0 19px 20px}
+  .profile-edit-form{padding:22px 19px 24px}
+}
