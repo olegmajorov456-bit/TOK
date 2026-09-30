@@ -520,3 +520,17 @@ html:has(.tok-theme-neon){
 .tok-theme-neon.admin-page .admin-report-top select{background:#1d1f2d;border-color:#34374a;color:#f8f8fb}
 .tok-theme-neon.admin-page .admin-report-users,
 .tok-theme-neon.admin-page .admin-report-details{background:#1d1f2d}
+
+/* Theme chooser preview follows the real palettes */
+.tok-theme-light .theme-preview-light{background:#f2f3f6}
+.tok-theme-light .theme-preview-light i{background:#fff}
+.tok-theme-light .theme-preview-light b{background:#fff;border-color:#dfe2e7}
+.tok-theme-light .theme-preview-light em{background:#e0e2e7}
+.tok-theme-light .theme-preview-neon{background:#10111a}
+.tok-theme-light .theme-preview-neon i{background:#191b28}
+.tok-theme-light .theme-preview-neon b{background:linear-gradient(135deg,#241825,#171925);border-color:#4a2940}
+.tok-theme-light .theme-preview-neon em{background:#ff3975;box-shadow:0 0 7px #ff3975}
+.tok-theme-neon .theme-preview-neon{background:#10111a}
+.tok-theme-neon .theme-preview-neon i{background:#191b28}
+.tok-theme-neon .theme-preview-neon b{background:linear-gradient(135deg,#241825,#171925);border-color:#4a2940}
+.tok-theme-neon .theme-preview-neon em{background:#ff3975;box-shadow:0 0 7px rgba(255,57,117,.7)}
