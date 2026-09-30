@@ -37,7 +37,7 @@ function ProfileForm({ user, onProfileCreated }) {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const theme = localStorage.getItem("tok-theme") || "neon";
+  const theme = localStorage.getItem("tok-theme") || "light";
 
   function handleAvatarChange(event) {
     const file = event.target.files?.[0];
