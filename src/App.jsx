@@ -166,7 +166,7 @@ function App() {
     setSelectedChat(null);
   }
 
-  if (isPrivacyPage) return <PrivacyPolicy />;
+  if (isPrivacyPage) return <PrivacyPolicy theme={theme} />;
   if (recoveryMode) return <PasswordReset />;
 
   if (loading) {
