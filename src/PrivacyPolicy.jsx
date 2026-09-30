@@ -1,8 +1,8 @@
 import "./PrivacyPolicy.css";
 
-function PrivacyPolicy() {
+function PrivacyPolicy({ theme = "light" }) {
   return (
-    <div className="privacy-page">
+    <div className={"privacy-page tok-theme-" + theme}>
       <div className="privacy-card">
         <img src="/tok-logo.png" alt="ТОК" className="privacy-logo" />
         <h1>Политика конфиденциальности</h1>
