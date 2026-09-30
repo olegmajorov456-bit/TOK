@@ -1,0 +1,522 @@
+/* TOK — unified visual system
+   Light is the default: clean, airy, white cards and restrained pink accents.
+   Neon keeps the same pink/purple palette but uses a layered midnight/plum surface
+   instead of the old almost-black flat background.
+*/
+
+:root{
+  --tok-pink:#e83c6d;
+  --tok-pink-strong:#ff2f73;
+  --tok-pink-soft:#fff0f4;
+  --tok-purple:#9b5cff;
+  --tok-light-bg:#f3f4f7;
+  --tok-light-surface:#ffffff;
+  --tok-light-soft:#f8f9fb;
+  --tok-light-border:#e1e4e9;
+  --tok-light-text:#20242b;
+  --tok-light-muted:#737984;
+  --tok-dark-bg:#10111a;
+  --tok-dark-surface:#171925;
+  --tok-dark-soft:#1d1f2d;
+  --tok-dark-border:#2c2e3d;
+  --tok-dark-text:#f7f7fb;
+  --tok-dark-muted:#9297a6;
+}
+
+/* Default / classic light */
+body:has(.tok-theme-light),
+html:has(.tok-theme-light){
+  background:var(--tok-light-bg);
+  color:var(--tok-light-text);
+}
+
+.tok-theme-light{
+  color:var(--tok-light-text);
+  background:
+    radial-gradient(circle at 50% -18%,rgba(232,60,109,.055),transparent 34%),
+    var(--tok-light-bg)!important;
+}
+.tok-theme-light .app-content{
+  background:linear-gradient(180deg,#fafbfc 0%,#f1f2f5 100%)!important;
+}
+.tok-theme-light .app-header{
+  background:rgba(255,255,255,.9);
+  border-bottom-color:var(--tok-light-border);
+  box-shadow:0 4px 20px rgba(31,36,45,.045);
+}
+.tok-theme-light .app-header:after{
+  background:linear-gradient(90deg,transparent,#e83c6d,transparent);
+}
+.tok-theme-light .app-header-logo img{
+  filter:drop-shadow(0 7px 18px rgba(31,36,45,.08));
+}
+.tok-theme-light .header-action,
+.tok-theme-light .notification-bell-button{
+  background:#fff;
+  border-color:var(--tok-light-border);
+  color:#30343b;
+  box-shadow:0 5px 16px rgba(31,36,45,.055);
+}
+.tok-theme-light .header-action:hover,
+.tok-theme-light .notification-bell-button:hover,
+.tok-theme-light .notification-bell-button.open{
+  background:#fff7f9;
+  border-color:#e83c6d;
+  color:#d93361;
+}
+.tok-theme-light .header-profile-button{
+  background:#fff;
+  border-color:var(--tok-light-border);
+  box-shadow:0 6px 18px rgba(31,36,45,.08);
+}
+.tok-theme-light .bottom-nav{
+  background:rgba(255,255,255,.95);
+  border-color:#dfe2e7;
+  box-shadow:0 16px 42px rgba(31,36,45,.13);
+}
+.tok-theme-light .bottom-nav-item{color:#8b919a}
+.tok-theme-light .bottom-nav-item:hover{background:#f6f7f9;color:#3d424a}
+.tok-theme-light .bottom-nav-item.active{
+  background:#fff0f4;
+  color:#e83c6d;
+  box-shadow:inset 0 0 0 1px rgba(232,60,109,.08);
+}
+.tok-theme-light .bottom-nav-item.active:after{background:#e83c6d;box-shadow:none}
+
+/* Light surfaces shared by every screen */
+.tok-theme-light .home-welcome,
+.tok-theme-light .home-profile-card,
+.tok-theme-light .home-post-card,
+.tok-theme-light .home-matches-card,
+.tok-theme-light .home-tip,
+.tok-theme-light .home-discovery-card,
+.tok-theme-light .filters-panel,
+.tok-theme-light .discovery-card,
+.tok-theme-light .discovery-empty,
+.tok-theme-light .matches-list,
+.tok-theme-light .matches-empty,
+.tok-theme-light .profile-card,
+.tok-theme-light .profile-details,
+.tok-theme-light .profile-section,
+.tok-theme-light .profile-theme-section{
+  border-color:var(--tok-light-border);
+  box-shadow:0 14px 42px rgba(31,36,45,.065);
+}
+.tok-theme-light .home-welcome,
+.tok-theme-light .home-profile-card,
+.tok-theme-light .home-post-card,
+.tok-theme-light .home-matches-card,
+.tok-theme-light .home-tip,
+.tok-theme-light .home-discovery-card,
+.tok-theme-light .filters-panel,
+.tok-theme-light .discovery-card,
+.tok-theme-light .discovery-empty,
+.tok-theme-light .matches-list,
+.tok-theme-light .matches-empty{
+  background:#fff;
+}
+.tok-theme-light .home-discovery-card{
+  background:linear-gradient(145deg,#fff7fa,#fff)!important;
+  border-color:#ead9df;
+}
+.tok-theme-light .home-discovery-button,
+.tok-theme-light .matches-home-button,
+.tok-theme-light .profile-primary-button,
+.tok-theme-light .profile-save-button{
+  background:linear-gradient(90deg,#e83c6d,#d92f63);
+}
+.tok-theme-light .home-welcome h1,
+.tok-theme-light .home-discovery-content h2,
+.tok-theme-light .home-post-card h3,
+.tok-theme-light .home-profile-name,
+.tok-theme-light .home-matches-info strong,
+.tok-theme-light .matches-heading h1,
+.tok-theme-light .match-info strong,
+.tok-theme-light .matches-empty h2,
+.tok-theme-light .profile-name-block h1,
+.tok-theme-light .profile-details-heading,
+.tok-theme-light .profile-section h3,
+.tok-theme-light .profile-theme-title strong{
+  color:var(--tok-light-text);
+}
+.tok-theme-light .home-welcome p:last-child,
+.tok-theme-light .home-discovery-content p,
+.tok-theme-light .home-post-card p,
+.tok-theme-light .home-matches-info p,
+.tok-theme-light .home-tip p,
+.tok-theme-light .matches-heading p,
+.tok-theme-light .discovery-header p,
+.tok-theme-light .discovery-description,
+.tok-theme-light .profile-description{
+  color:var(--tok-light-muted);
+}
+.tok-theme-light .home-card-avatar,
+.tok-theme-light .home-post-icon,
+.tok-theme-light .home-matches-icon,
+.tok-theme-light .empty-icon,
+.tok-theme-light .matches-empty-icon{
+  background:#fff0f4;
+  color:#e83c6d;
+}
+.tok-theme-light .filter-grid select,
+.tok-theme-light .filter-grid input,
+.tok-theme-light .profile-edit-form input,
+.tok-theme-light .profile-edit-form select,
+.tok-theme-light .profile-edit-form textarea{
+  background:#f8f9fb;
+  border-color:#dfe2e7;
+  color:var(--tok-light-text);
+}
+.tok-theme-light .filter-grid select:focus,
+.tok-theme-light .filter-grid input:focus,
+.tok-theme-light .profile-edit-form input:focus,
+.tok-theme-light .profile-edit-form select:focus,
+.tok-theme-light .profile-edit-form textarea:focus{
+  background:#fff;
+  border-color:#e83c6d;
+}
+.tok-theme-light .filters-toggle,
+.tok-theme-light .discovery-button.skip,
+.tok-theme-light .empty-home-button,
+.tok-theme-light .profile-admin-button,
+.tok-theme-light .profile-logout-button,
+.tok-theme-light .profile-cancel-button,
+.tok-theme-light .chat-back{
+  background:#f1f2f5;
+  border-color:#dfe2e7;
+  color:#3f444c;
+}
+.tok-theme-light .hobbies span,
+.tok-theme-light .hobby-tag{
+  background:#fff0f4;
+  border-color:#f0ccd7;
+  color:#d93361;
+}
+.tok-theme-light .match-card{background:#fff;border-bottom-color:#eceef1}
+.tok-theme-light .match-card:hover{background:#fafbfc}
+.tok-theme-light .match-chat-icon{background:#fff0f4;color:#e83c6d}
+.tok-theme-light .match-card:hover .match-chat-icon{background:#e83c6d;color:#fff}
+.tok-theme-light .chat-page{background:linear-gradient(180deg,#fafbfc,#f1f2f5);color:var(--tok-light-text)}
+.tok-theme-light .chat-header{background:rgba(255,255,255,.94);border-bottom-color:#e2e4e8}
+.tok-theme-light .chat-user strong{color:var(--tok-light-text)}
+.tok-theme-light .chat-user span{color:#7b818a}
+.tok-theme-light .chat-message.theirs{background:#fff;color:#343840;border-color:#e0e3e8;box-shadow:0 4px 13px rgba(31,36,45,.04)}
+.tok-theme-light .chat-empty strong{color:var(--tok-light-text)}
+.tok-theme-light .chat-empty>div{background:#fff0f4;color:#e83c6d}
+.tok-theme-light .chat-input-area{background:rgba(255,255,255,.96);border-color:#dfe2e7;box-shadow:0 12px 35px rgba(31,36,45,.12)}
+.tok-theme-light .chat-input-area input{color:var(--tok-light-text)}
+.tok-theme-light .notification-panel{background:#fff;border-color:#e1e4e8;box-shadow:0 20px 55px rgba(31,36,45,.13)}
+.tok-theme-light .notification-panel-header{border-bottom-color:#eceef1}
+.tok-theme-light .notification-panel-header h2,
+.tok-theme-light .notification-item-top strong{color:var(--tok-light-text)}
+.tok-theme-light .notification-item{background:#fff;color:var(--tok-light-text);border-bottom-color:#eceef1}
+.tok-theme-light .notification-item:hover,
+.tok-theme-light .notification-item.unread{background:#f8f9fb}
+.tok-theme-light .notification-item-content p{color:#747a84}
+.tok-theme-light .site-loading{
+  background:linear-gradient(180deg,#fbfbfc,#eef0f3);
+}
+.tok-theme-light .site-loading-logo img{filter:drop-shadow(0 8px 22px rgba(31,36,45,.08))}
+.tok-theme-light .site-loading-spinner{border-color:#e1e4e8;border-top-color:#e83c6d;border-right-color:#f3a0b6}
+
+/* Dark / neon redesign: same pink + purple accents, new layered surfaces */
+body:has(.tok-theme-neon),
+html:has(.tok-theme-neon){
+  background:var(--tok-dark-bg);
+  color:var(--tok-dark-text);
+}
+.tok-theme-neon{
+  color:var(--tok-dark-text);
+  background:
+    radial-gradient(circle at 50% -15%,rgba(255,47,115,.13),transparent 28%),
+    radial-gradient(circle at 100% 35%,rgba(155,92,255,.08),transparent 30%),
+    var(--tok-dark-bg)!important;
+}
+.tok-theme-neon .app-content{
+  background:linear-gradient(180deg,#12131d 0%,#10111a 100%)!important;
+}
+.tok-theme-neon .app-header{
+  background:rgba(18,19,29,.88);
+  border-bottom-color:#292b3a;
+  box-shadow:0 6px 24px rgba(0,0,0,.22);
+}
+.tok-theme-neon .app-header:after{
+  background:linear-gradient(90deg,transparent,#ff3975,#9b5cff,transparent);
+  opacity:.75;
+}
+.tok-theme-neon .header-action,
+.tok-theme-neon .notification-bell-button{
+  background:#191b28;
+  border-color:#303247;
+  color:#f7f7fb;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);
+}
+.tok-theme-neon .header-action:hover,
+.tok-theme-neon .notification-bell-button:hover,
+.tok-theme-neon .notification-bell-button.open{
+  background:#202234;
+  border-color:#ff3975;
+  box-shadow:0 0 0 3px rgba(255,57,117,.08),0 10px 25px rgba(255,47,115,.1);
+}
+.tok-theme-neon .header-profile-button{
+  background:#191b28;
+  border-color:#35384a;
+  box-shadow:0 0 0 4px rgba(255,255,255,.02),0 8px 24px rgba(0,0,0,.25);
+}
+.tok-theme-neon .bottom-nav{
+  background:rgba(23,25,37,.94);
+  border-color:#303247;
+  box-shadow:0 18px 55px rgba(0,0,0,.35);
+}
+.tok-theme-neon .bottom-nav-item{color:#85899a}
+.tok-theme-neon .bottom-nav-item:hover{background:#202234;color:#e4e5eb}
+.tok-theme-neon .bottom-nav-item.active{
+  background:linear-gradient(180deg,#2b1725,#241622);
+  color:#ff5a8a;
+  box-shadow:inset 0 0 0 1px rgba(255,57,117,.18);
+}
+.tok-theme-neon .bottom-nav-item.active:after{
+  background:#ff3975;
+  box-shadow:0 0 10px rgba(255,47,115,.65);
+}
+
+/* Dark shared surfaces */
+.tok-theme-neon .home-welcome,
+.tok-theme-neon .home-profile-card,
+.tok-theme-neon .home-post-card,
+.tok-theme-neon .home-matches-card,
+.tok-theme-neon .home-tip,
+.tok-theme-neon .filters-panel,
+.tok-theme-neon .discovery-card,
+.tok-theme-neon .discovery-empty,
+.tok-theme-neon .matches-list,
+.tok-theme-neon .matches-empty,
+.tok-theme-neon .profile-card,
+.tok-theme-neon .profile-details,
+.tok-theme-neon .profile-section,
+.tok-theme-neon .profile-theme-section{
+  background:var(--tok-dark-surface);
+  border-color:var(--tok-dark-border);
+  box-shadow:0 20px 55px rgba(0,0,0,.28);
+}
+.tok-theme-neon .home-discovery-card{
+  background:linear-gradient(145deg,#241825,#171925 72%)!important;
+  border-color:#4a2940;
+}
+.tok-theme-neon .home-profile-card:hover,
+.tok-theme-neon .match-card:hover{
+  background:#1d1f2d;
+}
+.tok-theme-neon .home-welcome h1,
+.tok-theme-neon .home-discovery-content h2,
+.tok-theme-neon .home-post-card h3,
+.tok-theme-neon .home-profile-name,
+.tok-theme-neon .home-matches-info strong,
+.tok-theme-neon .matches-heading h1,
+.tok-theme-neon .match-info strong,
+.tok-theme-neon .matches-empty h2,
+.tok-theme-neon .profile-name-block h1,
+.tok-theme-neon .profile-details-heading,
+.tok-theme-neon .profile-section h3,
+.tok-theme-neon .profile-theme-title strong{
+  color:#f8f8fb;
+}
+.tok-theme-neon .home-welcome p:last-child,
+.tok-theme-neon .home-discovery-content p,
+.tok-theme-neon .home-post-card p,
+.tok-theme-neon .home-matches-info p,
+.tok-theme-neon .home-tip p,
+.tok-theme-neon .matches-heading p,
+.tok-theme-neon .discovery-header p,
+.tok-theme-neon .discovery-description,
+.tok-theme-neon .profile-description{
+  color:#9297a6;
+}
+.tok-theme-neon .home-card-avatar,
+.tok-theme-neon .home-post-icon,
+.tok-theme-neon .home-matches-icon,
+.tok-theme-neon .empty-icon,
+.tok-theme-neon .matches-empty-icon{
+  background:#2b1725;
+  color:#ff5a8a;
+}
+.tok-theme-neon .filters-toggle,
+.tok-theme-neon .discovery-button.skip,
+.tok-theme-neon .empty-home-button,
+.tok-theme-neon .profile-admin-button,
+.tok-theme-neon .profile-logout-button,
+.tok-theme-neon .profile-cancel-button,
+.tok-theme-neon .chat-back{
+  background:#202234;
+  border-color:#34374a;
+  color:#ececf1;
+}
+.tok-theme-neon .filter-grid select,
+.tok-theme-neon .filter-grid input,
+.tok-theme-neon .profile-edit-form input,
+.tok-theme-neon .profile-edit-form select,
+.tok-theme-neon .profile-edit-form textarea{
+  background:#1c1e2b;
+  border-color:#34374a;
+  color:#f5f5f8;
+}
+.tok-theme-neon .filter-grid select:focus,
+.tok-theme-neon .filter-grid input:focus,
+.tok-theme-neon .profile-edit-form input:focus,
+.tok-theme-neon .profile-edit-form select:focus,
+.tok-theme-neon .profile-edit-form textarea:focus{
+  background:#202234;
+  border-color:#ff3975;
+}
+.tok-theme-neon .hobbies span,
+.tok-theme-neon .hobby-tag{
+  background:#2a1724;
+  border-color:#543047;
+  color:#ff719b;
+}
+.tok-theme-neon .match-card{
+  background:var(--tok-dark-surface);
+  border-bottom-color:#2a2c3a;
+}
+.tok-theme-neon .match-avatar{box-shadow:0 0 0 3px rgba(255,255,255,.025),0 7px 20px rgba(0,0,0,.22)}
+.tok-theme-neon .match-chat-icon{background:#2b1725;color:#ff5a8a}
+.tok-theme-neon .chat-page{background:linear-gradient(180deg,#12131d,#10111a);color:#f8f8fb}
+.tok-theme-neon .chat-header{background:rgba(18,19,29,.9);border-bottom-color:#2b2d3c}
+.tok-theme-neon .chat-back{background:#1b1d29;border-color:#34374a;color:#f7f7fb}
+.tok-theme-neon .chat-message.theirs{background:#1d1f2c;color:#ececf2;border-color:#303347}
+.tok-theme-neon .chat-empty>div{background:#2b1725;color:#ff5a8a}
+.tok-theme-neon .chat-empty strong{color:#f8f8fb}
+.tok-theme-neon .chat-input-area{
+  background:rgba(25,27,40,.96);
+  border-color:#34374a;
+  box-shadow:0 18px 45px rgba(0,0,0,.34);
+}
+.tok-theme-neon .chat-input-area input{color:#f8f8fb}
+.tok-theme-neon .notification-panel{
+  background:#171925;
+  border-color:#34374a;
+  box-shadow:0 25px 70px rgba(0,0,0,.42);
+}
+.tok-theme-neon .notification-panel-header{border-bottom-color:#2d2f40}
+.tok-theme-neon .notification-item{background:#171925;border-bottom-color:#2a2c3a}
+.tok-theme-neon .notification-item:hover,
+.tok-theme-neon .notification-item.unread{background:#1d1f2d}
+.tok-theme-neon .notification-panel-header h2,
+.tok-theme-neon .notification-item-top strong{color:#f8f8fb}
+.tok-theme-neon .notification-item-content p{color:#9297a6}
+.tok-theme-neon .site-loading{
+  background:
+    radial-gradient(circle at 50% 38%,rgba(255,47,115,.11),transparent 26%),
+    linear-gradient(180deg,#12131d,#10111a);
+}
+.tok-theme-neon .site-loading-spinner{border-color:#2e3040;border-top-color:#ff2f73;border-right-color:#9b5cff}
+
+/* Standalone screens */
+.tok-auth-light{background:linear-gradient(180deg,#fbfbfc 0%,#eef0f3 100%)}
+.tok-auth-neon{
+  background:
+    radial-gradient(circle at 50% 10%,rgba(255,47,115,.14),transparent 30%),
+    linear-gradient(180deg,#11121b,#0f1018);
+}
+.tok-auth-neon .auth-card{background:#181a27;border-color:#303247;box-shadow:0 30px 80px rgba(0,0,0,.38)}
+.tok-auth-neon .auth-card input{background:#1d1f2c;border-color:#34374a;color:#fff}
+.tok-auth-neon .auth-card input:focus{background:#202234;border-color:#ff3975}
+.tok-auth-neon .auth-card h2{color:#fff}
+.tok-auth-neon .auth-subtitle,.tok-auth-neon .auth-message{color:#9297a6}
+.tok-auth-neon .switch-button,.tok-auth-neon .privacy-check a{color:#ff6a99}
+
+.tok-onboarding-neon{
+  background:
+    radial-gradient(circle at 50% 8%,rgba(255,47,115,.12),transparent 30%),
+    linear-gradient(180deg,#11121b,#0f1018);
+}
+.tok-onboarding-neon .onboarding-card{background:#181a27;border-color:#303247;box-shadow:0 28px 75px rgba(0,0,0,.38)}
+.tok-onboarding-neon .onboarding-card input,
+.tok-onboarding-neon .onboarding-card select,
+.tok-onboarding-neon .onboarding-card textarea{background:#1d1f2c;border-color:#34374a;color:#fff}
+.tok-onboarding-neon .avatar-upload{background:#1d1f2c;border-color:#34374a}
+.tok-onboarding-neon .onboarding-card h1{color:#fff}
+.tok-onboarding-neon .onboarding-subtitle,.tok-onboarding-neon .avatar-label,.tok-onboarding-neon .avatar-upload small{color:#9297a6}
+
+.tok-theme-light .profile-study{background:#f8f9fb;border-color:#e1e4e8}
+.tok-theme-light .profile-study-icon{background:#fff0f4}
+.tok-theme-light .profile-detail-item{background:#f8f9fb;border-color:#e1e4e8}
+.tok-theme-light .profile-detail-item .detail-icon{background:#fff0f4;color:#e83c6d}
+.tok-theme-light .profile-about-section{background:#fbfbfc}
+.tok-theme-light .profile-empty-description{background:#f8f9fb;border-color:#e1e4e8}
+.tok-theme-neon .profile-study,
+.tok-theme-neon .profile-detail-item{background:#1d1f2d;border-color:#303347}
+.tok-theme-neon .profile-study-icon,
+.tok-theme-neon .profile-detail-item .detail-icon{background:#2b1725;color:#ff5a8a}
+.tok-theme-neon .profile-about-section{background:#191b28}
+.tok-theme-neon .profile-empty-description{background:#1d1f2d;border-color:#303347}
+
+.tok-theme-light .profile-theme-option{background:#f8f9fb;border-color:#dfe2e7}
+.tok-theme-light .profile-theme-option.active{background:#fff7f9;border-color:#e83c6d}
+.tok-theme-neon .profile-theme-option{background:#1d1f2d;border-color:#34374a}
+.tok-theme-neon .profile-theme-option.active{background:#291824;border-color:#ff3975;box-shadow:0 0 0 1px rgba(255,57,117,.1),0 10px 25px rgba(0,0,0,.18)}
+
+.tok-theme-light .profile-loading{background:linear-gradient(180deg,#fbfbfc,#f0f2f5)}
+.tok-theme-neon .profile-loading{background:linear-gradient(180deg,#12131d,#10111a)}
+.tok-theme-neon .profile-loading-card{background:#171925;border-color:#303247}
+.tok-theme-neon .profile-loading-photo{background:linear-gradient(135deg,#1a1c28,#26293a,#181a25)}
+.tok-theme-neon .profile-loading-line,
+.tok-theme-neon .profile-loading-grid span,
+.tok-theme-neon .profile-loading-tags span{
+  background:linear-gradient(100deg,#1d1f2c 25%,#2b2e3d 45%,#1d1f2c 65%);
+  background-size:220% 100%;
+}
+
+/* Support */
+.tok-theme-light .support-page{background:linear-gradient(180deg,#fafbfc,#f0f2f5)}
+.tok-theme-light .support-header{background:rgba(255,255,255,.94);border-bottom-color:#e1e4e8}
+.tok-theme-light .support-back{background:#f1f2f5;border-color:#dfe2e7;color:#343840}
+.tok-theme-light .support-header strong{color:#20242b}
+.tok-theme-light .support-message.admin{background:#fff;color:#343840}
+.tok-theme-neon .support-page{background:linear-gradient(180deg,#12131d,#10111a);color:#f8f8fb}
+.tok-theme-neon .support-header{background:rgba(18,19,29,.9);border-bottom-color:#2c2e3d}
+.tok-theme-neon .support-back{background:#1d1f2d;border-color:#34374a;color:#f8f8fb}
+.tok-theme-neon .support-header strong{color:#f8f8fb}
+.tok-theme-neon .support-header span{color:#9297a6}
+.tok-theme-neon .support-message.admin{background:#1d1f2d;color:#ececf2;box-shadow:none}
+.tok-theme-neon .support-input{background:rgba(25,27,40,.96);border-color:#34374a;box-shadow:0 18px 45px rgba(0,0,0,.34)}
+.tok-theme-neon .support-input input{color:#f8f8fb}
+
+/* Report modal */
+.tok-theme-light .report-modal{background:#fff;border-color:#e1e4e8}
+.tok-theme-neon .report-overlay{background:rgba(7,8,13,.7)}
+.tok-theme-neon .report-modal{background:#181a27;border-color:#34374a;box-shadow:0 28px 80px rgba(0,0,0,.55)}
+.tok-theme-neon .report-close,
+.tok-theme-neon .report-reasons button{background:#1d1f2d;border-color:#34374a;color:#ececf2}
+.tok-theme-neon .report-reasons button.selected{background:#2b1725;border-color:#ff6b94;color:#ff7a9f}
+.tok-theme-neon .report-modal textarea{background:#1d1f2d;border-color:#34374a;color:#fff}
+.tok-theme-neon .report-submit,
+.tok-theme-neon .report-success button{background:linear-gradient(90deg,#ff2f73,#d92766)}
+.tok-theme-neon .report-success-icon{background:#2b1725;color:#ff5a8a}
+
+/* Admin */
+.tok-theme-neon.admin-page{background:linear-gradient(180deg,#12131d,#10111a);color:#f8f8fb}
+.tok-theme-neon.admin-page .admin-header{background:rgba(18,19,29,.92);border-bottom-color:#2c2e3d}
+.tok-theme-neon.admin-page .admin-tabs,
+.tok-theme-neon.admin-page .admin-support-card,
+.tok-theme-neon.admin-page .admin-chat,
+.tok-theme-neon.admin-page .admin-report-card,
+.tok-theme-neon.admin-page .admin-empty,
+.tok-theme-neon.admin-page .admin-home-form{background:#181a27;color:#f8f8fb;border-color:#303247}
+.tok-theme-neon.admin-page .admin-tabs button.active{background:#2b1725;color:#fff}
+.tok-theme-neon.admin-page .admin-refresh,
+.tok-theme-neon.admin-page .admin-chat-back{background:#1d1f2d;color:#ececf2}
+.tok-theme-neon.admin-page .admin-support-info strong,
+.tok-theme-neon.admin-page .admin-section-heading h2,
+.tok-theme-neon.admin-page .admin-report-top h3{color:#f8f8fb}
+.tok-theme-neon.admin-page .admin-support-info span,
+.tok-theme-neon.admin-page .admin-support-info small,
+.tok-theme-neon.admin-page .admin-report-date,
+.tok-theme-neon.admin-page .admin-empty p{color:#9297a6}
+.tok-theme-neon.admin-page .admin-support-messages{background:#11121c}
+.tok-theme-neon.admin-page .admin-support-message.user{background:#1d1f2d;color:#ececf2}
+.tok-theme-neon.admin-page .admin-chat-input{background:#181a27;border-top-color:#303247}
+.tok-theme-neon.admin-page .admin-chat-input input,
+.tok-theme-neon.admin-page .admin-report-top select{background:#1d1f2d;border-color:#34374a;color:#f8f8fb}
+.tok-theme-neon.admin-page .admin-report-users,
+.tok-theme-neon.admin-page .admin-report-details{background:#1d1f2d}
