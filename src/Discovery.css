@@ -6,3 +6,38 @@
 .tok-theme-neon .discovery-actions{background:#171925}.tok-theme-neon .discovery-actions:before{background:#2c2e3d}
 .tok-theme-neon .discovery-button{background:#191b28;border-color:#34374a;color:#b8bcc7}.tok-theme-neon .discovery-button.undo{background:#202234;color:#aeb3bf}.tok-theme-neon .discovery-button.skip{background:#241522;border-color:#573044;color:#ff668f}.tok-theme-neon .discovery-button.like{background:linear-gradient(145deg,#ff3977,#d92766);border-color:#ff4d82;color:#fff;box-shadow:0 10px 30px rgba(255,43,113,.28)}.tok-theme-neon .discovery-button.superlike{background:#192b25;border-color:#315b49;color:#5ee08e}.tok-theme-neon .discovery-report-button{color:#747987}.tok-theme-neon .discovery-report-button:hover{color:#ff668f}
 @media(max-width:600px){.discovery-actions{gap:9px;padding:17px 12px 13px}.discovery-button{width:56px;height:56px}.discovery-button-symbol{font-size:23px}.discovery-actions:before{left:12px;right:12px}}
+
+/* Premium reference-style discovery controls */
+.discovery-actions{gap:11px;padding:21px 20px 15px}
+.discovery-button{width:52px;height:52px;border-width:1px;box-shadow:0 5px 15px rgba(31,36,45,.055)}
+.discovery-button svg{width:23px;height:23px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.discovery-button.undo{width:46px;height:46px}
+.discovery-button.undo svg{width:21px;height:21px}
+.discovery-button.skip{width:54px;height:54px}
+.discovery-button.skip svg{width:23px;height:23px}
+.discovery-button.like{width:62px;height:62px;box-shadow:0 10px 24px rgba(232,60,109,.25)}
+.discovery-button.like svg{width:29px;height:29px;fill:currentColor;stroke:currentColor;stroke-width:1.4}
+.discovery-button.like:after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(232,60,109,.10);pointer-events:none}
+.discovery-button.superlike{width:54px;height:54px}
+.discovery-button.superlike svg{width:24px;height:24px;fill:currentColor;stroke:currentColor;stroke-width:1.4}
+.discovery-button:hover:not(:disabled){transform:translateY(-3px) scale(1.045)}
+.discovery-button:active:not(:disabled){transform:translateY(0) scale(.96)}
+.discovery-button.undo:hover:not(:disabled){color:#4f5660;background:#f0f2f5}
+.discovery-button.skip:hover:not(:disabled){background:#ffecef;border-color:#eebdca}
+.discovery-button.like:hover:not(:disabled){background:#dF315f;box-shadow:0 13px 30px rgba(232,60,109,.32)}
+.discovery-button.superlike:hover:not(:disabled){background:#e7f6ed;border-color:#bfe1cd}
+.discovery-report-button{margin-top:2px;font-weight:700;letter-spacing:.1px}
+.tok-theme-neon .discovery-button{box-shadow:0 7px 18px rgba(0,0,0,.2)}
+.tok-theme-neon .discovery-button.undo:hover:not(:disabled){background:#282b3a;color:#f0f1f5}
+.tok-theme-neon .discovery-button.skip:hover:not(:disabled){background:#311725;border-color:#71405a}
+.tok-theme-neon .discovery-button.like{box-shadow:0 11px 30px rgba(255,43,113,.32)}
+.tok-theme-neon .discovery-button.like:hover:not(:disabled){background:linear-gradient(145deg,#ff4b84,#e52d6d);box-shadow:0 14px 34px rgba(255,43,113,.4)}
+.tok-theme-neon .discovery-button.superlike:hover:not(:disabled){background:#20372d;border-color:#41735a}
+@media(max-width:600px){
+  .discovery-actions{gap:8px;padding:17px 12px 21px}
+  .discovery-button{width:50px;height:50px}
+  .discovery-button.undo{width:44px;height:44px}
+  .discovery-button.skip{width:52px;height:52px}
+  .discovery-button.like{width:59px;height:59px}
+  .discovery-button.superlike{width:52px;height:52px}
+}
