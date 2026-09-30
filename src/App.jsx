@@ -27,7 +27,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState("home");
   const [selectedChat, setSelectedChat] = useState(null);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
@@ -45,28 +44,6 @@ function App() {
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
-  useEffect(() => {
-    if (!session?.user?.id) return;
-    let channel;
-    async function loadUnreadNotifications() {
-      const { count, error } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", session.user.id)
-        .eq("is_read", false);
-      if (!error) setUnreadNotifications(count || 0);
-    }
-    loadUnreadNotifications();
-    channel = supabase.channel(`app-notifications-${session.user.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` }, () => {
-        loadUnreadNotifications();
-      })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` }, () => {
-        loadUnreadNotifications();
-      })
-      .subscribe();
-    return () => { if (channel) supabase.removeChannel(channel); };
-  }, [session?.user?.id]);
 
   const isPrivacyPage = window.location.pathname === "/privacy";
 
@@ -209,10 +186,9 @@ function App() {
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
-        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} />}\n        {page === "notifications" && <Notifications user={session.user} />}
-        {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
+        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} />}\n        {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
-      <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} onProfile={() => setPage("profile")} notificationCount={unreadNotifications} />
+      <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
   );
 }
