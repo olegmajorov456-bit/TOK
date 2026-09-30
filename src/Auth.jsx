@@ -12,7 +12,7 @@ function Auth() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
-  const theme = localStorage.getItem("tok-theme") || "neon";
+  const theme = localStorage.getItem("tok-theme") || "light";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -93,7 +93,7 @@ function Auth() {
   }
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page tok-auth-${theme}`}>
       <div className="auth-card">
         <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
         <h2>{isLogin ? "Вход" : "Регистрация"}</h2>
