@@ -25,7 +25,6 @@ function getHobbies(profile) {
 function Discovery({ user, onHome }) {
   const [allProfiles, setAllProfiles] = useState([]);
   const [profiles, setProfiles] = useState([]);
-  const [likedBy, setLikedBy] = useState(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -35,17 +34,6 @@ function Discovery({ user, onHome }) {
   const [refreshLoading, setRefreshLoading] = useState(false);
 
   useEffect(() => { loadProfiles(); }, []);
-
-  async function loadIncomingLikes() {
-    const { data, error } = await supabase.from("likes").select("user_id").eq("liked_user_id", user.id);
-    if (error) {
-      console.error("Ошибка загрузки входящих лайков:", error);
-      return new Set();
-    }
-    const ids = new Set((data || []).map((item) => item.user_id));
-    setLikedBy(ids);
-    return ids;
-  }
 
   function shuffleProfiles(items) {
     const result = [...items];
@@ -66,8 +54,6 @@ function Discovery({ user, onHome }) {
       setLoading(false);
       return;
     }
-
-    const incomingLikeIds = await loadIncomingLikes();
 
     const { data: outgoingLikes, error: outgoingLikesError } = await supabase
       .from("likes")
@@ -193,7 +179,6 @@ function Discovery({ user, onHome }) {
 
   const profile = profiles[currentIndex];
   const profileHobbies = getHobbies(profile);
-  const hasIncomingLike = profile ? likedBy.has(profile.id) : false;
 
   return <div className="discovery-page"><main className="discovery-container">
     <div className="discovery-header"><div><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div>
@@ -205,7 +190,7 @@ function Discovery({ user, onHome }) {
       <label>Возраст до<input type="number" min="16" max="100" placeholder="100" value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} /></label>
     </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
     {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Здесь больше нет анкет, которые вы ещё не лайкнули. Можно обновить список после новых анкет."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card">
-      <div className="discovery-photo"><div className="discovery-photo-top"></div>{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}{hasIncomingLike && <div className="incoming-like-badge">💗 Вам поставили лайк</div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
+      <div className="discovery-photo"><div className="discovery-photo-top"></div>{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
       <div className="discovery-content">{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
       <div className="discovery-actions">
         <button className="discovery-button undo" onClick={handleUndo} disabled={actionLoading} title="Вернуться к предыдущей анкете" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6" /></svg></button>
