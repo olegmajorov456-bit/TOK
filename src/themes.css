@@ -585,3 +585,29 @@ html:has(.tok-theme-neon){
 .tok-theme-neon .matches-container{color:#f8f8fb}
 .tok-theme-neon .discovery-loading,
 .tok-theme-neon .matches-loading{color:#f8f8fb}
+
+/* Admin inline tokens */
+.admin-page.tok-theme-light{
+  --admin-card:#fff;
+  --admin-input:#fff;
+  --admin-border:#e3e5e9;
+  --admin-text:#20242b;
+  --admin-muted:#777d86;
+  --admin-active:#f1f2f5;
+  --admin-shadow:0 8px 28px rgba(31,36,45,.06);
+}
+.admin-page.tok-theme-neon{
+  --admin-card:#181a27;
+  --admin-input:#1d1f2d;
+  --admin-border:#34374a;
+  --admin-text:#f8f8fb;
+  --admin-muted:#9297a6;
+  --admin-active:#2b1725;
+  --admin-shadow:0 18px 45px rgba(0,0,0,.24);
+}
+.admin-page.tok-theme-neon .admin-container>input{
+  background:#1d1f2d!important;
+  border-color:#34374a!important;
+  color:#f8f8fb!important;
+}
+.admin-page.tok-theme-neon .admin-container>input::placeholder{color:#777c8b}
