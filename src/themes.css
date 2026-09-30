@@ -611,3 +611,7 @@ html:has(.tok-theme-neon){
   color:#f8f8fb!important;
 }
 .admin-page.tok-theme-neon .admin-container>input::placeholder{color:#777c8b}
+
+/* Final discovery action row overrides */
+.tok-theme-light .discovery-actions{background:#fff;border-color:#e1e4e9}.tok-theme-light .discovery-button{background:#fff;border-color:#e0e3e8;color:#60656e}.tok-theme-light .discovery-button.undo{background:#f6f7f9;color:#747b86}.tok-theme-light .discovery-button.skip{background:#fff4f6;border-color:#f1d3dc;color:#ef426d}.tok-theme-light .discovery-button.like{background:#e83c6d;border-color:#e83c6d;color:#fff}.tok-theme-light .discovery-button.superlike{background:#f1faf4;border-color:#d8eee0;color:#42a66b}
+.tok-theme-neon .discovery-actions{background:#171925;border-color:#2c2e3d}.tok-theme-neon .discovery-button{background:#191b28;border-color:#34374a;color:#b8bcc7}.tok-theme-neon .discovery-button.undo{background:#202234;color:#aeb3bf}.tok-theme-neon .discovery-button.skip{background:#241522;border-color:#573044;color:#ff668f}.tok-theme-neon .discovery-button.like{background:linear-gradient(145deg,#ff3977,#d92766);border-color:#ff4d82;color:#fff}.tok-theme-neon .discovery-button.superlike{background:#192b25;border-color:#315b49;color:#5ee08e}
