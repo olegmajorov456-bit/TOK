@@ -212,7 +212,7 @@ function App() {
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} />}\n        {page === "notifications" && <Notifications user={session.user} />}
         {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
-      <BottomNav activePage={page} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} onProfile={() => setPage("profile")} notificationCount={unreadNotifications} />
+      <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} onProfile={() => setPage("profile")} notificationCount={unreadNotifications} />
     </div>
   );
 }
