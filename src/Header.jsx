@@ -45,7 +45,6 @@ function Header({ onHome, onSupport, onProfile, onMatches, profile, user }) {
               <span className="header-profile-placeholder">👤</span>
             )}
           </span>
-          <span className="header-profile-online" aria-hidden="true" />
         </button>
       </div>
     </header>
