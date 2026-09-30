@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Chat.css";
 
-function Chat({ user, match, profile, onBack }) {
+function Chat({ user, match, profile, onBack, theme = "light" }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -159,7 +159,7 @@ function Chat({ user, match, profile, onBack }) {
   }
 
   if (loading) {
-    return <div className="chat-page"><div className="chat-loading"><div className="chat-spinner" /><p>Открываем чат...</p></div></div>;
+    return <div className={"chat-page tok-theme-" + theme}><div className="chat-loading"><div className="chat-spinner" /><p>Открываем чат...</p></div></div>;
   }
 
   return (
