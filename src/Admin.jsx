@@ -248,10 +248,10 @@ function Admin({ user, onBack }) {
     return [item.name, item.faculty, item.id].some((value) => String(value || "").toLowerCase().includes(query));
   });
 
-  const tabButtonStyle = { minHeight: 50, border: "none", borderRadius: 15, background: "transparent", color: "#777", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer", padding: "0 10px" };
-  const activeTabStyle = { ...tabButtonStyle, background: "#f1f1f3", color: "#222" };
-  const selectStyle = { width: "100%", padding: "12px", border: "1px solid #e3e3e6", borderRadius: 13, background: "#fff", color: "#222", fontFamily: "inherit", marginTop: 7 };
-  const cardStyle = { background: "#fff", borderRadius: 20, padding: 14, boxShadow: "0 7px 25px rgba(0,0,0,.05)" };
+  const tabButtonStyle = { minHeight: 50, border: "none", borderRadius: 15, background: "transparent", color: "var(--admin-muted)", fontFamily: "inherit", fontSize: 13, fontWeight: 700, cursor: "pointer", padding: "0 10px" };
+  const activeTabStyle = { ...tabButtonStyle, background: "var(--admin-active)", color: "var(--admin-text)" };
+  const selectStyle = { width: "100%", padding: "12px", border: "1px solid var(--admin-border)", borderRadius: 13, background: "var(--admin-input)", color: "var(--admin-text)", fontFamily: "inherit", marginTop: 7 };
+  const cardStyle = { background: "var(--admin-card)", borderRadius: 20, padding: 14, boxShadow: "var(--admin-shadow)" };
 
   if (checkingAdmin) return <div className={`admin-page tok-theme-${theme}`}><div className="admin-loading"><div className="admin-spinner" /><p>Проверяем доступ...</p></div></div>;
   if (!isAdmin) return <div className={`admin-page tok-theme-${theme}`}><div className="admin-access-denied"><div className="admin-denied-icon">🔒</div><h1>Доступ запрещён</h1><p>Эта страница доступна только администраторам ТОК.</p><button className="admin-back-button" onClick={onBack}>Вернуться назад</button></div></div>;
@@ -287,7 +287,7 @@ function Admin({ user, onBack }) {
               <h3 style={{ margin: "4px 0 10px" }}>Создать мэтч между двумя пользователями</h3>
               <label>Первый пользователь<select style={selectStyle} value={selectedUserIds[0]} onChange={(e) => selectMatchUser(0, e.target.value)}><option value="">Выберите...</option>{users.filter((item) => item.id !== selectedUserIds[1]).map((item) => <option key={item.id} value={item.id}>{item.name || "Без имени"}{item.is_blocked ? " — заблокирован" : ""}</option>)}</select></label>
               <label style={{ display: "block", marginTop: 10 }}>Второй пользователь<select style={selectStyle} value={selectedUserIds[1]} onChange={(e) => selectMatchUser(1, e.target.value)}><option value="">Выберите...</option>{users.filter((item) => item.id !== selectedUserIds[0]).map((item) => <option key={item.id} value={item.id}>{item.name || "Без имени"}{item.is_blocked ? " — заблокирован" : ""}</option>)}</select></label>
-              <button onClick={createManualMatch} style={{ width: "100%", marginTop: 13, border: "none", borderRadius: 14, padding: 13, background: "#123b78", color: "#fff", fontFamily: "inherit", fontWeight: 700, cursor: "pointer" }}>💕 Создать мэтч</button>
+              <button onClick={createManualMatch} style={{ width: "100%", marginTop: 13, border: "none", borderRadius: 14, padding: 13, background: "linear-gradient(90deg,#ff2f73,#d92766)", color: "#fff", fontFamily: "inherit", fontWeight: 700, cursor: "pointer" }}>💕 Создать мэтч</button>
               {matchMessage && <p className="admin-report-date" style={{ color: matchMessage.startsWith("💕") ? "#20863a" : "#c83232" }}>{matchMessage}</p>}
             </div>
           </section>
