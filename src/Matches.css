@@ -3,7 +3,7 @@
 .matches-heading h1{display:flex;align-items:center;gap:8px}.matches-title-heart{color:#ff4d82;font-size:.82em;font-weight:400}
 .matches-list{box-shadow:0 18px 50px rgba(0,0,0,.18)}.match-card{min-height:86px;position:relative;transition:transform .18s,background .18s}.match-card:hover{transform:translateY(-1px)}
 .match-avatar{box-shadow:0 0 0 3px rgba(255,255,255,.025),0 7px 18px rgba(0,0,0,.2)}
-.match-name-row{display:flex;align-items:center;gap:7px;min-width:0}.match-online-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#36d77a;box-shadow:0 0 8px rgba(54,215,122,.5)}
+.match-name-row{display:flex;align-items:center;gap:7px;min-width:0}
 .match-info span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.match-chat-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:11px;background:#24131d;color:#ff5a8a;font-size:24px;line-height:1;transition:.18s}.match-card:hover .match-chat-icon{background:#ff2f73;color:#fff}
 .matches-loading{min-height:calc(100vh - 170px);position:relative}.matches-loading:after{content:"Загружаем чаты";position:absolute;top:calc(50% + 34px);color:#777c88;font-size:11px}
 .tok-theme-light .matches-list{box-shadow:0 16px 42px rgba(31,36,45,.07)}.tok-theme-light .match-card{background:#fff}.tok-theme-light .match-card:hover{background:#fafbfc}.tok-theme-light .match-avatar{box-shadow:0 0 0 3px #fff,0 6px 16px rgba(31,36,45,.1)}.tok-theme-light .match-chat-icon{background:#fff0f4;color:#e83c6d}.tok-theme-light .match-card:hover .match-chat-icon{background:#e83c6d;color:#fff}.tok-theme-light .match-online-dot{box-shadow:0 0 7px rgba(53,180,105,.35)}.tok-theme-light .matches-loading:after{color:#7b818a}
