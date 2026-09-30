@@ -168,6 +168,10 @@ begin
     return new;
   end if;
 
+  if exists (select 1 from public.notifications n where n.user_id = new.liked_user_id and n.actor_id = new.user_id and n.type = 'like' and n.related_id = new.id) then
+    return new;
+  end if;
+
   insert into public.notifications (user_id, actor_id, type, body, related_id)
   values (
     new.liked_user_id,
@@ -219,6 +223,10 @@ begin
   preview := left(trim(new.body), 120);
   if preview = '' then
     preview := 'Отправил(а) вам сообщение';
+  end if;
+
+  if exists (select 1 from public.notifications n where n.user_id = recipient_id and n.actor_id = new.sender_id and n.type = 'message' and n.related_id = new.conversation_id and n.body = preview and n.created_at >= new.created_at - interval '2 seconds' and n.created_at <= new.created_at + interval '2 seconds') then
+    return new;
   end if;
 
   insert into public.notifications (user_id, actor_id, type, body, related_id)
