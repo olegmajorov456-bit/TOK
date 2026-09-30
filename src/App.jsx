@@ -199,7 +199,7 @@ function App() {
 
   if (!profile) return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
 
-  if (page === "chat" && selectedChat) return <Chat user={session.user} match={selectedChat.match} profile={selectedChat.profile} onBack={() => setPage("matches")} />;
+  if (page === "chat" && selectedChat) return <Chat user={session.user} match={selectedChat.match} profile={selectedChat.profile} theme={theme} onBack={() => setPage("matches")} />;
   if (page === "support") return <Support user={session.user} onBack={() => setPage("home")} />;
   if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
