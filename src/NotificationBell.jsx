@@ -2,6 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./NotificationBell.css";
 
+function dedupeNotifications(list) {
+  const seen = new Set();
+  return list.filter((item) => {
+    const key = `${item.user_id}|${item.actor_id || ""}|${item.type}|${item.body || ""}|${item.created_at || ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function formatNotificationTime(value) {
   const date = new Date(value);
   const diff = Math.max(0, Date.now() - date.getTime());
@@ -38,7 +48,7 @@ function NotificationBell({ user, onMatches }) {
       return;
     }
 
-    const list = data || [];
+    const list = dedupeNotifications(data || []);
     setNotifications(list);
 
     const actorIds = [...new Set(list.map((item) => item.actor_id).filter(Boolean))];
@@ -89,10 +99,7 @@ function NotificationBell({ user, onMatches }) {
           if (actor) {
             setActors((current) => ({ ...current, [actor.id]: actor }));
           }
-          setNotifications((current) => [
-            notification,
-            ...current.filter((item) => item.id !== notification.id),
-          ].slice(0, 30));
+          setNotifications((current) => dedupeNotifications([notification, ...current]).slice(0, 30));
         }
       )
       .subscribe();
