@@ -40,7 +40,7 @@ function PasswordReset() {
   }
 
   return (
-    <div className={`auth-page tok-auth-${localStorage.getItem("tok-theme") || "neon"}`}>
+    <div className={`auth-page tok-auth-${localStorage.getItem("tok-theme") || "light"}`}>
       <div className="auth-card">
         <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
         <h2>Новый пароль</h2>
