@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Matches.css";
 
-function Matches({ user, onHome, onOpenChat }) {
+function Matches({ user, onHome, onOpenChat, theme = "light" }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chatPreview, setChatPreview] = useState({});
@@ -110,7 +110,7 @@ function Matches({ user, onHome, onOpenChat }) {
 
   if (loading) {
     return (
-      <div className="matches-page">
+      <div className={`matches-page tok-theme-${theme}`}>
         <div className="matches-loading">
           <div className="matches-spinner" />
           <p>Загружаем мэтчи...</p>
