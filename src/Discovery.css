@@ -41,3 +41,12 @@
   .discovery-button.like{width:59px;height:59px}
   .discovery-button.superlike{width:52px;height:52px}
 }
+
+/* Compact tooltips for discovery actions */
+.discovery-button[data-tip]{position:relative}
+.discovery-button[data-tip]::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translate(-50%,4px);padding:7px 9px;border:1px solid #e1e4e9;border-radius:9px;background:#20242b;color:#fff;font-size:9px;font-weight:700;line-height:1;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;box-shadow:0 7px 20px rgba(31,36,45,.16);transition:opacity .16s ease,transform .16s ease,visibility .16s ease;z-index:20}
+.discovery-button[data-tip]::before{content:"";position:absolute;left:50%;bottom:calc(100% + 4px);width:7px;height:7px;background:#20242b;border-right:1px solid #e1e4e9;border-bottom:1px solid #e1e4e9;transform:translate(-50%,4px) rotate(45deg);opacity:0;visibility:hidden;transition:opacity .16s ease,transform .16s ease,visibility .16s ease;z-index:21}
+.discovery-button[data-tip]:hover::after,.discovery-button[data-tip]:hover::before{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.tok-theme-neon .discovery-button[data-tip]::after{background:#242634;border-color:#3b3e50;box-shadow:0 9px 24px rgba(0,0,0,.35)}
+.tok-theme-neon .discovery-button[data-tip]::before{background:#242634;border-color:#3b3e50}
+@media(max-width:700px){.discovery-button[data-tip]::after,.discovery-button[data-tip]::before{display:none}}
