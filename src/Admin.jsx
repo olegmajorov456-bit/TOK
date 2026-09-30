@@ -6,6 +6,7 @@ const DEFAULT_TITLE = "Общайся. Знакомься. Находи свои
 const DEFAULT_DESCRIPTION = "ТОК создан специально для студентов ИГЭУ. Здесь всё начинается с обычной симпатии.";
 
 function Admin({ user, onBack }) {
+  const theme = localStorage.getItem("tok-theme") || "light";
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
   const [activeTab, setActiveTab] = useState("users");
@@ -252,11 +253,11 @@ function Admin({ user, onBack }) {
   const selectStyle = { width: "100%", padding: "12px", border: "1px solid #e3e3e6", borderRadius: 13, background: "#fff", color: "#222", fontFamily: "inherit", marginTop: 7 };
   const cardStyle = { background: "#fff", borderRadius: 20, padding: 14, boxShadow: "0 7px 25px rgba(0,0,0,.05)" };
 
-  if (checkingAdmin) return <div className="admin-page"><div className="admin-loading"><div className="admin-spinner" /><p>Проверяем доступ...</p></div></div>;
-  if (!isAdmin) return <div className="admin-page"><div className="admin-access-denied"><div className="admin-denied-icon">🔒</div><h1>Доступ запрещён</h1><p>Эта страница доступна только администраторам ТОК.</p><button className="admin-back-button" onClick={onBack}>Вернуться назад</button></div></div>;
+  if (checkingAdmin) return <div className={`admin-page tok-theme-${theme}`}><div className="admin-loading"><div className="admin-spinner" /><p>Проверяем доступ...</p></div></div>;
+  if (!isAdmin) return <div className={`admin-page tok-theme-${theme}`}><div className="admin-access-denied"><div className="admin-denied-icon">🔒</div><h1>Доступ запрещён</h1><p>Эта страница доступна только администраторам ТОК.</p><button className="admin-back-button" onClick={onBack}>Вернуться назад</button></div></div>;
 
   return (
-    <div className="admin-page">
+    <div className={`admin-page tok-theme-${theme}`}>
       <header className="admin-header"><button className="admin-back" onClick={onBack}>←</button><img src="/tok-logo.png" alt="ТОК" className="admin-logo" /></header>
       <main className="admin-container">
         <div className="admin-tabs" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
