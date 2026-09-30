@@ -120,7 +120,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
   }
 
   return (
-    <div className="matches-page">
+    <div className={`matches-page tok-theme-${theme}`}>
 
       <main className="matches-container">
 
