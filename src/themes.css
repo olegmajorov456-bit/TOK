@@ -468,12 +468,12 @@ html:has(.tok-theme-neon){
 }
 
 /* Support */
-.tok-theme-light .support-page{background:linear-gradient(180deg,#fafbfc,#f0f2f5)}
+.support-page.tok-theme-light{background:linear-gradient(180deg,#fafbfc,#f0f2f5)}
 .tok-theme-light .support-header{background:rgba(255,255,255,.94);border-bottom-color:#e1e4e8}
 .tok-theme-light .support-back{background:#f1f2f5;border-color:#dfe2e7;color:#343840}
 .tok-theme-light .support-header strong{color:#20242b}
 .tok-theme-light .support-message.admin{background:#fff;color:#343840}
-.tok-theme-neon .support-page{background:linear-gradient(180deg,#12131d,#10111a);color:#f8f8fb}
+.support-page.tok-theme-neon{background:linear-gradient(180deg,#12131d,#10111a);color:#f8f8fb}
 .tok-theme-neon .support-header{background:rgba(18,19,29,.9);border-bottom-color:#2c2e3d}
 .tok-theme-neon .support-back{background:#1d1f2d;border-color:#34374a;color:#f8f8fb}
 .tok-theme-neon .support-header strong{color:#f8f8fb}
