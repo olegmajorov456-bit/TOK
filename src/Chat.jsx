@@ -163,7 +163,7 @@ function Chat({ user, match, profile, onBack, theme = "light" }) {
   }
 
   return (
-    <div className="chat-page">
+    <div className={`chat-page tok-theme-${theme}`}>
       <header className="chat-header">
         <button className="chat-back" onClick={onBack}>←</button>
         <div className="chat-user">
