@@ -29,7 +29,17 @@ function App() {
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
-  const [theme, setTheme] = useState(() => localStorage.getItem("tok-theme") || "light");
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("tok-theme");
+    const migrated = localStorage.getItem("tok-theme-v2");
+    if (!migrated) {
+      const nextTheme = savedTheme === "light" ? "light" : "light";
+      localStorage.setItem("tok-theme-v2", "1");
+      localStorage.setItem("tok-theme", nextTheme);
+      return nextTheme;
+    }
+    return savedTheme === "neon" || savedTheme === "light" ? savedTheme : "light";
+  });
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
