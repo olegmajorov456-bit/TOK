@@ -29,7 +29,7 @@ function App() {
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
-  const [theme, setTheme] = useState(() => localStorage.getItem("tok-theme") || "neon");
+  const [theme, setTheme] = useState(() => localStorage.getItem("tok-theme") || "light");
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
@@ -151,7 +151,7 @@ function App() {
 
   if (blocked) {
     return (
-      <div className="auth-page">
+      <div className={`auth-page tok-auth-${theme}`}>
         <div className="auth-card">
           <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
           <h2>Аккаунт заблокирован</h2>
