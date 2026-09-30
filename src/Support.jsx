@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 import "./Support.css";
 
 function Support({ user, onBack }) {
+  const theme = localStorage.getItem("tok-theme") || "light";
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -158,7 +159,7 @@ function Support({ user, onBack }) {
     setSending(false);
   }
 
-  if (loading) return <div className="support-page"><div className="support-loading"><p>Открываем поддержку...</p></div></div>;
+  if (loading) return <div className={`support-page tok-theme-${theme}`}><div className="support-loading"><p>Открываем поддержку...</p></div></div>;
 
   return (
     <div className="support-page">
