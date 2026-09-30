@@ -33,7 +33,7 @@ function App() {
     const savedTheme = localStorage.getItem("tok-theme");
     const migrated = localStorage.getItem("tok-theme-v2");
     if (!migrated) {
-      const nextTheme = savedTheme === "light" ? "light" : "light";
+      const nextTheme = "light";
       localStorage.setItem("tok-theme-v2", "1");
       localStorage.setItem("tok-theme", nextTheme);
       return nextTheme;
