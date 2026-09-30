@@ -534,3 +534,54 @@ html:has(.tok-theme-neon){
 .tok-theme-neon .theme-preview-neon i{background:#191b28}
 .tok-theme-neon .theme-preview-neon b{background:linear-gradient(135deg,#241825,#171925);border-color:#4a2940}
 .tok-theme-neon .theme-preview-neon em{background:#ff3975;box-shadow:0 0 7px rgba(255,57,117,.7)}
+
+/* Screen-level dark surfaces that previously owned their own backgrounds */
+.tok-theme-neon .home-page,
+.tok-theme-neon .discovery-page,
+.tok-theme-neon .matches-page,
+.tok-theme-neon .profile-page{
+  background:
+    radial-gradient(circle at 50% 0,rgba(255,47,115,.075),transparent 32%),
+    linear-gradient(180deg,#12131d 0%,#10111a 100%)!important;
+}
+.tok-theme-neon .home-welcome,
+.tok-theme-neon .home-profile-card,
+.tok-theme-neon .home-post-card,
+.tok-theme-neon .home-matches-card,
+.tok-theme-neon .home-tip,
+.tok-theme-neon .filters-panel,
+.tok-theme-neon .discovery-content,
+.tok-theme-neon .discovery-actions,
+.tok-theme-neon .discovery-empty,
+.tok-theme-neon .matches-empty,
+.tok-theme-neon .profile-identity{
+  background:#171925;
+  border-color:#2c2e3d;
+}
+.tok-theme-neon .discovery-card{
+  background:#171925;
+  border-color:#34374a;
+}
+.tok-theme-neon .discovery-content,
+.tok-theme-neon .discovery-actions{background:#171925}
+.tok-theme-neon .discovery-photo,
+.tok-theme-neon .no-photo{background:#1d1f2d}
+.tok-theme-neon .discovery-gradient{
+  background:linear-gradient(180deg,transparent,rgba(10,11,17,.2) 35%,rgba(10,11,17,.92) 100%);
+}
+.tok-theme-neon .profile-photo-wrapper{background:#1d1f2d}
+.tok-theme-neon .profile-details,
+.tok-theme-neon .profile-section,
+.tok-theme-neon .profile-theme-section{border-color:#2c2e3d}
+.tok-theme-neon .profile-status,
+.tok-theme-neon .profile-theme-title span,
+.tok-theme-neon .profile-detail-item small{color:#9297a6}
+.tok-theme-neon .profile-section-heading span{background:#202234;color:#9297a6}
+.tok-theme-neon .profile-primary-button,
+.tok-theme-neon .profile-save-button{background:linear-gradient(90deg,#ff2f73,#d92766)}
+.tok-theme-neon .profile-admin-button,
+.tok-theme-neon .profile-logout-button,
+.tok-theme-neon .profile-cancel-button{background:#202234;border-color:#34374a;color:#ececf2}
+.tok-theme-neon .matches-container{color:#f8f8fb}
+.tok-theme-neon .discovery-loading,
+.tok-theme-neon .matches-loading{color:#f8f8fb}
