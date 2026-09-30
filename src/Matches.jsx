@@ -206,7 +206,7 @@ function Matches({ user, onHome, onOpenChat }) {
                   </div>
 
                   <div className="match-info">
-                    <div className="match-name-row"><strong>{profile.name}</strong><span className="match-online-dot" /></div>
+                    <div className="match-name-row"><strong>{profile.name}</strong></div>
                     <span>{chatPreview[match.id]?.body || "Начать общение"}</span>
                   </div>
                   <div className="match-chat-icon">›</div>
