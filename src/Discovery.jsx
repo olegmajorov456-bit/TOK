@@ -150,7 +150,6 @@ function Discovery({ user, onHome }) {
     const { data: matchId, error: matchError } = await supabase.rpc("create_match_if_mutual", { target_user_id: profile.id });
     if (matchError) console.error("Ошибка создания мэтча:", matchError);
     if (matchId) alert(`💕 У вас взаимная симпатия с ${profile.name}!`);
-    setLikedBy((current) => new Set(current).add(profile.id));
 
     setAllProfiles((current) => current.filter((item) => item.id !== profile.id));
     setProfiles((current) => {
