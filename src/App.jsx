@@ -175,7 +175,19 @@ function App() {
 
   if (!profile) return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
 
-  if (page === "chat" && selectedChat) return <Chat user={session.user} match={selectedChat.match} profile={selectedChat.profile} theme={theme} onBack={() => setPage("matches")} />;
+  if (page === "chat" && selectedChat) return (
+    <Chat
+      user={session.user}
+      match={selectedChat.match}
+      profile={selectedChat.profile}
+      theme={theme}
+      onBack={() => setPage("matches")}
+      onHome={goHome}
+      onDiscovery={() => { setPage("discovery"); setSelectedChat(null); }}
+      onMatches={() => setPage("matches")}
+      onProfile={() => { setPage("profile"); setSelectedChat(null); }}
+    />
+  );
   if (page === "support") return <Support user={session.user} onBack={() => setPage("home")} />;
   if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
