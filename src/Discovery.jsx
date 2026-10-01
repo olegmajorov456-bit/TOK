@@ -32,6 +32,7 @@ function Discovery({ user, onHome }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
   const [refreshLoading, setRefreshLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => { loadProfiles(); }, []);
 
@@ -111,28 +112,26 @@ function Discovery({ user, onHome }) {
     setFiltersOpen(false);
   }
 
-  async function handleSkip() {
+  function handleSkip() {
     if (actionLoading) return;
-    const profile = profiles[currentIndex];
-    if (!profile) return;
+    const current = profiles[currentIndex];
+    if (!current || profiles.length <= 1) return;
 
     setActionLoading(true);
+    setHistory((items) => [...items, current]);
 
+    setProfiles((currentProfiles) => {
+      const next = currentProfiles.filter((item) => item.id !== current.id);
+      return next.length ? next : currentProfiles;
+    });
     setCurrentIndex((index) => {
-      if (profiles.length <= 1) return 0;
-      return index < profiles.length - 1 ? index + 1 : 0;
+      const nextLength = profiles.length - 1;
+      return nextLength <= 0 || index >= nextLength ? 0 : index;
     });
-
-    setProfiles((current) => {
-      if (current.length <= 1) return current;
-      if (currentIndex < current.length - 1) return current;
-      return shuffleProfiles(current);
-    });
-
     setActionLoading(false);
   }
 
-  function handleUndo() {
+  function handleUndo()() {
     if (actionLoading || profiles.length <= 1) return;
     setCurrentIndex((index) => index > 0 ? index - 1 : profiles.length - 1);
   }
@@ -151,6 +150,7 @@ function Discovery({ user, onHome }) {
     if (matchError) console.error("Ошибка создания мэтча:", matchError);
     if (matchId) alert(`💕 У вас взаимная симпатия с ${profile.name}!`);
 
+    setHistory((current) => current.filter((item) => item.id !== profile.id));
     setAllProfiles((current) => current.filter((item) => item.id !== profile.id));
     setProfiles((current) => {
       const next = current.filter((item) => item.id !== profile.id);
