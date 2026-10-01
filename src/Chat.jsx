@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Chat.css";
+import BottomNav from "./BottomNav";
 
-function Chat({ user, match, profile, onBack, theme = "light" }) {
+function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, onProfile, theme = "light" }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -187,6 +188,7 @@ function Chat({ user, match, profile, onBack, theme = "light" }) {
         <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder="Напишите сообщение..." maxLength={2000} disabled={sending} />
         <button type="submit" disabled={sending || !messageText.trim()}>➤</button>
       </form>
+      <BottomNav activePage="chat" onHome={onHome} onDiscovery={onDiscovery} onMatches={onMatches} onProfile={onProfile} />
     </div>
   );
 }
