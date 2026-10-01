@@ -185,7 +185,8 @@ function App() {
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
-        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}\n        {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
+        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}
+        {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
       <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
