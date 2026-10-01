@@ -188,7 +188,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
         <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder="Напишите сообщение..." maxLength={2000} disabled={sending} />
         <button type="submit" disabled={sending || !messageText.trim()}>➤</button>
       </form>
-      <BottomNav activePage="chat" onHome={onHome} onDiscovery={onDiscovery} onMatches={onMatches} onProfile={onProfile} />
+      <BottomNav activePage="matches" onHome={onHome} onDiscovery={onDiscovery} onMatches={onMatches} onProfile={onProfile} />
     </div>
   );
 }
