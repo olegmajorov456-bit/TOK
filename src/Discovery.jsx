@@ -31,6 +31,7 @@ function Discovery({ user, onHome }) {
   const [reportOpen, setReportOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
+  const [preferredGender, setPreferredGender] = useState("");
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [history, setHistory] = useState([]);
 
@@ -70,13 +71,14 @@ function Discovery({ user, onHome }) {
     return result;
   }
 
-  function filterProfiles(items, activeFilters = filters) {
+  function filterProfiles(items, activeFilters = filters, preference = preferredGender) {
     const minAge = activeFilters.minAge ? Number(activeFilters.minAge) : null;
     const maxAge = activeFilters.maxAge ? Number(activeFilters.maxAge) : null;
+    const genderFilter = activeFilters.gender || preference;
 
     return items.filter((profile) => {
       const age = calculateAge(profile.birth_date);
-      if (activeFilters.gender && profile.gender !== activeFilters.gender) return false;
+      if (genderFilter && profile.gender !== genderFilter) return false;
       if (activeFilters.faculty && profile.faculty !== activeFilters.faculty) return false;
       if (activeFilters.course && String(profile.course) !== String(activeFilters.course)) return false;
       if (minAge !== null && (!age || age < minAge)) return false;
@@ -110,6 +112,9 @@ function Discovery({ user, onHome }) {
     if (matchesError) console.error("Ошибка загрузки мэтчей:", matchesError);
 
     const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
+    const profilePreference = myProfile.looking_for === "male" || myProfile.looking_for === "female" ? myProfile.looking_for : "";
+    setPreferredGender(profilePreference);
+    setFilters((current) => ({ ...current, gender: current.gender || profilePreference }));
     const matchedUserIds = new Set((myMatches || []).map((match) => (
       match.user1_id === user.id ? match.user2_id : match.user1_id
     )));
@@ -131,7 +136,7 @@ function Discovery({ user, onHome }) {
     );
 
     setAllProfiles(candidates);
-    setProfiles(shuffleProfiles(filterProfiles(candidates)));
+    setProfiles(shuffleProfiles(filterProfiles(candidates, { ...filters, gender: filters.gender || profilePreference }, profilePreference)));
     setHistory([]);
     setLoading(false);
   }
@@ -150,8 +155,9 @@ function Discovery({ user, onHome }) {
     setFiltersOpen(false);
   }
   function resetFilters() {
-    setFilters({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
-    setProfiles(shuffleProfiles(allProfiles));
+    const reset = { gender: preferredGender, faculty: "", course: "", minAge: "", maxAge: "" };
+    setFilters(reset);
+    setProfiles(shuffleProfiles(filterProfiles(allProfiles, reset, preferredGender)));
     setCurrentIndex(0);
     setFiltersOpen(false);
   }
@@ -159,19 +165,21 @@ function Discovery({ user, onHome }) {
   function handleSkip() {
     if (actionLoading) return;
     const current = profiles[currentIndex];
-    if (!current || profiles.length <= 1) return;
+    if (!current || profiles.length === 0) return;
 
     setActionLoading(true);
     setHistory((items) => [...items, current]);
 
+    // Пропуск не удаляет анкету из выдачи: она уходит в конец очереди
+    // и снова появится после остальных. Анкета исчезает навсегда только после лайка/мэтча.
     setProfiles((currentProfiles) => {
-      const next = currentProfiles.filter((item) => item.id !== current.id);
-      return next.length ? next : currentProfiles;
+      if (currentProfiles.length <= 1) return currentProfiles;
+      const next = [...currentProfiles];
+      const [skipped] = next.splice(currentIndex, 1);
+      next.push(skipped);
+      return next;
     });
-    setCurrentIndex((index) => {
-      const nextLength = profiles.length - 1;
-      return nextLength <= 0 || index >= nextLength ? 0 : index;
-    });
+    setCurrentIndex((index) => (profiles.length <= 1 ? 0 : index >= profiles.length - 1 ? 0 : index));
     setActionLoading(false);
   }
 
@@ -180,11 +188,8 @@ function Discovery({ user, onHome }) {
     const previous = history[history.length - 1];
     setHistory((items) => items.slice(0, -1));
 
-    setProfiles((current) => {
-      if (current.some((item) => item.id === previous.id)) return current;
-      return [...current, previous];
-    });
-    setCurrentIndex(profiles.length);
+    const previousIndex = profiles.findIndex((item) => item.id === previous.id);
+    if (previousIndex >= 0) setCurrentIndex(previousIndex);
   }
 
   async function handleLike() {
