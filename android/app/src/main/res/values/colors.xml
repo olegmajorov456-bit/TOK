@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="tok_pink">#E83C6D</color>
+    <color name="tok_dark">#08090D</color>
+    <color name="tok_white">#FFFFFF</color>
 </resources>
