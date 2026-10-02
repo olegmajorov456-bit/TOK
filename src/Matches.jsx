@@ -207,7 +207,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
 
                   <div className="match-info">
                     <div className="match-name-row"><strong>{profile.name}</strong></div>
-                    <span>{chatPreview[match.id]?.body || "Начать общение"}</span>
+                    <span>{chatPreview[match.id]?.body || (chatPreview[match.id]?.image_url ? "📷 Фото" : "Начать общение")}</span>
                   </div>
                   <div className="match-chat-icon">›</div>
 
