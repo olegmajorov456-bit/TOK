@@ -648,3 +648,42 @@
 .admin-save-button:disabled { opacity:.5; }
 .admin-home-message { margin:0 0 14px; color:#5c8a61; font-size:13px; }
 @media(max-width:600px) { .admin-logo { width:44px; height:44px; } .admin-tabs { grid-template-columns:1fr; } .admin-chat { min-height:500px; } }
+
+
+/* Final admin form/theme cleanup */
+.admin-user-search{
+  width:100%;
+  padding:13px;
+  box-sizing:border-box;
+  border:1px solid var(--admin-border);
+  border-radius:14px;
+  margin-bottom:12px;
+  outline:none;
+  background:var(--admin-input);
+  color:var(--admin-text);
+  font-family:inherit;
+}
+.admin-user-search::placeholder{color:var(--admin-muted)}
+.admin-user-search:focus{border-color:#e83c6d;box-shadow:0 0 0 3px rgba(232,60,109,.08)}
+.admin-home-save{
+  width:100%;
+  margin-top:13px;
+  border:0;
+  border-radius:14px;
+  padding:13px;
+  background:linear-gradient(90deg,#ff2f73,#d92766);
+  color:#fff;
+  font-family:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+.admin-home-save:disabled{opacity:.6;cursor:wait}
+.tok-theme-neon .admin-user-search{background:#1d1f2d;border-color:#34374a;color:#f8f8fb}
+.tok-theme-neon .admin-user-search::placeholder{color:#777c8b}
+@media(max-width:600px){
+  .admin-container{width:calc(100% - 20px);padding-top:14px}
+  .admin-tabs{grid-template-columns:1fr 1fr!important;overflow:visible}
+  .admin-tabs button{font-size:11px;min-height:48px;padding:0 6px}
+  .admin-section-heading{align-items:flex-start}
+  .admin-section-heading h2{font-size:21px}
+}
