@@ -33,3 +33,10 @@
 .tok-theme-light .chat-attach-button{background:#f1f2f4;color:#4b515a}
 .tok-theme-light .chat-image-preview{background:#fff;border-color:#dfe2e7;color:#4b515a}
 .tok-theme-light .chat-image-preview button{background:#f1f2f4;color:#343840}
+
+
+/* Chat input — no pink focus ring around the text field */
+.chat-input-area input:focus{outline:none!important;box-shadow:none!important;border-color:transparent!important}
+.chat-input-area input{border:0!important;outline:none!important;box-shadow:none!important}
+.chat-input-area:focus-within{border-color:#2b2d36!important;box-shadow:0 15px 45px rgba(0,0,0,.45)!important}
+.tok-theme-light .chat-input-area:focus-within{border-color:#dfe2e7!important;box-shadow:0 15px 40px rgba(31,36,45,.13)!important}
