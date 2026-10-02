@@ -16,3 +16,20 @@
 .chat-page.tok-theme-light .chat-input-area input::placeholder{color:#9aa0a9}
 .chat-page.tok-theme-light .chat-input-area button{background:#e83c6d;box-shadow:0 6px 18px rgba(232,60,109,.18)}
 .chat-page.tok-theme-light .chat-spinner{border-color:#e1e4e9;border-top-color:#e83c6d}
+
+.chat-profile-button{border:0;background:transparent;padding:0;color:inherit;text-align:left;cursor:pointer}
+.chat-profile-button:hover{opacity:.9}
+.chat-message{position:relative;padding-bottom:7px}
+.chat-message-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-message-time{display:block;margin-top:4px;text-align:right;font-size:9px;line-height:1;color:currentColor;opacity:.58}
+.chat-image-link{display:block;margin:-2px -4px 6px}
+.chat-image{display:block;max-width:min(300px,70vw);max-height:360px;border-radius:13px;object-fit:cover}
+.chat-attach-button{width:38px;height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#252630;color:#fff;font-size:16px;cursor:pointer}
+.chat-attach-button input{display:none}
+.chat-image-preview{position:absolute;left:8px;right:8px;bottom:62px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #343640;border-radius:12px;background:#171820;color:#d8d9df;font-size:10px}
+.chat-image-preview span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-image-preview button{width:24px;height:24px;border:0;border-radius:8px;background:#2b2d36;color:#fff;cursor:pointer}
+.chat-input-area{position:fixed}
+.tok-theme-light .chat-attach-button{background:#f1f2f4;color:#4b515a}
+.tok-theme-light .chat-image-preview{background:#fff;border-color:#dfe2e7;color:#4b515a}
+.tok-theme-light .chat-image-preview button{background:#f1f2f4;color:#343840}
