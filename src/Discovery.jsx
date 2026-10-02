@@ -18,8 +18,29 @@ function calculateAge(birthDate) {
 
 function getHobbies(profile) {
   if (!profile?.hobbies) return [];
-  if (Array.isArray(profile.hobbies)) return profile.hobbies.filter(Boolean).map(String).map((item) => item.trim()).filter(Boolean);
-  return String(profile.hobbies).split(",").map((item) => item.trim()).filter(Boolean);
+  if (Array.isArray(profile.hobbies)) {
+    return profile.hobbies.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
+  }
+
+  let value = String(profile.hobbies).trim();
+  if (!value || value === "[]" || value === "{}") return [];
+
+  if (value.startsWith("{") && value.endsWith("}")) {
+    value = value.slice(1, -1);
+  }
+
+  if (value.startsWith("[") && value.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
+      }
+    } catch {
+      value = value.slice(1, -1);
+    }
+  }
+
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function Discovery({ user, onHome }) {
