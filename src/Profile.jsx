@@ -28,8 +28,30 @@ function getMinBirthDate() {
 
 function getHobbies(profile) {
   if (!profile?.hobbies) return [];
-  if (Array.isArray(profile.hobbies)) return profile.hobbies.filter(Boolean);
-  return String(profile.hobbies).split(",").map((item) => item.trim()).filter(Boolean);
+  if (Array.isArray(profile.hobbies)) {
+    return profile.hobbies.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
+  }
+
+  let value = String(profile.hobbies).trim();
+
+  // Старые записи могли сохраниться как Postgres-массив: {Музыка,Спорт}
+  if (value.startsWith("{") && value.endsWith("}")) {
+    value = value.slice(1, -1).replace(/\\"/g, '"');
+  }
+
+  // На случай записей, сохранённых JSON-массивом.
+  if (value.startsWith("[") && value.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
+      }
+    } catch {
+      value = value.slice(1, -1);
+    }
+  }
+
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChange }) {
@@ -129,7 +151,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
         avatarUrl = publicUrlData.publicUrl;
       }
 
-      const hobbiesValue = hobbies.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 12);
+      const hobbiesValue = hobbies.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 12).join(", ");
       const { data, error } = await supabase.from("profiles").update({
         name: name.trim(),
         birth_date: birthDate || null,
