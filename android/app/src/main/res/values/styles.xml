@@ -2,9 +2,16 @@
 <resources>
     <style name="Theme.TOK" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#E83C6D</item>
-        <item name="android:navigationBarColor">#08090D</item>
-        <item name="android:statusBarColor">#08090D</item>
+        <item name="android:colorAccent">@color/tok_pink</item>
+        <item name="android:navigationBarColor">@color/tok_dark</item>
+        <item name="android:statusBarColor">@color/tok_dark</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+    <style name="Theme.TOK.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/tok_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_tok_heart</item>
+        <item name="postSplashScreenTheme">@style/Theme.TOK</item>
     </style>
 </resources>
