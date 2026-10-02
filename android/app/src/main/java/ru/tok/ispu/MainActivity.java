@@ -16,12 +16,14 @@ import android.webkit.WebViewClient;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity {
     private static final String START_URL = "https://tok-ispu.pages.dev/";
     private static final int FILE_CHOOSER_REQUEST = 1001;
 
     private WebView webView;
+    private SwipeRefreshLayout refreshLayout;
     private ValueCallback<Uri[]> uploadCallback;
 
     @Override
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         cookies.setAcceptCookie(true);
         cookies.setAcceptThirdPartyCookies(webView, true);
 
-        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);\n        webView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {\n            refreshLayout.setEnabled(scrollY == 0);\n        });
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
