@@ -98,7 +98,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
     const { data: conversations } = await supabase.from("conversations").select("id,match_id").in("match_id", matchIds);
     const conversationIds = (conversations || []).map((item) => item.id);
     if (conversationIds.length) {
-      const { data: recentMessages } = await supabase.from("messages").select("conversation_id,body,created_at,sender_id").in("conversation_id", conversationIds).order("created_at", { ascending: false });
+      const { data: recentMessages } = await supabase.from("messages").select("conversation_id,body,image_url,created_at,sender_id").in("conversation_id", conversationIds).order("created_at", { ascending: false });
       const previews = {};
       for (const message of recentMessages || []) if (!previews[message.conversation_id]) previews[message.conversation_id] = message;
       const previewByMatch = {};
