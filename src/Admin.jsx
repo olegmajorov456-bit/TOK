@@ -72,7 +72,7 @@ function Admin({ user, onBack }) {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "support_conversations" }, () => loadSupportConversations())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "support_messages" }, (payload) => {
         loadSupportConversations();
-        if (selectedConversation?.id === payload.new.conversation_id) {
+        if (selectedConversationRef.current?.id === payload.new.conversation_id) {
           setSupportMessages((current) => current.some((item) => item.id === payload.new.id) ? current : [...current, payload.new]);
           setTimeout(scrollSupportToBottom, 30);
         }
@@ -270,7 +270,7 @@ function Admin({ user, onBack }) {
         {activeTab === "users" && (
           <section className="admin-section">
             <div className="admin-section-heading"><div><span className="admin-section-kicker">МОДЕРАЦИЯ</span><h2>Пользователи</h2></div><button className="admin-refresh" onClick={loadUsers}>↻ Обновить</button></div>
-            <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder="Поиск по имени, факультету или ID..." style={{ width: "100%", padding: 13, boxSizing: "border-box", border: "1px solid #e3e3e6", borderRadius: 14, marginBottom: 12, outline: "none" }} />
+            <input className="admin-user-search" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder="Поиск по имени, факультету или ID..." />
             {loadingUsers ? <div className="admin-empty"><div className="admin-spinner" /><p>Загружаем пользователей...</p></div> : <div className="admin-support-list">
               {filteredUsers.map((item) => (
                 <article key={item.id} style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 12 }}>
@@ -297,7 +297,7 @@ function Admin({ user, onBack }) {
 
         {activeTab === "reports" && <section className="admin-section"><div className="admin-section-heading"><div><span className="admin-section-kicker">МОДЕРАЦИЯ</span><h2>Жалобы пользователей</h2></div><button className="admin-refresh" onClick={loadReports}>↻ Обновить</button></div>{loadingReports ? <div className="admin-empty"><div className="admin-spinner" /><p>Загружаем жалобы...</p></div> : reports.length === 0 ? <div className="admin-empty"><div className="admin-empty-icon">🚩</div><h3>Жалоб пока нет</h3></div> : <div className="admin-reports-list">{reports.map((report) => <article key={report.id} className="admin-report-card"><div className="admin-report-top"><div><span className="admin-report-label">Жалоба №{report.id}</span><h3>{report.reason}</h3></div><select value={report.status} onChange={(e) => updateReportStatus(report.id, e.target.value)}><option value="new">Новая</option><option value="in_review">На рассмотрении</option><option value="resolved">Решена</option><option value="rejected">Отклонена</option></select></div><div className="admin-report-users"><div className="admin-report-user"><span>Кто пожаловался</span><strong>{report.reporter?.name || "Пользователь"}</strong></div><div className="admin-report-arrow">→</div><div className="admin-report-user"><span>На кого</span><strong>{report.reported?.name || "Пользователь"}</strong></div></div>{report.details && <div className="admin-report-details"><span>Подробности</span><p>{report.details}</p></div>}<div className="admin-report-date">{new Date(report.created_at).toLocaleString("ru-RU")}</div></article>)}</div>}</section>}
 
-        {activeTab === "home" && <section className="admin-section"><div className="admin-section-heading"><div><span className="admin-section-kicker">НАСТРОЙКИ САЙТА</span><h2>Главная страница</h2></div></div><form onSubmit={saveHomeSettings} style={cardStyle}><label>Заголовок<input value={homeTitle} onChange={(e) => setHomeTitle(e.target.value)} style={selectStyle} /></label><label style={{ display: "block", marginTop: 14 }}>Описание<textarea value={homeDescription} onChange={(e) => setHomeDescription(e.target.value)} rows="5" style={{ ...selectStyle, resize: "vertical" }} /></label><button type="submit" disabled={savingHome} style={{ marginTop: 13, border: "none", borderRadius: 14, padding: 13, background: "#123b78", color: "#fff", fontFamily: "inherit", fontWeight: 700, cursor: "pointer" }}>{savingHome ? "Сохраняем..." : "💾 Сохранить"}</button>{homeMessage && <p className="admin-report-date">{homeMessage}</p>}</form></section>}
+        {activeTab === "home" && <section className="admin-section"><div className="admin-section-heading"><div><span className="admin-section-kicker">НАСТРОЙКИ САЙТА</span><h2>Главная страница</h2></div></div><form onSubmit={saveHomeSettings} style={cardStyle}><label>Заголовок<input value={homeTitle} onChange={(e) => setHomeTitle(e.target.value)} style={selectStyle} /></label><label style={{ display: "block", marginTop: 14 }}>Описание<textarea value={homeDescription} onChange={(e) => setHomeDescription(e.target.value)} rows="5" style={{ ...selectStyle, resize: "vertical" }} /></label><button type="submit" className="admin-home-save" disabled={savingHome}>{savingHome ? "Сохраняем..." : "💾 Сохранить"}</button>{homeMessage && <p className="admin-report-date">{homeMessage}</p>}</form></section>}
       </main>
     </div>
   );
