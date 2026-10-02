@@ -19,3 +19,7 @@
 .tok-theme-light .notification-bell-button:hover,.tok-theme-light .notification-bell-button.open{background:#fff7f9;border-color:#e83c6d;color:#e83c6d}
 .tok-theme-light .notification-badge{border-color:#fff}
 .tok-theme-light .notification-mini-spinner{border-color:#e1e4e8;border-top-color:#e83c6d}
+
+
+/* Use a consistent vector bell icon */
+.notification-bell-icon{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
