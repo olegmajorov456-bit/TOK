@@ -162,7 +162,7 @@ function Support({ user, onBack }) {
   if (loading) return <div className={`support-page tok-theme-${theme}`}><div className="support-loading"><p>Открываем поддержку...</p></div></div>;
 
   return (
-    <div className="support-page">
+    <div className={`support-page tok-theme-${theme}`}>
       <header className="support-header">
         <button className="support-back" onClick={onBack}>←</button>
         <div><strong>Поддержка ТОК</strong><span>Мы рядом, если что-то не работает</span></div>
