@@ -45,66 +45,85 @@ function Discovery({ user, onHome }) {
     return result;
   }
 
+  function filterProfiles(items, activeFilters = filters) {
+    const minAge = activeFilters.minAge ? Number(activeFilters.minAge) : null;
+    const maxAge = activeFilters.maxAge ? Number(activeFilters.maxAge) : null;
+
+    return items.filter((profile) => {
+      const age = calculateAge(profile.birth_date);
+      if (activeFilters.gender && profile.gender !== activeFilters.gender) return false;
+      if (activeFilters.faculty && profile.faculty !== activeFilters.faculty) return false;
+      if (activeFilters.course && String(profile.course) !== String(activeFilters.course)) return false;
+      if (minAge !== null && (!age || age < minAge)) return false;
+      if (maxAge !== null && (!age || age > maxAge)) return false;
+      return true;
+    });
+  }
+
   async function loadProfiles() {
     setLoading(true);
     setCurrentIndex(0);
 
-    const { data: myProfile, error: myProfileError } = await supabase.from("profiles").select("gender, looking_for").eq("id", user.id).single();
+    const { data: myProfile, error: myProfileError } = await supabase
+      .from("profiles")
+      .select("gender, looking_for")
+      .eq("id", user.id)
+      .single();
+
     if (myProfileError) {
       console.error("Ошибка загрузки своего профиля:", myProfileError);
       setLoading(false);
       return;
     }
 
-    const { data: outgoingLikes, error: outgoingLikesError } = await supabase
-      .from("likes")
-      .select("liked_user_id")
-      .eq("user_id", user.id);
+    const [{ data: outgoingLikes, error: outgoingLikesError }, { data: myMatches, error: matchesError }] = await Promise.all([
+      supabase.from("likes").select("liked_user_id").eq("user_id", user.id),
+      supabase.from("matches").select("user1_id,user2_id").or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`),
+    ]);
 
-    if (outgoingLikesError) {
-      console.error("Ошибка загрузки поставленных лайков:", outgoingLikesError);
-    }
+    if (outgoingLikesError) console.error("Ошибка загрузки поставленных лайков:", outgoingLikesError);
+    if (matchesError) console.error("Ошибка загрузки мэтчей:", matchesError);
 
     const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
+    const matchedUserIds = new Set((myMatches || []).map((match) => (
+      match.user1_id === user.id ? match.user2_id : match.user1_id
+    )));
 
-    let query = supabase.from("profiles").select("*").neq("id", user.id).eq("is_blocked", false);
-    if (myProfile.looking_for === "male" || myProfile.looking_for === "female") query = query.eq("gender", myProfile.looking_for);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .neq("id", user.id)
+      .eq("is_blocked", false);
 
-    const { data, error } = await query;
     if (error) {
       console.error("Ошибка загрузки анкет:", error);
       setLoading(false);
       return;
     }
 
-    const candidates = data || [];
-    const resultProfiles = candidates.filter(
-      (profile) => !outgoingLikeIds.has(profile.id)
+    const candidates = (data || []).filter(
+      (profile) => !outgoingLikeIds.has(profile.id) && !matchedUserIds.has(profile.id)
     );
 
-    const shuffledProfiles = shuffleProfiles(resultProfiles);
-    setAllProfiles(resultProfiles);
-    setProfiles(shuffledProfiles);
+    setAllProfiles(candidates);
+    setProfiles(shuffleProfiles(filterProfiles(candidates)));
+    setHistory([]);
     setLoading(false);
   }
-
   function applyFilters() {
     const minAge = filters.minAge ? Number(filters.minAge) : null;
     const maxAge = filters.maxAge ? Number(filters.maxAge) : null;
-    const filtered = allProfiles.filter((profile) => {
-      const age = calculateAge(profile.birth_date);
-      if (filters.gender && profile.gender !== filters.gender) return false;
-      if (filters.faculty && profile.faculty !== filters.faculty) return false;
-      if (filters.course && String(profile.course) !== String(filters.course)) return false;
-      if (minAge !== null && (!age || age < minAge)) return false;
-      if (maxAge !== null && (!age || age > maxAge)) return false;
-      return true;
-    });
+    if (minAge !== null && maxAge !== null && minAge > maxAge) {
+      setFiltersOpen(false);
+      return;
+    }
+
+    const filtered = filterProfiles(allProfiles, filters);
     setProfiles(shuffleProfiles(filtered));
     setCurrentIndex(0);
+    setHistory([]);
     setFiltersOpen(false);
   }
-
   function resetFilters() {
     setFilters({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
     setProfiles(shuffleProfiles(allProfiles));
@@ -131,9 +150,16 @@ function Discovery({ user, onHome }) {
     setActionLoading(false);
   }
 
-  function handleUndo()() {
-    if (actionLoading || profiles.length <= 1) return;
-    setCurrentIndex((index) => index > 0 ? index - 1 : profiles.length - 1);
+  function handleUndo() {
+    if (actionLoading || history.length === 0) return;
+    const previous = history[history.length - 1];
+    setHistory((items) => items.slice(0, -1));
+
+    setProfiles((current) => {
+      if (current.some((item) => item.id === previous.id)) return current;
+      return [...current, previous];
+    });
+    setCurrentIndex(profiles.length);
   }
 
   async function handleLike() {
