@@ -189,14 +189,16 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
         imageUrl = publicUrlData.publicUrl;
       }
 
+      const messagePayload = {
+        conversation_id: conversation.id,
+        sender_id: user.id,
+        body: text,
+      };
+      if (imageUrl) messagePayload.image_url = imageUrl;
+
       const { data, error } = await supabase
         .from("messages")
-        .insert({
-          conversation_id: conversation.id,
-          sender_id: user.id,
-          body: text,
-          image_url: imageUrl,
-        })
+        .insert(messagePayload)
         .select()
         .single();
 
