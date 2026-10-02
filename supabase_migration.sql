@@ -258,3 +258,36 @@ begin
     alter publication supabase_realtime add table public.notifications;
   end if;
 end $$;
+
+
+-- Чат: изображения и базовая отправка фото.
+alter table public.messages add column if not exists image_url text;
+
+insert into storage.buckets (id, name, public)
+values ('chat-media', 'chat-media', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Users can upload own chat media" on storage.objects;
+create policy "Users can upload own chat media"
+  on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'chat-media'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+drop policy if exists "Authenticated users can view chat media" on storage.objects;
+create policy "Authenticated users can view chat media"
+  on storage.objects for select to authenticated
+  using (bucket_id = 'chat-media');
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'messages'
+  ) then
+    alter publication supabase_realtime add table public.messages;
+  end if;
+end $$;
