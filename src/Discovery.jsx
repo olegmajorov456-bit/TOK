@@ -250,7 +250,7 @@ function Discovery({ user, onHome }) {
     setRefreshLoading(false);
   }
 
-  const activeFiltersCount = useMemo(() => Object.values(filters).filter(Boolean).length, [filters]);
+  const activeFiltersCount = useMemo(() => Object.entries(filters).filter(([key, value]) => value && !(key === "gender" && value === preferredGender)).length, [filters, preferredGender]);
   if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{refreshLoading ? "Обновляем все анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
 
   const profile = profiles[currentIndex];
