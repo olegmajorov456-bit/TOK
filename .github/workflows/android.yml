@@ -48,8 +48,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="android-v1.0.${{ github.run_number }}"
+          TAG="android-v1.2.${{ github.run_number }}"
           gh release create "$TAG" TOK-Android.apk \
-            --title "ТОК Android v1.0.${{ github.run_number }}" \
-            --notes "Автоматическая сборка Android-приложения ТОК. APK для установки на Android." \
+            --title "ТОК Android v1.2.${{ github.run_number }}" \
+            --notes "Обновлённая сборка Android-приложения ТОК: pull-to-refresh и новый launcher icon." \
             --latest
