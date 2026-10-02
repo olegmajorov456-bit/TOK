@@ -5,13 +5,16 @@
     <application
         android:allowBackup="true"
         android:label="ТОК"
-        android:theme="@style/Theme.TOK"
+        android:theme="@style/Theme.TOK.Starting"
         android:usesCleartextTraffic="false"
-        android:resizeableActivity="true">
+        android:resizeableActivity="true"
+        android:icon="@drawable/ic_tok_heart"
+        android:roundIcon="@drawable/ic_tok_heart">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
