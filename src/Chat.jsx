@@ -3,7 +3,7 @@ import { supabase } from "./supabaseClient";
 import "./Chat.css";
 import BottomNav from "./BottomNav";
 
-function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, onProfile, theme = "light" }) {
+function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, onProfile, onViewProfile, theme = "light" }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
@@ -223,7 +223,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
     <div className={`chat-page tok-theme-${theme}`}>
       <header className="chat-header">
         <button type="button" className="chat-back" onClick={onBack}>←</button>
-        <button type="button" className="chat-user chat-profile-button" onClick={() => window.dispatchEvent(new CustomEvent("tok-open-chat-profile", { detail: profile }))} aria-label="Открыть профиль">
+        <button type="button" className="chat-user chat-profile-button" onClick={() => onViewProfile?.(profile)} aria-label="Открыть профиль">
 
           <div className="chat-avatar">
             {profile?.avatar_url ? <img src={profile.avatar_url} alt={profile.name || ""} /> : <span>👤</span>}
