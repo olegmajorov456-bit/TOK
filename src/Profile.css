@@ -227,3 +227,8 @@
 .tok-theme-light .profile-form-title{border-bottom-color:#eceef1}
 .tok-theme-light .profile-edit-form input:focus,.tok-theme-light .profile-edit-form select:focus,.tok-theme-light .profile-edit-form textarea:focus{border-color:#cfd3d9!important;box-shadow:none!important}
 @media(max-width:600px){.profile-form-row{grid-template-columns:1fr}.profile-edit-buttons{grid-template-columns:1fr 1.2fr}}
+
+
+/* Avoid implying online status on the profile */
+.profile-status-dot{background:#ff4d82}
+.tok-theme-light .profile-status-dot{background:#e83c6d}
