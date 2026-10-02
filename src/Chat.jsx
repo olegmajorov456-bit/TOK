@@ -231,7 +231,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
             {profile?.avatar_url ? <img src={profile.avatar_url} alt={profile.name || ""} /> : <span>👤</span>}
           </div>
           <div><strong>{profile?.name || "Пользователь"}</strong><span>Ваш мэтч ❤️</span></div>
-        </div>
+        </button>
       </header>
 
       <main className="chat-messages">
