@@ -11,6 +11,7 @@ import Matches from "./Matches";
 import Chat from "./Chat";
 import Support from "./Support";
 import Admin from "./Admin";
+import PublicProfile from "./PublicProfile";
 import Header from "./Header";
 import BottomNav from "./BottomNav";
 import "./App.css";
@@ -26,6 +27,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState("home");
   const [selectedChat, setSelectedChat] = useState(null);
+  const [viewedProfile, setViewedProfile] = useState(null);
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
@@ -175,6 +177,14 @@ function App() {
 
   if (!profile) return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
 
+  if (page === "view-profile" && viewedProfile) return (
+    <PublicProfile
+      profile={viewedProfile}
+      onBack={() => { setPage("chat"); setViewedProfile(null); }}
+      theme={theme}
+    />
+  );
+
   if (page === "chat" && selectedChat) return (
     <Chat
       user={session.user}
@@ -186,6 +196,7 @@ function App() {
       onDiscovery={() => { setPage("discovery"); setSelectedChat(null); }}
       onMatches={() => setPage("matches")}
       onProfile={() => { setPage("profile"); setSelectedChat(null); }}
+      onViewProfile={(otherProfile) => { setViewedProfile(otherProfile); setPage("view-profile"); }}
     />
   );
   if (page === "support") return <Support user={session.user} onBack={() => setPage("home")} />;
