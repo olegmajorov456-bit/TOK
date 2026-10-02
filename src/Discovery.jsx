@@ -272,7 +272,6 @@ function Discovery({ user, onHome }) {
         <button className="discovery-button undo" onClick={handleUndo} disabled={actionLoading} title="Вернуться к предыдущей анкете" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6" /></svg></button>
         <button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading} title="Пропустить анкету" aria-label="Пропустить"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
         <button className="discovery-button like" onClick={handleLike} disabled={actionLoading} title="Поставить лайк" aria-label="Нравится"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></button>
-        <button className="discovery-button superlike" onClick={handleLike} disabled={actionLoading} title="Особая симпатия" aria-label="Особая симпатия"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.3 5 5.5.6-4.1 3.7 1.2 5.4-4.9-2.8-4.9 2.8 1.2-5.4-4.1-3.7 5.5-.6L12 3Z" /></svg></button>
         <button className="discovery-report-button" onClick={() => setReportOpen(true)}>Пожаловаться</button>
       </div>
     </div>}
