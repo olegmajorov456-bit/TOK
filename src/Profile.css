@@ -207,3 +207,23 @@
   .profile-loading-grid{margin-left:19px;margin-right:19px}
   .profile-loading-section{margin-left:19px;margin-right:19px}
 }
+
+
+/* Edit profile — clean form without pink focus outlines */
+.profile-edit-form{display:flex;flex-direction:column;gap:14px;background:#111219}
+.profile-form-title{padding-bottom:6px;border-bottom:1px solid #292b34}
+.profile-form-title h2{margin:0 0 5px}
+.profile-form-title p{margin:0;font-size:12px}
+.profile-edit-form label{display:flex;flex-direction:column;gap:7px}
+.profile-edit-form input,.profile-edit-form select,.profile-edit-form textarea{width:100%;min-height:46px;padding:11px 13px;outline:none;transition:border-color .15s,background .15s,box-shadow .15s}
+.profile-edit-form textarea{resize:vertical;min-height:115px}
+.profile-edit-form input:focus,.profile-edit-form select:focus,.profile-edit-form textarea:focus{border-color:#454852!important;box-shadow:none!important;outline:none!important}
+.profile-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-field-hint,.textarea-counter{color:#707580;font-size:10px}
+.profile-edit-buttons{display:grid;grid-template-columns:1fr 1.35fr;gap:10px;margin-top:4px}
+.profile-cancel-button,.profile-save-button{min-height:46px;border-radius:13px;border:1px solid #30323c;font-family:inherit;font-weight:800;cursor:pointer}
+.profile-save-button{border:0}
+.tok-theme-light .profile-edit-form{background:#fff}
+.tok-theme-light .profile-form-title{border-bottom-color:#eceef1}
+.tok-theme-light .profile-edit-form input:focus,.tok-theme-light .profile-edit-form select:focus,.tok-theme-light .profile-edit-form textarea:focus{border-color:#cfd3d9!important;box-shadow:none!important}
+@media(max-width:600px){.profile-form-row{grid-template-columns:1fr}.profile-edit-buttons{grid-template-columns:1fr 1.2fr}}
