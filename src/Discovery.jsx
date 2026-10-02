@@ -34,7 +34,32 @@ function Discovery({ user, onHome }) {
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [history, setHistory] = useState([]);
 
-  useEffect(() => { loadProfiles(); }, []);
+  useEffect(() => {
+    loadProfiles();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`discovery-matches-${user.id}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "matches",
+      }, (payload) => {
+        const match = payload.new;
+        const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
+        if (!otherUserId) return;
+
+        setAllProfiles((current) => current.filter((item) => item.id !== otherUserId));
+        setProfiles((current) => current.filter((item) => item.id !== otherUserId));
+        setHistory((current) => current.filter((item) => item.id !== otherUserId));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user.id]);
 
   function shuffleProfiles(items) {
     const result = [...items];
