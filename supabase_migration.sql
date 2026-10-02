@@ -298,4 +298,4 @@ begin
   ) then
     alter publication supabase_realtime add table public.matches;
   end if;
-end $;
+end $$;
