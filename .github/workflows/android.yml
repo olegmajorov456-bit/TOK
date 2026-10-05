@@ -52,5 +52,5 @@ jobs:
           TAG="android-v${VERSION_NAME}.${{ github.run_number }}"
           gh release create "$TAG" TOK-Android.apk \
             --title "ТОК Android v${VERSION_NAME}.${{ github.run_number }}" \
-            --notes "Обновлённая сборка Android-приложения ТОК: pull-to-refresh и новый launcher icon." \
+            --notes "Релиз ТОК Android v${VERSION_NAME}: обновления приложения, улучшения интерфейса и исправления чата." \
             --latest
