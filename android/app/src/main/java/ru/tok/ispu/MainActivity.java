@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -32,11 +35,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
+        WindowCompat.setDecorFitsSystemWindows(window, false);
         window.setStatusBarColor(0xFF08090D);
         window.setNavigationBarColor(0xFF08090D);
 
         webView = new WebView(this);
         setContentView(webView);
+
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
+            int top = insets.getInsets(WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout()).top;
+            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars() | WindowInsetsCompat.Type.ime()).bottom;
+            view.setPadding(view.getPaddingLeft(), top, view.getPaddingRight(), bottom);
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(webView);
 
         configureWebView();
         configureBackNavigation();
@@ -63,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " TOK-Android/1.2"
+                settings.getUserAgentString() + " TOK-Android/" + BuildConfig.VERSION_NAME
         );
 
         CookieManager cookies = CookieManager.getInstance();
