@@ -95,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if ("http".equalsIgnoreCase(scheme)
                         || "https".equalsIgnoreCase(scheme)) {
+                    String url = uri.toString();
+                    if (url.toLowerCase().contains(".apk")) {
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                        } catch (Exception ignored) {
+                        }
+                        return true;
+                    }
                     return false;
                 }
 
