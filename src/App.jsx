@@ -25,8 +25,15 @@ function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState("home");
-  const [selectedChat, setSelectedChat] = useState(null);
+  const [page, setPage] = useState(() => sessionStorage.getItem("tok-page") || "home");
+  const [selectedChat, setSelectedChat] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("tok-selected-chat");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [viewedProfile, setViewedProfile] = useState(null);
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
@@ -46,6 +53,21 @@ function App() {
   });
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
+
+  // Keep the current screen when Android temporarily recreates the WebView
+  // while the system file picker is open.
+  useEffect(() => {
+    sessionStorage.setItem("tok-page", page);
+    if (selectedChat) {
+      try {
+        sessionStorage.setItem("tok-selected-chat", JSON.stringify(selectedChat));
+      } catch (error) {
+        console.warn("Не удалось сохранить состояние чата:", error);
+      }
+    } else {
+      sessionStorage.removeItem("tok-selected-chat");
+    }
+  }, [page, selectedChat]);
 
 
   function compareVersions(version, currentParts) {
@@ -143,6 +165,8 @@ function App() {
         setProfile(null);
         setBlocked(false);
         setSelectedChat(null);
+        sessionStorage.removeItem("tok-selected-chat");
+        sessionStorage.setItem("tok-page", "home");
         setPage("home");
         setLoading(false);
         return;
