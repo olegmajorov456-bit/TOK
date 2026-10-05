@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -43,10 +44,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(webView);
 
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
-            int top = insets.getInsets(WindowInsetsCompat.Type.statusBars() | WindowInsetsCompat.Type.displayCutout()).top;
-            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars() | WindowInsetsCompat.Type.ime()).bottom;
-            view.setPadding(view.getPaddingLeft(), top, view.getPaddingRight(), bottom);
-            return insets;
+            int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
+            Insets bars = insets.getInsets(types);
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return new WindowInsetsCompat.Builder(insets)
+                    .setInsets(types, Insets.NONE)
+                    .build();
         });
         ViewCompat.requestApplyInsets(webView);
 
