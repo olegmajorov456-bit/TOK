@@ -8,6 +8,8 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
@@ -94,6 +96,8 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
       }
 
       setMessages(loadedMessages || []);
+      setReplyingTo(null);
+      setLightboxImage(null);
 
       if (channelRef.current) {
         await supabase.removeChannel(channelRef.current);
@@ -193,6 +197,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
         conversation_id: conversation.id,
         sender_id: user.id,
         body: text,
+        reply_to_id: replyingTo?.id || null,
       };
       if (imageUrl) messagePayload.image_url = imageUrl;
 
@@ -211,6 +216,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
       setMessages((current) => current.some((item) => item.id === data.id) ? current : [...current, data]);
       setMessageText("");
       setSelectedImage(null);
+      setReplyingTo(null);
     } finally {
       setImageUploading(false);
       setSending(false);
@@ -237,17 +243,45 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
       <main className="chat-messages">
         {messages.length === 0 ? (
           <div className="chat-empty"><div>💕</div><strong>Начните общение</strong><p>Вы понравились друг другу. Напишите первым!</p></div>
-        ) : messages.map((message) => (
-          <div key={message.id} className={`chat-message ${message.sender_id === user.id ? "mine" : "theirs"}`}>
-            {message.image_url && <a className="chat-image-link" href={message.image_url} target="_blank" rel="noreferrer"><img className="chat-image" src={message.image_url} alt="Отправленное фото" /></a>}
-            {message.body && <div className="chat-message-text">{message.body}</div>}
-            <time className="chat-message-time">{formatMessageTime(message.created_at)}</time>
-          </div>
-        ))}
+        ) : messages.map((message) => {
+          const replied = message.reply_to_id ? messages.find((item) => item.id === message.reply_to_id) : null;
+          return (
+            <div id={"message-" + message.id} key={message.id} className={`chat-message ${message.sender_id === user.id ? "mine" : "theirs"}`}>
+              {replied && (
+                <button type="button" className="chat-reply-quote" onClick={() => document.getElementById("message-" + replied.id)?.scrollIntoView({ behavior: "smooth", block: "center" })}>
+                  <strong>{replied.sender_id === user.id ? "Вы" : (profile?.name || "Пользователь")}</strong>
+                  <span>{replied.body || "📷 Фото"}</span>
+                </button>
+              )}
+              {message.image_url && (
+                <button type="button" className="chat-image-button" onClick={() => setLightboxImage(message.image_url)} aria-label="Открыть фото">
+                  <img className="chat-image" src={message.image_url} alt="Отправленное фото" />
+                </button>
+              )}
+              {message.body && <div className="chat-message-text">{message.body}</div>}
+              <div className="chat-message-actions">
+                <button type="button" className="chat-reply-button" onClick={() => setReplyingTo(message)}>↩ Ответить</button>
+                <time className="chat-message-time">{formatMessageTime(message.created_at)}</time>
+              </div>
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </main>
 
+      {lightboxImage && (
+        <div className="chat-lightbox" role="dialog" aria-modal="true" onClick={() => setLightboxImage(null)}>
+          <button type="button" className="chat-lightbox-close" onClick={() => setLightboxImage(null)} aria-label="Закрыть">×</button>
+          <img src={lightboxImage} alt="Фото" onClick={(event) => event.stopPropagation()} />
+        </div>
+      )}
       <form className="chat-input-area" onSubmit={sendMessage}>
+        {replyingTo && (
+          <div className="chat-reply-preview">
+            <div><strong>Ответ {replyingTo.sender_id === user.id ? "вам" : (profile?.name || "пользователю")}</strong><span>{replyingTo.body || "📷 Фото"}</span></div>
+            <button type="button" onClick={() => setReplyingTo(null)} aria-label="Отменить ответ">×</button>
+          </div>
+        )}
         {selectedImage && <div className="chat-image-preview"><span>📷 {selectedImage.name}</span><button type="button" onClick={() => setSelectedImage(null)} aria-label="Убрать фото">×</button></div>}
         <label className="chat-attach-button" title="Отправить фото" aria-label="Отправить фото">
           📎
