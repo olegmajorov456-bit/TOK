@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private SwipeRefreshLayout refreshLayout;
     private ValueCallback<Uri[]> uploadCallback;
-    private int safeTop;
-    private int safeBottom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +46,7 @@ public class MainActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
             int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
             Insets bars = insets.getInsets(types);
-            safeTop = Math.max(0, bars.top);
-            safeBottom = Math.max(0, bars.bottom);
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            applySafeAreaToWebView();
             return new WindowInsetsCompat.Builder(insets)
                     .setInsets(types, Insets.NONE)
                     .build();
@@ -68,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void applySafeAreaToWebView() {
-        if (webView == null) return;
-        webView.evaluateJavascript("document.documentElement.style.setProperty('--tok-safe-top','" + safeTop + "px');document.documentElement.style.setProperty('--tok-safe-bottom','" + safeBottom + "px');", null);
-    }
 
     private void configureWebView() {
         WebSettings settings = webView.getSettings();
@@ -129,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                applySafeAreaToWebView();
             }
 
             @Override
