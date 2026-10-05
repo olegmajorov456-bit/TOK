@@ -38,3 +38,14 @@
 .tok-theme-light .site-loading-logo{height:135px}
 .tok-theme-light .site-loading-logo img{filter:drop-shadow(0 8px 22px rgba(31,36,45,.08))!important}
 .tok-theme-light .site-loading-spinner{width:32px;height:32px;margin-top:18px;border:3px solid #e0e3e8;border-top-color:#e83c6d;border-right-color:#f1a0b5;box-shadow:0 5px 18px rgba(232,60,109,.08)}
+
+.tok-update-overlay{position:fixed;inset:0;z-index:9999;background:rgba(5,7,12,.72);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px}
+.tok-update-card{width:min(390px,100%);border-radius:26px;padding:28px;background:#fff;color:#20242b;box-shadow:0 25px 80px rgba(0,0,0,.35);text-align:center}
+.tok-update-icon{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;background:#ffe7ef;color:#e83c6d;font-size:32px;display:flex;align-items:center;justify-content:center}
+.tok-update-kicker{font-size:10px;font-weight:850;letter-spacing:.16em;color:#e83c6d}
+.tok-update-card h2{margin:7px 0 8px;font-size:22px}
+.tok-update-card strong{font-size:13px;color:#555d68}
+.tok-update-card p{margin:12px 0;color:#737a84;font-size:13px;line-height:1.5}
+.tok-update-button{display:block;margin-top:18px;padding:14px 18px;border-radius:15px;background:#e83c6d;color:#fff;text-decoration:none;font-weight:800}
+.tok-update-later{margin-top:10px;border:0;background:transparent;color:#777f89;font-weight:700;cursor:pointer}
+.tok-update-card small{display:block;margin-top:12px;color:#9a5b6c}
