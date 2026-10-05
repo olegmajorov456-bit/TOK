@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " TOK-Android/" + BuildConfig.VERSION_NAME
+                settings.getUserAgentString() + " TOK-Android/1.3"
         );
 
         CookieManager cookies = CookieManager.getInstance();
