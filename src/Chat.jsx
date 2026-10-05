@@ -201,11 +201,21 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
       };
       if (imageUrl) messagePayload.image_url = imageUrl;
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("messages")
         .insert(messagePayload)
         .select()
         .single();
+
+      if (error && replyingTo && /reply_to_id|column|schema cache/i.test(error.message || "")) {
+        const fallback = await supabase
+          .from("messages")
+          .insert({ ...messagePayload, reply_to_id: undefined })
+          .select()
+          .single();
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error) {
         console.error("Ошибка отправки сообщения:", error);
@@ -249,8 +259,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
             <div id={"message-" + message.id} key={message.id} className={`chat-message ${message.sender_id === user.id ? "mine" : "theirs"}`}>
               {replied && (
                 <button type="button" className="chat-reply-quote" onClick={() => document.getElementById("message-" + replied.id)?.scrollIntoView({ behavior: "smooth", block: "center" })}>
-                  <strong>{replied.sender_id === user.id ? "Вы" : (profile?.name || "Пользователь")}</strong>
-                  <span>{replied.body || "📷 Фото"}</span>
+                  <span className="chat-reply-line"><b>{replied.sender_id === user.id ? "Вы" : (profile?.name || "Пользователь")}</b><span>{replied.body || "📷 Фото"}</span></span><span className="chat-reply-arrow">↩</span>
                 </button>
               )}
               {message.image_url && (
@@ -278,7 +287,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
       <form className="chat-input-area" onSubmit={sendMessage}>
         {replyingTo && (
           <div className="chat-reply-preview">
-            <div><strong>Ответ {replyingTo.sender_id === user.id ? "вам" : (profile?.name || "пользователю")}</strong><span>{replyingTo.body || "📷 Фото"}</span></div>
+            <div><strong>Ответ на сообщение</strong><span>{replyingTo.sender_id === user.id ? "Ваше сообщение" : (profile?.name || "Пользователь")}</span><em>{replyingTo.body || "📷 Фото"}</em></div>
             <button type="button" onClick={() => setReplyingTo(null)} aria-label="Отменить ответ">×</button>
           </div>
         )}
@@ -287,7 +296,7 @@ function Chat({ user, match, profile, onBack, onHome, onDiscovery, onMatches, on
           📎
           <input type="file" accept="image/*" onChange={handleImageChange} disabled={sending} />
         </label>
-        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder={selectedImage ? "Добавьте подпись..." : "Напишите сообщение..."} maxLength={2000} disabled={sending} />
+        <input type="text" value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder={selectedImage ? "Добавьте подпись..." : replyingTo ? "Ответить на сообщение..." : "Напишите сообщение..."} maxLength={2000} disabled={sending} />
         <button type="submit" disabled={sending || imageUploading || (!messageText.trim() && !selectedImage)}>{imageUploading ? "…" : "➤"}</button>
       </form>
       <BottomNav activePage="matches" onHome={onHome} onDiscovery={onDiscovery} onMatches={onMatches} onProfile={onProfile} />
