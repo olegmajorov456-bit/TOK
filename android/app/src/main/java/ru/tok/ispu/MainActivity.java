@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " TOK-Android/1.3"
+                settings.getUserAgentString() + " TOK-Android/1.5"
         );
 
         CookieManager cookies = CookieManager.getInstance();
@@ -169,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     Intent chooserIntent = params.createIntent();
+                    chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    chooserIntent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
                     startActivityForResult(chooserIntent, FILE_CHOOSER_REQUEST);
                     return true;
                 } catch (Exception e) {
