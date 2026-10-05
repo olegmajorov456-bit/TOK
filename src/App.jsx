@@ -30,6 +30,8 @@ function App() {
   const [viewedProfile, setViewedProfile] = useState(null);
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
+  const [androidUpdate, setAndroidUpdate] = useState(null);
+  const [showAndroidUpdate, setShowAndroidUpdate] = useState(false);
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("tok-theme");
@@ -45,6 +47,28 @@ function App() {
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
+
+  function compareVersions(version, currentParts) {
+    const next = String(version).split(".").map(Number);
+    const length = Math.max(next.length, currentParts.length);
+    for (let i = 0; i < length; i += 1) {
+      const a = next[i] || 0;
+      const b = currentParts[i] || 0;
+      if (a !== b) return a > b ? 1 : -1;
+    }
+    return 0;
+  }
+
+  function updateVersion(rows) {
+    const values = Object.fromEntries((rows || []).map((item) => [item.key, item.value]));
+    if (!values.android_version_name || !values.android_apk_url) return null;
+    return {
+      version: values.android_version_name,
+      url: values.android_apk_url,
+      notes: values.android_update_notes || "",
+      force: String(values.android_force_update).toLowerCase() === "true",
+    };
+  }
 
   const isPrivacyPage = window.location.pathname === "/privacy";
 
@@ -67,7 +91,7 @@ function App() {
       const { data, error } = await supabase
         .from("app_settings")
         .select("key,value")
-        .in("key", ["home_title", "home_description"]);
+        .in("key", ["home_title", "home_description", "android_version_name", "android_apk_url", "android_update_notes", "android_force_update"]);
 
       if (error) {
         console.error("Ошибка загрузки текста главной:", error);
@@ -79,7 +103,17 @@ function App() {
         if (item.key === "home_title" && item.value) next.title = item.value;
         if (item.key === "home_description" && item.value) next.description = item.value;
       }
-      if (mounted) setHomeSettings(next);
+      if (mounted) {
+        setHomeSettings(next);
+        const ua = navigator.userAgent || "";
+        const match = ua.match(/TOK-Android\/([0-9.]+)/i);
+        const current = match ? match[1].split(".").map(Number) : null;
+        const available = updateVersion(data || []);
+        if (current && available && compareVersions(available.version, current) > 0) {
+          setAndroidUpdate(available);
+          setShowAndroidUpdate(true);
+        }
+      }
     }
 
     async function initialize() {
@@ -203,6 +237,7 @@ function App() {
   if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
   return (
+    <>
     <div className={`app-shell tok-theme-${theme}`}>
       <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} />
       <main className="app-content">
@@ -213,6 +248,21 @@ function App() {
       </main>
       <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
+    {showAndroidUpdate && androidUpdate && (
+      <div className="tok-update-overlay">
+        <div className="tok-update-card">
+          <div className="tok-update-icon">↗</div>
+          <span className="tok-update-kicker">НОВАЯ ВЕРСИЯ</span>
+          <h2>Доступно обновление ТОК</h2>
+          <strong>Версия {androidUpdate.version}</strong>
+          {androidUpdate.notes && <p>{androidUpdate.notes}</p>}
+          <a className="tok-update-button" href={androidUpdate.url}>Скачать обновление</a>
+          {!androidUpdate.force && <button className="tok-update-later" onClick={() => setShowAndroidUpdate(false)}>Позже</button>}
+          {androidUpdate.force && <small>Обновление обязательно для продолжения.</small>}
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
