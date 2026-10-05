@@ -48,8 +48,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="android-v1.2.${{ github.run_number }}"
+          VERSION_NAME=$(grep -o 'versionName "[^"]*"' android/app/build.gradle | head -1 | cut -d '"' -f2)
+          TAG="android-v${VERSION_NAME}.${{ github.run_number }}"
           gh release create "$TAG" TOK-Android.apk \
-            --title "ТОК Android v1.2.${{ github.run_number }}" \
+            --title "ТОК Android v${VERSION_NAME}.${{ github.run_number }}" \
             --notes "Обновлённая сборка Android-приложения ТОК: pull-to-refresh и новый launcher icon." \
             --latest
