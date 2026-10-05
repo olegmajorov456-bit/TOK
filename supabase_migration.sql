@@ -299,3 +299,24 @@ begin
     alter publication supabase_realtime add table public.matches;
   end if;
 end $$;
+
+
+-- Ответы на сообщения в чате.
+alter table public.messages add column if not exists reply_to_id bigint references public.messages(id) on delete set null;
+create index if not exists messages_reply_to_idx on public.messages(reply_to_id);
+
+-- Уведомления удаляются после прочтения.
+drop policy if exists "Users can delete own notifications" on public.notifications;
+create policy "Users can delete own notifications" on public.notifications for delete to authenticated using (user_id = auth.uid());
+
+-- Хранилище APK-обновлений.
+insert into storage.buckets (id, name, public) values ('app-updates', 'app-updates', true) on conflict (id) do update set public = true;
+drop policy if exists "Admins can upload app updates" on storage.objects;
+create policy "Admins can upload app updates" on storage.objects for insert to authenticated with check (bucket_id = 'app-updates' and public.is_admin());
+drop policy if exists "Admins can update app updates" on storage.objects;
+create policy "Admins can update app updates" on storage.objects for update to authenticated using (bucket_id = 'app-updates' and public.is_admin()) with check (bucket_id = 'app-updates' and public.is_admin());
+drop policy if exists "Admins can delete app updates" on storage.objects;
+create policy "Admins can delete app updates" on storage.objects for delete to authenticated using (bucket_id = 'app-updates' and public.is_admin());
+drop policy if exists "Anyone can view app updates" on storage.objects;
+create policy "Anyone can view app updates" on storage.objects for select to public using (bucket_id = 'app-updates');
+insert into public.app_settings (key,value) values ('android_version_code','3'),('android_version_name','1.2'),('android_apk_url',''),('android_update_notes',''),('android_force_update','false') on conflict (key) do nothing;
