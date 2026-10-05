@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         cookies.setAcceptCookie(true);
         cookies.setAcceptThirdPartyCookies(webView, true);
 
-        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);\n        webView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {\n            refreshLayout.setEnabled(scrollY == 0);\n        });
+        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
