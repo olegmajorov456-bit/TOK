@@ -2,3 +2,6 @@
 .app-header-logo{flex:0 0 120px;justify-content:flex-start;padding:0}
 .app-header-logo-image{display:block;width:120px;height:54px;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 10px rgba(232,60,109,.15))}
 @media(max-width:600px){.app-header-logo{flex-basis:94px}.app-header-logo-image{width:94px;height:48px}}
+
+.app-header-logo .app-header-logo-image{width:120px;height:54px;object-fit:contain;object-position:left center}
+@media(max-width:600px){.app-header-logo .app-header-logo-image{width:94px;height:48px}}
