@@ -114,6 +114,25 @@ function NotificationBell({ user, onMatches }) {
     [notifications]
   );
 
+
+  async function respondToLike(item, liked) {
+    if (!item?.actor_id || !user?.id) return;
+    if (liked) {
+      const { error } = await supabase.from("likes").insert({ user_id: user.id, liked_user_id: item.actor_id });
+      if (error && error.code !== "23505") { console.error("Не удалось поставить лайк:", error); return; }
+      const { data: matchId, error: matchError } = await supabase.rpc("create_match_if_mutual", { target_user_id: item.actor_id });
+      if (matchError) console.error("Ошибка создания мэтча:", matchError);
+      if (matchId) alert("💕 У вас взаимная симпатия!");
+    } else {
+      const { error } = await supabase.from("profile_passes").upsert(
+        { user_id: user.id, passed_user_id: item.actor_id },
+        { onConflict: "user_id,passed_user_id", ignoreDuplicates: true }
+      );
+      if (error) { console.error("Не удалось скрыть анкету:", error); alert("Не удалось отклонить анкету. Возможно, не выполнена SQL-миграция."); return; }
+    }
+    await markRead(item.id);
+  }
+
   async function markRead(id) {
     const { error } = await supabase
       .from("notifications")
@@ -178,23 +197,23 @@ function NotificationBell({ user, onMatches }) {
                 notifications.map((item) => {
                   const actor = actors[item.actor_id];
                   return (
-                    <button
-                      key={item.id}
-                      className={"notification-item " + (item.is_read ? "" : "unread")}
-                      onClick={() => { markRead(item.id); if (item.type === "message") { setOpen(false); onMatches?.(); } }}
-                    >
-                      <div className="notification-avatar">
-                        {actor?.avatar_url ? <img src={actor.avatar_url} alt="" /> : <span>👤</span>}
-                      </div>
-                      <div className="notification-item-content">
-                        <div className="notification-item-top">
-                          <strong>{actor?.name || "Пользователь"}</strong>
-                          {!item.is_read && <span className="notification-unread-dot" />}
+                    <div key={item.id} className={"notification-item-wrap " + (item.is_read ? "" : "unread")}>
+                      <button className={"notification-item " + (item.is_read ? "" : "unread")}
+                        onClick={() => { if (item.type === "message") { markRead(item.id); setOpen(false); onMatches?.(); } else markRead(item.id); }}>
+                        <div className="notification-avatar">
+                          {actor?.avatar_url ? <img src={actor.avatar_url} alt="" /> : <span>👤</span>}
                         </div>
-                        <p>{item.body || (item.type === "like" ? "Поставил(а) вам лайк" : "Отправил(а) вам сообщение")}</p>
-                        <time>{formatNotificationTime(item.created_at)}</time>
-                      </div>
-                    </button>
+                        <div className="notification-item-content">
+                          <div className="notification-item-top"><strong>{actor?.name || "Пользователь"}</strong>{!item.is_read && <span className="notification-unread-dot" />}</div>
+                          <p>{item.body || (item.type === "like" ? "Поставил(а) вам лайк" : "Отправил(а) вам сообщение")}</p>
+                          <time>{formatNotificationTime(item.created_at)}</time>
+                        </div>
+                      </button>
+                      {item.type === "like" && item.actor_id && <div className="notification-like-actions">
+                        <button className="notification-like-yes" onClick={() => respondToLike(item, true)}>♥ Лайк</button>
+                        <button className="notification-like-no" onClick={() => respondToLike(item, false)}>✕ Не интересно</button>
+                      </div>}
+                    </div>
                   );
                 })
               )}
