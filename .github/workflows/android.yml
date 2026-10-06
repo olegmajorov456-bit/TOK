@@ -34,6 +34,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Set build version
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.7.${{ github.run_number }}\"/" android/app/build.gradle
       - name: Build APK
         run: gradle --no-daemon -p android assembleDebug
       - name: Prepare APK
@@ -49,8 +53,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION_NAME=$(grep -o 'versionName "[^"]*"' android/app/build.gradle | head -1 | cut -d '"' -f2)
-          TAG="android-v${VERSION_NAME}.${{ github.run_number }}"
+          TAG="android-v${VERSION_NAME}"
           gh release create "$TAG" TOK-Android.apk \
-            --title "ТОК Android v${VERSION_NAME}.${{ github.run_number }}" \
+            --title "ТОК Android v${VERSION_NAME}" \
             --notes "Релиз ТОК Android v${VERSION_NAME}: обновления приложения, улучшения интерфейса и исправления чата." \
             --latest
