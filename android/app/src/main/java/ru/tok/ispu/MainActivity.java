@@ -21,6 +21,7 @@ import java.net.URL;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
+import android.view.WindowManager;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(window, false);
         window.setStatusBarColor(0xFF08090D);
         window.setNavigationBarColor(0xFF08090D);
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         webView = new WebView(this);
         setContentView(webView);
@@ -236,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                view.evaluateJavascript("(function(){if(window.__tokKeyboardFix)return;window.__tokKeyboardFix=true;var root=document.documentElement;function sync(){var vv=window.visualViewport;var h=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;root.classList.toggle('tok-keyboard-open',h>120);root.style.setProperty('--tok-keyboard-height',h+'px');}if(window.visualViewport){window.visualViewport.addEventListener('resize',sync);window.visualViewport.addEventListener('scroll',sync);}window.addEventListener('resize',sync);document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){setTimeout(sync,100);setTimeout(sync,350);}});document.addEventListener('focusout',function(){setTimeout(sync,150);});sync();})();", null);
             }
 
             @Override
