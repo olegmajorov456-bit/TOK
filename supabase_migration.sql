@@ -320,3 +320,20 @@ create policy "Admins can delete app updates" on storage.objects for delete to a
 drop policy if exists "Anyone can view app updates" on storage.objects;
 create policy "Anyone can view app updates" on storage.objects for select to public using (bucket_id = 'app-updates');
 insert into public.app_settings (key,value) values ('android_version_code','3'),('android_version_name','1.2'),('android_apk_url',''),('android_update_notes',''),('android_force_update','false') on conflict (key) do nothing;
+
+
+-- Анкеты, которые пользователь отметил как «Не интересно».
+create table if not exists public.profile_passes (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  passed_user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, passed_user_id),
+  constraint profile_passes_not_self check (user_id <> passed_user_id)
+);
+alter table public.profile_passes enable row level security;
+drop policy if exists "Users can view own profile passes" on public.profile_passes;
+create policy "Users can view own profile passes" on public.profile_passes for select to authenticated using (user_id = auth.uid());
+drop policy if exists "Users can create own profile passes" on public.profile_passes;
+create policy "Users can create own profile passes" on public.profile_passes for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "Users can update own profile passes" on public.profile_passes;
+create policy "Users can update own profile passes" on public.profile_passes for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
