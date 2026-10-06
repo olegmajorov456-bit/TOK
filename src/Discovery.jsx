@@ -124,15 +124,18 @@ function Discovery({ user, onHome }) {
       return;
     }
 
-    const [{ data: outgoingLikes, error: outgoingLikesError }, { data: myMatches, error: matchesError }] = await Promise.all([
+    const [{ data: outgoingLikes, error: outgoingLikesError }, { data: myMatches, error: matchesError }, { data: passedProfiles, error: passesError }] = await Promise.all([
       supabase.from("likes").select("liked_user_id").eq("user_id", user.id),
       supabase.from("matches").select("user1_id,user2_id").or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`),
+      supabase.from("profile_passes").select("passed_user_id").eq("user_id", user.id),
     ]);
 
     if (outgoingLikesError) console.error("Ошибка загрузки поставленных лайков:", outgoingLikesError);
     if (matchesError) console.error("Ошибка загрузки мэтчей:", matchesError);
+    if (passesError) console.error("Ошибка загрузки отклонённых анкет:", passesError);
 
     const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
+    const passedIds = new Set((passedProfiles || []).map((item) => item.passed_user_id));
     const profilePreference = myProfile.looking_for === "male" || myProfile.looking_for === "female" ? myProfile.looking_for : "";
     setPreferredGender(profilePreference);
     setFilters((current) => ({ ...current, gender: current.gender || profilePreference }));
@@ -153,7 +156,7 @@ function Discovery({ user, onHome }) {
     }
 
     const candidates = (data || []).filter(
-      (profile) => !outgoingLikeIds.has(profile.id) && !matchedUserIds.has(profile.id)
+      (profile) => !outgoingLikeIds.has(profile.id) && !matchedUserIds.has(profile.id) && !passedIds.has(profile.id)
     );
 
     setAllProfiles(candidates);
@@ -259,7 +262,7 @@ function Discovery({ user, onHome }) {
   return <div className="discovery-page"><main className="discovery-container">
     <div className="discovery-header"><div><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div>
     {filtersOpen && <section className="filters-panel"><div className="filter-grid">
-      <label>Пол<select value={filters.gender} onChange={(e) => setFilters({ ...filters, gender: e.target.value })}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option></select></label>
+      <label>Пол<select value={filters.gender} onChange={(e) => setFilters({ ...filters, gender: e.target.value })}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
       <label>Факультет<select value={filters.faculty} onChange={(e) => setFilters({ ...filters, faculty: e.target.value })}><option value="">Любой</option>{FACULTIES.map((faculty) => <option key={faculty} value={faculty}>{faculty}</option>)}</select></label>
       <label>Курс<select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })}><option value="">Любой</option>{COURSES.map((course) => <option key={course} value={course}>{course} курс</option>)}</select></label>
       <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
