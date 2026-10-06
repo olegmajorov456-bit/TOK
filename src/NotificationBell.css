@@ -23,3 +23,5 @@
 
 /* Use a consistent vector bell icon */
 .notification-bell-icon{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.notification-item-wrap{border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:8px}.notification-item-wrap .notification-item{border-bottom:0}.notification-like-actions{display:flex;gap:8px;padding:0 12px 0 68px}.notification-like-actions button{border:0;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer}.notification-like-yes{background:#e83c6d;color:#fff}.notification-like-no{background:rgba(130,135,145,.14);color:inherit}.notification-like-actions button:hover{filter:brightness(1.06)}.tok-theme-light .notification-item-wrap{border-bottom-color:#eceef2}
