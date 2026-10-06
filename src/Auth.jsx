@@ -12,6 +12,7 @@ function Auth() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
   const theme = localStorage.getItem("tok-theme") || "light";
 
   async function handleSubmit(event) {
@@ -42,11 +43,20 @@ function Auth() {
         return;
       }
 
-      const { error } = await supabase.auth.signUp({ email: normalizedEmail, password });
+      const { data, error } = await supabase.auth.signUp({ email: normalizedEmail, password });
       if (error) setMessage(error.message);
-      else setMessage("Регистрация прошла успешно! Проверьте почту, если подтверждение включено.");
+      else if (!data.session) setVerificationEmail(normalizedEmail);
+      else setMessage("Регистрация прошла успешно!");
     }
 
+    setLoading(false);
+  }
+
+  async function handleResendVerification() {
+    setLoading(true);
+    setMessage("");
+    const { error } = await supabase.auth.resend({ type: "signup", email: verificationEmail });
+    setMessage(error ? error.message : "Письмо отправлено повторно. Проверь почту.");
     setLoading(false);
   }
 
@@ -74,6 +84,23 @@ function Auth() {
     setLoading(false);
   }
 
+  if (verificationEmail) {
+    return (
+      <div className={"auth-page tok-auth-" + theme}>
+        <div className="auth-card auth-verification-card">
+          <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
+          <div className="auth-mail-icon" aria-hidden="true">✉</div>
+          <h2>Проверь почту</h2>
+          <p className="auth-subtitle">Мы отправили письмо для подтверждения адреса</p>
+          <div className="auth-verification-email">{verificationEmail}</div>
+          <p className="auth-verification-help">Открой письмо от ТОК и нажми на ссылку подтверждения. Если письма нет, проверь папку «Спам».</p>
+          <button className="auth-verification-resend" type="button" disabled={loading} onClick={handleResendVerification}>{loading ? "Отправляем..." : "Отправить письмо ещё раз"}</button>
+          {message && <p className="auth-message">{message}</p>}
+          <button className="switch-button" type="button" onClick={() => { setVerificationEmail(""); setMessage(""); setIsLogin(true); }}>← Вернуться ко входу</button>
+        </div>
+      </div>
+    );
+  }
   if (forgotMode) {
     return (
       <div className={`auth-page tok-auth-${theme}`}>
