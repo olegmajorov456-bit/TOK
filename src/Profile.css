@@ -232,3 +232,5 @@
 /* Avoid implying online status on the profile */
 .profile-status-dot{background:#ff4d82}
 .tok-theme-light .profile-status-dot{background:#e83c6d}
+
+.profile-delete-account-button{width:100%;margin-top:10px;padding:12px 16px;border:1px solid rgba(220,38,38,.35);border-radius:14px;background:rgba(220,38,38,.07);color:#dc2626;font-weight:700;cursor:pointer;transition:background .2s,border-color .2s}.profile-delete-account-button:hover{background:rgba(220,38,38,.13);border-color:rgba(220,38,38,.6)}.profile-delete-account-button:disabled{opacity:.55;cursor:wait}
