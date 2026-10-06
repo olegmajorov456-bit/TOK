@@ -299,7 +299,6 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
                 <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
                 {profile.is_admin === true && <button className="profile-admin-button" onClick={onAdmin}>🛡️ Панель администратора</button>}
                 <button className="profile-logout-button" onClick={handleLogout}>🚪 Выйти из аккаунта</button>
-                <button className="profile-delete-account-button" onClick={handleDeleteAccount} disabled={deletingAccount}>{deletingAccount ? "Удаляем аккаунт..." : "🗑️ Удалить аккаунт навсегда"}</button>
               </div>
             </>
           ) : (
@@ -319,6 +318,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
               <label>О себе<textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Расскажи о себе, своих интересах..." maxLength="500" rows="5" /><span className="textarea-counter">{description.length}/500</span></label>
               {message && <div className={message.includes("✓") ? "profile-success" : "profile-form-message"}>{message}</div>}
               <div className="profile-edit-buttons"><button type="button" className="profile-cancel-button" onClick={handleCancel}>Отмена</button><button type="submit" className="profile-save-button" disabled={saving}>{saving ? "Сохраняем..." : "Сохранить"}</button></div>
+              <div className="profile-danger-zone"><p>Если больше не хочешь пользоваться ТОК, можно удалить аккаунт без возможности восстановления.</p><button type="button" className="profile-delete-account-button" onClick={handleDeleteAccount} disabled={deletingAccount}>{deletingAccount ? "Удаляем аккаунт..." : "🗑️ Удалить аккаунт навсегда"}</button></div>
             </form>
           )}
           {!isEditing && message && <div className="profile-success">{message}</div>}
