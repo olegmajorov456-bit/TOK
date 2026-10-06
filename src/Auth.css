@@ -12,3 +12,12 @@
 /* Stable password toggle: reserve its width so the input never shifts */
 .auth-password-toggle{width:62px;height:30px;display:flex;align-items:center;justify-content:center;padding:0!important;white-space:nowrap;transform:translateY(-50%)!important}
 .auth-password-toggle:hover{transform:translateY(-50%)!important}
+
+.auth-verification-card{animation:auth-card-in .24s ease}
+.auth-mail-icon{width:64px;height:64px;margin:4px auto 14px;display:grid;place-items:center;border-radius:20px;background:rgba(232,60,109,.12);color:#e83c6d;font-size:31px}
+.auth-verification-email{margin:0 0 12px;padding:12px 14px;border:1px solid #e83c6d33;border-radius:12px;background:rgba(232,60,109,.06);color:inherit;font-size:14px;font-weight:750;overflow-wrap:anywhere}
+.auth-verification-help{margin:0 0 15px;color:#8f929d;font-size:12px;line-height:1.6}
+.auth-verification-resend{width:100%;min-height:48px;border:0;border-radius:13px;background:#e83c6d;color:#fff;font-weight:800;cursor:pointer}
+.auth-verification-resend:disabled{opacity:.6;cursor:wait}
+.tok-auth-light .auth-verification-help{color:#737984}
+@keyframes auth-card-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
