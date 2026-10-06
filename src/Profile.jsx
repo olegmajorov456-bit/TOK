@@ -69,6 +69,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -202,6 +203,22 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
     setIsEditing(false);
   }
 
+  async function handleDeleteAccount() {
+    const confirmation = window.prompt("Удалить аккаунт ТОК навсегда? Это действие нельзя отменить. Для подтверждения введи УДАЛИТЬ.");
+    if (confirmation !== "УДАЛИТЬ") return;
+    setDeletingAccount(true);
+    setMessage("");
+    const { error } = await supabase.functions.invoke("delete-account", { method: "POST" });
+    if (error) {
+      console.error("Ошибка удаления аккаунта:", error);
+      setMessage("Не удалось удалить аккаунт. Проверьте, что функция delete-account развёрнута в Supabase.");
+      setDeletingAccount(false);
+      return;
+    }
+    await supabase.auth.signOut();
+    window.location.assign("/");
+  }
+
   async function handleLogout() {
     await supabase.auth.signOut();
   }
@@ -282,6 +299,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
                 <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
                 {profile.is_admin === true && <button className="profile-admin-button" onClick={onAdmin}>🛡️ Панель администратора</button>}
                 <button className="profile-logout-button" onClick={handleLogout}>🚪 Выйти из аккаунта</button>
+                <button className="profile-delete-account-button" onClick={handleDeleteAccount} disabled={deletingAccount}>{deletingAccount ? "Удаляем аккаунт..." : "🗑️ Удалить аккаунт навсегда"}</button>
               </div>
             </>
           ) : (
