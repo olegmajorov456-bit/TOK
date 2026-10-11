@@ -18,8 +18,8 @@ function calculateAge(birthDate) {
 
 function normalizeGender(value) {
   const gender = String(value || "").trim().toLowerCase().replace(/ё/g, "е");
-  if (["male", "m", "man", "boy", "парень", "парня", "мужчина", "мужской"].includes(gender)) return "male";
-  if (["female", "f", "woman", "girl", "девушка", "девушку", "женщина", "женский"].includes(gender)) return "female";
+  if (["male", "m", "man", "boy", "парень", "парня", "парни", "парней", "мужчина", "мужчины", "мужской"].includes(gender)) return "male";
+  if (["female", "f", "woman", "girl", "девушка", "девушку", "девушки", "девушек", "женщина", "женщины", "женский", "женский пол"].includes(gender)) return "female";
   if (["other", "другое", "другой", "другая"].includes(gender)) return "other";
   return gender;
 }
@@ -61,6 +61,7 @@ function Discovery({ user, onHome }) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({ gender: "", faculty: "", course: "", minAge: "", maxAge: "" });
   const [preferredGender, setPreferredGender] = useState("");
+  const [genderFilterTouched, setGenderFilterTouched] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [history, setHistory] = useState([]);
 
@@ -103,7 +104,7 @@ function Discovery({ user, onHome }) {
   function filterProfiles(items, activeFilters = filters, preference = preferredGender) {
     const minAge = activeFilters.minAge ? Number(activeFilters.minAge) : null;
     const maxAge = activeFilters.maxAge ? Number(activeFilters.maxAge) : null;
-    const genderFilter = normalizeGender(activeFilters.gender || preference);
+    const genderFilter = normalizeGender(activeFilters.gender);
 
     return items.filter((profile) => {
       const age = calculateAge(profile.birth_date);
@@ -147,7 +148,12 @@ function Discovery({ user, onHome }) {
     const normalizedPreference = normalizeGender(myProfile.looking_for);
     const profilePreference = normalizedPreference === "male" || normalizedPreference === "female" ? normalizedPreference : "";
     setPreferredGender(profilePreference);
-    setFilters((current) => ({ ...current, gender: current.gender || profilePreference }));
+    // Apply the account preference only as the initial default. If the user
+    // explicitly selects "Любой", preserve that choice during refreshes.
+    const selectedGender = genderFilterTouched ? filters.gender : (filters.gender || profilePreference);
+    if (!genderFilterTouched) {
+      setFilters((current) => ({ ...current, gender: current.gender || profilePreference }));
+    }
     const matchedUserIds = new Set((myMatches || []).map((match) => (
       match.user1_id === user.id ? match.user2_id : match.user1_id
     )));
@@ -169,7 +175,7 @@ function Discovery({ user, onHome }) {
     );
 
     setAllProfiles(candidates);
-    setProfiles(shuffleProfiles(filterProfiles(candidates, { ...filters, gender: filters.gender || profilePreference }, profilePreference)));
+    setProfiles(shuffleProfiles(filterProfiles(candidates, { ...filters, gender: selectedGender })));
     setHistory([]);
     setLoading(false);
   }
@@ -189,6 +195,7 @@ function Discovery({ user, onHome }) {
   }
   function resetFilters() {
     const reset = { gender: preferredGender, faculty: "", course: "", minAge: "", maxAge: "" };
+    setGenderFilterTouched(false);
     setFilters(reset);
     setProfiles(shuffleProfiles(filterProfiles(allProfiles, reset, preferredGender)));
     setCurrentIndex(0);
@@ -262,7 +269,7 @@ function Discovery({ user, onHome }) {
     setRefreshLoading(false);
   }
 
-  const activeFiltersCount = useMemo(() => Object.entries(filters).filter(([key, value]) => value && !(key === "gender" && value === preferredGender)).length, [filters, preferredGender]);
+  const activeFiltersCount = useMemo(() => Object.entries(filters).filter(([key, value]) => key === "gender" ? (genderFilterTouched && value !== preferredGender) : Boolean(value)).length, [filters, preferredGender, genderFilterTouched]);
   if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{refreshLoading ? "Обновляем все анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
 
   const profile = profiles[currentIndex];
@@ -271,7 +278,7 @@ function Discovery({ user, onHome }) {
   return <div className="discovery-page"><main className="discovery-container">
     <div className="discovery-header"><div><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div>
     {filtersOpen && <section className="filters-panel"><div className="filter-grid">
-      <label>Пол<select value={filters.gender} onChange={(e) => setFilters({ ...filters, gender: e.target.value })}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
+      <label>Пол<select value={filters.gender} onChange={(e) => { setGenderFilterTouched(true); setFilters({ ...filters, gender: e.target.value }); }}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
       <label>Факультет<select value={filters.faculty} onChange={(e) => setFilters({ ...filters, faculty: e.target.value })}><option value="">Любой</option>{FACULTIES.map((faculty) => <option key={faculty} value={faculty}>{faculty}</option>)}</select></label>
       <label>Курс<select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })}><option value="">Любой</option>{COURSES.map((course) => <option key={course} value={course}>{course} курс</option>)}</select></label>
       <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
