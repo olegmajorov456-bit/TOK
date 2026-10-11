@@ -8,6 +8,11 @@ on:
       - 'android/build.gradle'
       - 'android/settings.gradle'
       - 'android/gradle.properties'
+      - 'src/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'supabase/migrations/**'
       - '.github/workflows/android.yml'
   workflow_dispatch:
 
@@ -20,6 +25,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: Build web app
+        run: |
+          npm ci
+          npm run build
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
