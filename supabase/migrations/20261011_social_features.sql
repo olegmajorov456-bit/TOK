@@ -174,7 +174,10 @@ create policy random_chat_messages_insert_participant on public.random_chat_mess
 -- Restrict base-table access: anonymous authors/participants are exposed only via safe views.
 revoke all on public.confessions, public.confession_reactions, public.confession_comments,
   public.confession_reports, public.random_chat_rooms, public.random_chat_queue,
-  public.random_chat_messages from anon, authenticated;
+  public.random_chat_messages from public, anon, authenticated;
+
+revoke all on public.confessions_feed, public.confession_reaction_summary,
+  public.confession_comments_feed, public.random_chat_messages_feed from public, anon;
 
 grant select on public.confessions_feed to authenticated;
 grant select on public.confession_reaction_summary to authenticated;
@@ -332,5 +335,20 @@ grant execute on function public.get_random_chat_room_status(uuid) to authentica
 
 -- Random chat uses participant-scoped polling, so raw realtime rows aren't published.
 
+
+-- If an earlier version of this migration was applied, remove the raw chat tables
+-- from Realtime too; the client now polls the participant-scoped safe view.
+do $$
+begin
+  execute 'alter publication supabase_realtime drop table public.random_chat_messages';
+exception when undefined_object or object_not_in_prerequisite_state or insufficient_privilege then null;
+end;
+$$;
+do $$
+begin
+  execute 'alter publication supabase_realtime drop table public.random_chat_rooms';
+exception when undefined_object or object_not_in_prerequisite_state or insufficient_privilege then null;
+end;
+$$;
 
 notify pgrst, 'reload schema';
