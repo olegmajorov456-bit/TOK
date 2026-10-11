@@ -4,3 +4,6 @@ node_modules/
 .env.*.local
 dist/
 .DS_Store
+
+# Private Android release-signing key must never be committed.
+android/app/tok-release.jks
