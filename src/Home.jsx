@@ -10,13 +10,13 @@ function calculateAge(birthDate) {
   return age;
 }
 
-function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConfessions, onAchievements, onRandomChat, onNotifications }) {
+function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConfessions, onAchievements, onRandomChat, onInterestRooms, onNotifications, theme = "light" }) {
   const age = calculateAge(profile?.birth_date);
   const title = homeSettings?.title || "Общайся. Знакомься. Находи своих.";
   const description = homeSettings?.description || "ТОК создан специально для студентов ИГЭУ. Здесь всё начинается с обычной симпатии.";
 
   return (
-    <div className="home-page">
+    <div className={"home-page tok-theme-" + theme}>
       <main className="home-feed">
         <section className="home-welcome">
           <p className="home-welcome-small">ТОК · ИГЭУ</p>
@@ -62,6 +62,7 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConf
         <section className="home-feature-section"><div className="home-feature-heading"><div><span>ЕЩЁ БОЛЬШЕ В ТОК</span><h2>Найди свой формат общения</h2></div><span className="home-feature-spark">✦</span></div><div className="home-feature-grid">
           <button type="button" className="home-feature-card confession" onClick={onConfessions}><span className="home-feature-icon">🕯️</span><span className="home-feature-copy"><strong>Признания</strong><small>Истории анонимно</small></span><span className="home-feature-arrow">↗</span></button>
           <button type="button" className="home-feature-card random" onClick={onRandomChat}><span className="home-feature-icon">🎲</span><span className="home-feature-copy"><strong>Случайный чат</strong><small>Новый собеседник</small></span><span className="home-feature-arrow">↗</span></button>
+          <button type="button" className="home-feature-card rooms" onClick={onInterestRooms}><span className="home-feature-icon">💬</span><span className="home-feature-copy"><strong>Комнаты</strong><small>Чаты по интересам</small></span><span className="home-feature-arrow">↗</span></button>
           <button type="button" className="home-feature-card achievements" onClick={onAchievements}><span className="home-feature-icon">🏆</span><span className="home-feature-copy"><strong>Достижения</strong><small>Уровни и значки</small></span><span className="home-feature-arrow">↗</span></button>
           <button type="button" className="home-feature-card notifications" onClick={onNotifications}><span className="home-feature-icon">🔔</span><span className="home-feature-copy"><strong>Уведомления</strong><small>Вся активность здесь</small></span><span className="home-feature-arrow">↗</span></button>
         </div></section>

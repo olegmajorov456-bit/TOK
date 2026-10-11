@@ -351,4 +351,97 @@ exception when undefined_object or object_not_in_prerequisite_state or insuffici
 end;
 $$;
 
+-- Interest-based group rooms. The client gets a safe feed without author IDs.
+create table if not exists public.interest_rooms (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  description text not null,
+  icon text not null default '💬',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.interest_room_members (
+  room_id uuid not null references public.interest_rooms(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  joined_at timestamptz not null default now(),
+  primary key (room_id, user_id)
+);
+
+create table if not exists public.interest_room_messages (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid not null references public.interest_rooms(id) on delete cascade,
+  sender_id uuid not null references auth.users(id) on delete cascade,
+  body text not null check (char_length(trim(body)) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+
+insert into public.interest_rooms (slug, name, description, icon) values
+  ('general', 'Общая комната', 'Знакомься, задавай вопросы и общайся со студентами ИГЭУ.', '👋'),
+  ('coding', 'IT и программирование', 'Код, пет-проекты, технологии, хакатоны и помощь новичкам.', '💻'),
+  ('gaming', 'Игры', 'Находи тиммейтов, обсуждай новинки и любимые игры.', '🎮'),
+  ('music', 'Музыка', 'Делись треками, находи единомышленников и ходи на концерты.', '🎧'),
+  ('moto', 'Мотоциклы и техника', 'Обсуждай мото, машины, ремонт и технические увлечения.', '🏍️'),
+  ('sport', 'Спорт и активность', 'Ищи компанию для тренировок, прогулок и соревнований.', '⚡')
+on conflict (slug) do update set name = excluded.name, description = excluded.description, icon = excluded.icon;
+
+create index if not exists interest_room_messages_room_time_idx
+  on public.interest_room_messages (room_id, created_at asc);
+
+alter table public.interest_rooms enable row level security;
+alter table public.interest_room_members enable row level security;
+alter table public.interest_room_messages enable row level security;
+
+drop policy if exists interest_rooms_read_authenticated on public.interest_rooms;
+create policy interest_rooms_read_authenticated on public.interest_rooms
+  for select to authenticated using (true);
+
+drop policy if exists interest_room_members_read_self on public.interest_room_members;
+create policy interest_room_members_read_self on public.interest_room_members
+  for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists interest_room_members_join_self on public.interest_room_members;
+create policy interest_room_members_join_self on public.interest_room_members
+  for insert to authenticated with check (
+    user_id = auth.uid()
+    and exists (select 1 from public.interest_rooms r where r.id = room_id)
+  );
+
+drop policy if exists interest_room_members_leave_self on public.interest_room_members;
+create policy interest_room_members_leave_self on public.interest_room_members
+  for delete to authenticated using (user_id = auth.uid());
+
+drop policy if exists interest_room_messages_read_member on public.interest_room_messages;
+create policy interest_room_messages_read_member on public.interest_room_messages
+  for select to authenticated using (
+    exists (select 1 from public.interest_room_members m
+      where m.room_id = room_id and m.user_id = auth.uid())
+  );
+
+drop policy if exists interest_room_messages_write_member on public.interest_room_messages;
+create policy interest_room_messages_write_member on public.interest_room_messages
+  for insert to authenticated with check (
+    sender_id = auth.uid()
+    and exists (select 1 from public.interest_room_members m
+      where m.room_id = room_id and m.user_id = auth.uid())
+  );
+
+create or replace view public.interest_room_messages_feed as
+  select msg.id, msg.room_id, (msg.sender_id = auth.uid()) as is_mine, msg.body, msg.created_at
+  from public.interest_room_messages msg
+  where exists (
+    select 1 from public.interest_room_members m
+    where m.room_id = msg.room_id and m.user_id = auth.uid()
+  );
+
+-- Keep private identifiers out of the browser API and expose only the safe message view.
+revoke all on public.interest_rooms, public.interest_room_members, public.interest_room_messages
+  from public, anon, authenticated;
+revoke all on public.interest_room_messages_feed from public, anon;
+grant select (id, slug, name, description, icon, created_at) on public.interest_rooms to authenticated;
+grant select (room_id, user_id, joined_at), insert (room_id, user_id), delete
+  on public.interest_room_members to authenticated;
+grant insert (room_id, sender_id, body) on public.interest_room_messages to authenticated;
+grant select on public.interest_room_messages_feed to authenticated;
+
 notify pgrst, 'reload schema';

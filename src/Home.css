@@ -15,3 +15,6 @@
 .tok-theme-light .home-feature-section{background:#fff;border-color:#e2e5e9}.tok-theme-light .home-feature-heading h2,.tok-theme-light .home-feature-copy strong{color:#20242b}.tok-theme-light .home-feature-card{background:#fafbfc;border-color:#eceef1}
 .tok-theme-neon .home-feature-section{background:#111219;border-color:#292b34;box-shadow:0 15px 40px rgba(0,0,0,.25)}.tok-theme-neon .home-feature-heading h2,.tok-theme-neon .home-feature-copy strong{color:#f1f1f5}.tok-theme-neon .home-feature-card{background:#171820;border-color:#292b35;color:#f1f1f5}.tok-theme-neon .home-feature-copy small{color:#999eaa}.tok-theme-neon .home-feature-icon{background:#291722}
 @media(max-width:600px){.home-feature-section{padding:14px;border-radius:19px}.home-feature-grid{gap:7px}.home-feature-card{gap:7px;padding:10px 8px;border-radius:13px}.home-feature-icon{width:31px;height:31px;flex-basis:31px;font-size:15px}.home-feature-copy strong{font-size:10px}.home-feature-copy small{font-size:8px}.home-feature-heading h2{font-size:15px}}
+
+.home-feature-card.rooms .home-feature-icon{background:#e9f4ff}
+.tok-theme-neon .home-feature-card.rooms .home-feature-icon{background:#1e2a3b}
