@@ -5,7 +5,7 @@ import "./NotificationBell.css";
 function dedupeNotifications(list) {
   const seen = new Set();
   return list.filter((item) => {
-    const key = `${item.user_id}|${item.actor_id || ""}|${item.type}|${item.body || ""}|${item.created_at || ""}`;
+    const key = item.id ? String(item.id) : `${item.user_id}|${item.actor_id || ""}|${item.type}|${item.body || ""}|${item.created_at || ""}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -25,7 +25,7 @@ function formatNotificationTime(value) {
   return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
 }
 
-function NotificationBell({ user, onMatches }) {
+function NotificationBell({ user, onMatches, onAllNotifications }) {
   const [notifications, setNotifications] = useState([]);
   const [actors, setActors] = useState({});
   const [open, setOpen] = useState(false);
@@ -230,6 +230,9 @@ function NotificationBell({ user, onMatches }) {
                   );
                 })
               )}
+            </div>
+            <div className="notification-panel-footer">
+              <button type="button" onClick={() => { setOpen(false); onAllNotifications?.(); }}>Открыть центр уведомлений <span>↗</span></button>
             </div>
           </section>
         </>

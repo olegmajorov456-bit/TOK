@@ -1,7 +1,7 @@
 import "./Header.css";
 import NotificationBell from "./NotificationBell";
 
-function Header({ onHome, onSupport, onProfile, onMatches, profile, user }) {
+function Header({ onHome, onSupport, onProfile, onMatches, onNotifications, profile, user }) {
   return (
     <header className="app-header">
       <button className="app-header-logo" onClick={onHome} aria-label="ТОК — главная">
@@ -9,7 +9,7 @@ function Header({ onHome, onSupport, onProfile, onMatches, profile, user }) {
       </button>
 
       <div className="app-header-actions">
-        {user && <NotificationBell user={user} onMatches={onMatches} />}
+        {user && <NotificationBell user={user} onMatches={onMatches} onAllNotifications={onNotifications} />}
 
         <button
           className="header-action support"
