@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static final String RELEASE_API = "https://api.github.com/repos/olegmajorov456-bit/TOK/releases/latest";
     private static final String APK_ASSET_NAME = "TOK-Android.apk";
+    private static final long UPDATE_PROMPT_COOLDOWN_MS = 24L * 60L * 60L * 1000L;
     private long updateDownloadId = -1L;
     private BroadcastReceiver updateReceiver;
 
@@ -163,11 +164,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void showUpdateDialog(String tag, String apkUrl) {
         if (isFinishing() || isDestroyed()) return;
+
+        // A failed/cancelled installer must not spam the same prompt on every launch.
+        // A newer release tag remains eligible immediately; successful updates are
+        // also filtered by compareVersions() before reaching this method.
+        android.content.SharedPreferences preferences =
+                getSharedPreferences("tok_update_preferences", MODE_PRIVATE);
+        long now = System.currentTimeMillis();
+        String lastPromptedTag = preferences.getString("last_prompted_release_tag", "");
+        long lastPromptedAt = preferences.getLong("last_prompted_release_at", 0L);
+        if (tag.equals(lastPromptedTag) && now - lastPromptedAt < UPDATE_PROMPT_COOLDOWN_MS) return;
+
+        preferences.edit()
+                .putString("last_prompted_release_tag", tag)
+                .putLong("last_prompted_release_at", now)
+                .apply();
+
         new AlertDialog.Builder(this).setTitle("Доступно обновление ТОК")
             .setMessage("Найдена новая версия " + tag.replace("android-v", "") + ". Обновить приложение сейчас? Удалять текущую версию не нужно.")
             .setNegativeButton("Позже", (dialog, which) ->
-                    getSharedPreferences("tok_update_preferences", MODE_PRIVATE).edit()
-                            .putString("dismissed_release_tag", tag).apply())
+                    preferences.edit().putString("dismissed_release_tag", tag).apply())
             .setPositiveButton("Обновить", (dialog, which) -> downloadUpdate(apkUrl, tag)).show();
     }
 

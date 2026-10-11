@@ -8,12 +8,6 @@ on:
       - 'android/build.gradle'
       - 'android/settings.gradle'
       - 'android/gradle.properties'
-      - 'src/**'
-      - 'index.html'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'supabase/migrations/**'
-      - '.github/workflows/android.yml'
   workflow_dispatch:
 
 permissions:
