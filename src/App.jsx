@@ -10,6 +10,10 @@ import Discovery from "./Discovery";
 import Matches from "./Matches";
 import Chat from "./Chat";
 import Support from "./Support";
+import Confessions from "./Confessions";
+import Achievements from "./Achievements";
+import RandomChat from "./RandomChat";
+import Notifications from "./Notifications";
 import Admin from "./Admin";
 import PublicProfile from "./PublicProfile";
 import Header from "./Header";
@@ -204,6 +208,8 @@ function App() {
 
   if (!profile) return <ProfileForm user={session.user} onProfileCreated={handleProfileCreated} />;
 
+  if (page === "random-chat") return <RandomChat user={session.user} theme={theme} onHome={goHome} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />;
+
   if (page === "view-profile" && viewedProfile) return (
     <PublicProfile
       profile={viewedProfile}
@@ -232,14 +238,17 @@ function App() {
   return (
     <>
     <div className={`app-shell tok-theme-${theme}`}>
-      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} />
+      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} />
       <main className="app-content">
-        {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />}
+        {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onNotifications={() => setPage("notifications")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}
+        {page === "confessions" && <Confessions user={session.user} theme={theme} />}
+        {page === "achievements" && <Achievements user={session.user} theme={theme} />}
+        {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} />}
         {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
-      <BottomNav activePage={page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
+      <BottomNav activePage={["confessions", "achievements", "notifications"].includes(page) ? "home" : page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
     </>
   );

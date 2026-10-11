@@ -10,7 +10,7 @@ function calculateAge(birthDate) {
   return age;
 }
 
-function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings }) {
+function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConfessions, onAchievements, onRandomChat, onNotifications }) {
   const age = calculateAge(profile?.birth_date);
   const title = homeSettings?.title || "Общайся. Знакомься. Находи своих.";
   const description = homeSettings?.description || "ТОК создан специально для студентов ИГЭУ. Здесь всё начинается с обычной симпатии.";
@@ -59,7 +59,13 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings }) {
           <span className="home-arrow">→</span>
         </section>
 
-        <section className="home-tip"><span>💡</span><div><strong>Совет</strong><p>Хорошая фотография и интересное описание помогают получить больше симпатий.</p></div></section>
+        <section className="home-feature-section"><div className="home-feature-heading"><div><span>ЕЩЁ БОЛЬШЕ В ТОК</span><h2>Найди свой формат общения</h2></div><span className="home-feature-spark">✦</span></div><div className="home-feature-grid">
+          <button type="button" className="home-feature-card confession" onClick={onConfessions}><span className="home-feature-icon">🕯️</span><span className="home-feature-copy"><strong>Признания</strong><small>Истории анонимно</small></span><span className="home-feature-arrow">↗</span></button>
+          <button type="button" className="home-feature-card random" onClick={onRandomChat}><span className="home-feature-icon">🎲</span><span className="home-feature-copy"><strong>Случайный чат</strong><small>Новый собеседник</small></span><span className="home-feature-arrow">↗</span></button>
+          <button type="button" className="home-feature-card achievements" onClick={onAchievements}><span className="home-feature-icon">🏆</span><span className="home-feature-copy"><strong>Достижения</strong><small>Уровни и значки</small></span><span className="home-feature-arrow">↗</span></button>
+          <button type="button" className="home-feature-card notifications" onClick={onNotifications}><span className="home-feature-icon">🔔</span><span className="home-feature-copy"><strong>Уведомления</strong><small>Вся активность здесь</small></span><span className="home-feature-arrow">↗</span></button>
+        </div></section>
+        <section className="home-tip"><span>💡</span><div><strong>Совет</strong><p>Хорошая фотография, интересы и живое описание помогают находить людей, с которыми действительно есть о чём поговорить.</p></div></section>
       </main>
     </div>
   );

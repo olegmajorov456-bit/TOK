@@ -53,6 +53,20 @@ function getHobbies(profile) {
   return normalizeItems(items);
 }
 
+function normalizeInterest(value) {
+  return String(value || "").trim().toLocaleLowerCase("ru-RU").replace(/ё/g, "е");
+}
+
+function getSharedHobbies(profile, ownHobbies) {
+  const own = new Set((ownHobbies || []).map(normalizeInterest).filter(Boolean));
+  const found = new Map();
+  for (const item of getHobbies(profile)) {
+    const key = normalizeInterest(item);
+    if (key && own.has(key) && !found.has(key)) found.set(key, item);
+  }
+  return [...found.values()];
+}
+
 function Discovery({ user, onHome }) {
   const [allProfiles, setAllProfiles] = useState([]);
   const [profiles, setProfiles] = useState([]);
@@ -66,6 +80,8 @@ function Discovery({ user, onHome }) {
   const [genderFilterTouched, setGenderFilterTouched] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const [myHobbies, setMyHobbies] = useState([]);
+  const [sortMode, setSortMode] = useState("compatibility");
 
   useEffect(() => {
     loadProfiles();
@@ -103,6 +119,19 @@ function Discovery({ user, onHome }) {
     return result;
   }
 
+  function orderProfiles(items, ownHobbies = myHobbies, mode = sortMode) {
+    const randomized = shuffleProfiles(items);
+    if (mode !== "compatibility" || !ownHobbies.length) return randomized;
+    return randomized.sort((first, second) => getSharedHobbies(second, ownHobbies).length - getSharedHobbies(first, ownHobbies).length);
+  }
+
+  function changeSortMode(nextMode) {
+    setSortMode(nextMode);
+    setProfiles(orderProfiles(filterProfiles(allProfiles, filters), myHobbies, nextMode));
+    setCurrentIndex(0);
+    setHistory([]);
+  }
+
   function filterProfiles(items, activeFilters = filters, preference = preferredGender) {
     const minAge = activeFilters.minAge ? Number(activeFilters.minAge) : null;
     const maxAge = activeFilters.maxAge ? Number(activeFilters.maxAge) : null;
@@ -125,7 +154,7 @@ function Discovery({ user, onHome }) {
 
     const { data: myProfile, error: myProfileError } = await supabase
       .from("profiles")
-      .select("gender, looking_for")
+      .select("gender, looking_for, hobbies")
       .eq("id", user.id)
       .single();
 
@@ -147,6 +176,8 @@ function Discovery({ user, onHome }) {
 
     const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
     const passedIds = new Set((passedProfiles || []).map((item) => item.passed_user_id));
+    const ownHobbies = getHobbies(myProfile);
+    setMyHobbies(ownHobbies);
     const normalizedPreference = normalizeGender(myProfile.looking_for);
     const profilePreference = normalizedPreference === "male" || normalizedPreference === "female" ? normalizedPreference : "";
     setPreferredGender(profilePreference);
@@ -177,7 +208,7 @@ function Discovery({ user, onHome }) {
     );
 
     setAllProfiles(candidates);
-    setProfiles(shuffleProfiles(filterProfiles(candidates, { ...filters, gender: selectedGender })));
+    setProfiles(orderProfiles(filterProfiles(candidates, { ...filters, gender: selectedGender }), ownHobbies, sortMode));
     setHistory([]);
     setLoading(false);
   }
@@ -190,7 +221,7 @@ function Discovery({ user, onHome }) {
     }
 
     const filtered = filterProfiles(allProfiles, filters);
-    setProfiles(shuffleProfiles(filtered));
+    setProfiles(orderProfiles(filtered));
     setCurrentIndex(0);
     setHistory([]);
     setFiltersOpen(false);
@@ -199,7 +230,7 @@ function Discovery({ user, onHome }) {
     const reset = { gender: preferredGender, faculty: "", course: "", minAge: "", maxAge: "" };
     setGenderFilterTouched(false);
     setFilters(reset);
-    setProfiles(shuffleProfiles(filterProfiles(allProfiles, reset, preferredGender)));
+    setProfiles(orderProfiles(filterProfiles(allProfiles, reset, preferredGender)));
     setCurrentIndex(0);
     setFiltersOpen(false);
   }
@@ -276,9 +307,10 @@ function Discovery({ user, onHome }) {
 
   const profile = profiles[currentIndex];
   const profileHobbies = getHobbies(profile);
+  const commonHobbies = profile ? getSharedHobbies(profile, myHobbies) : [];
 
   return <div className="discovery-page"><main className="discovery-container">
-    <div className="discovery-header"><div><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div>
+    <div className="discovery-header"><div className="discovery-title-block"><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><div className="discovery-header-controls"><div className="discovery-sort-toggle" role="group" aria-label="Порядок анкет"><button type="button" className={sortMode === "compatibility" ? "active" : ""} onClick={() => changeSortMode("compatibility")}>✦ По интересам</button><button type="button" className={sortMode === "random" ? "active" : ""} onClick={() => changeSortMode("random")}>⇄ Случайно</button></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div></div>
     {filtersOpen && <section className="filters-panel"><div className="filter-grid">
       <label>Пол<select value={filters.gender} onChange={(e) => { setGenderFilterTouched(true); setFilters({ ...filters, gender: e.target.value }); }}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
       <label>Факультет<select value={filters.faculty} onChange={(e) => setFilters({ ...filters, faculty: e.target.value })}><option value="">Любой</option>{FACULTIES.map((faculty) => <option key={faculty} value={faculty}>{faculty}</option>)}</select></label>
@@ -288,7 +320,7 @@ function Discovery({ user, onHome }) {
     </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
     {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Здесь больше нет анкет, которые вы ещё не лайкнули. Можно обновить список после новых анкет."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card">
       <div className="discovery-photo"><div className="discovery-photo-top"></div>{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
-      <div className="discovery-content">{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
+      <div className="discovery-content"><div className={"discovery-compatibility " + (commonHobbies.length ? "has-common" : "")}><span>✦ Совпадение по интересам</span><strong>{commonHobbies.length ? commonHobbies.length + " общих" : "изучите анкету"}</strong></div>{commonHobbies.length > 0 && <div className="discovery-common-hobbies">{commonHobbies.map((hobby) => <span key={hobby}>♡ {hobby}</span>)}</div>}{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
       <div className="discovery-actions">
         <button className="discovery-button undo" onClick={handleUndo} disabled={actionLoading} title="Вернуться к предыдущей анкете" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6" /></svg></button>
         <button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading} title="Пропустить анкету" aria-label="Пропустить"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
