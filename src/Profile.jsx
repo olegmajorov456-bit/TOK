@@ -28,30 +28,31 @@ function getMinBirthDate() {
 
 function getHobbies(profile) {
   if (!profile?.hobbies) return [];
-  if (Array.isArray(profile.hobbies)) {
-    return profile.hobbies.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
-  }
+
+  const normalizeItems = (items) => items
+    .flatMap((item) => String(item).split(","))
+    .map((item) => item.trim().replace(/^["']|["']$/g, "").replace(/\\\"/g, '"'))
+    .filter(Boolean);
+
+  if (Array.isArray(profile.hobbies)) return normalizeItems(profile.hobbies);
 
   let value = String(profile.hobbies).trim();
+  if (!value || value === "[]" || value === "{}") return [];
 
-  // Старые записи могли сохраниться как Postgres-массив: {Музыка,Спорт}
-  if (value.startsWith("{") && value.endsWith("}")) {
-    value = value.slice(1, -1).replace(/\\"/g, '"');
-  }
-
-  // На случай записей, сохранённых JSON-массивом.
   if (value.startsWith("[") && value.endsWith("]")) {
     try {
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) {
-        return parsed.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean);
-      }
+      if (Array.isArray(parsed)) return normalizeItems(parsed);
     } catch {
       value = value.slice(1, -1);
     }
   }
 
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
+  // Legacy text and Postgres-array string formats: {Музыка,Спорт} or
+  // {"Математика, физика","Музыка"}. Preserve commas inside quoted items.
+  if (value.startsWith("{") && value.endsWith("}")) value = value.slice(1, -1);
+  const items = value.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+  return normalizeItems(items);
 }
 
 function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChange }) {
