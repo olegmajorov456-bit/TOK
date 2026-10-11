@@ -415,7 +415,7 @@ drop policy if exists interest_room_messages_read_member on public.interest_room
 create policy interest_room_messages_read_member on public.interest_room_messages
   for select to authenticated using (
     exists (select 1 from public.interest_room_members m
-      where m.room_id = room_id and m.user_id = auth.uid())
+      where m.room_id = interest_room_messages.room_id and m.user_id = auth.uid())
   );
 
 drop policy if exists interest_room_messages_write_member on public.interest_room_messages;
@@ -423,7 +423,7 @@ create policy interest_room_messages_write_member on public.interest_room_messag
   for insert to authenticated with check (
     sender_id = auth.uid()
     and exists (select 1 from public.interest_room_members m
-      where m.room_id = room_id and m.user_id = auth.uid())
+      where m.room_id = interest_room_messages.room_id and m.user_id = auth.uid())
   );
 
 create or replace view public.interest_room_messages_feed as
