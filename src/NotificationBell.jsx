@@ -21,7 +21,7 @@ function groupNotifications(list) {
     const canGroup = item.type === "message" && Boolean(item.actor_id) && Number.isFinite(timestamp);
     const bodyKey = String(item.body || "").trim().toLocaleLowerCase("ru-RU");
     const key = canGroup
-      ? "message|" + item.user_id + "|" + item.actor_id + "|" + bodyKey + "|" + Math.floor(timestamp / 60000)
+      ? "message|" + item.user_id + "|" + item.actor_id + "|" + bodyKey + "|" + Math.floor(timestamp / 30000)
       : "id|" + item.id;
     const existing = byKey.get(key);
     if (existing) {

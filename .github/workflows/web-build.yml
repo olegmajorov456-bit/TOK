@@ -1,0 +1,31 @@
+name: Web production build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.nvmrc'
+      - 'supabase/migrations/**'
+      - '.github/workflows/web-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build web app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Production build
+        run: npm run build
