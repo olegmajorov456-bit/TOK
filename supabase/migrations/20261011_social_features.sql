@@ -279,7 +279,7 @@ $$;
 
 create or replace function public.set_confession_reaction(target_confession_id uuid, target_reaction text)
 returns boolean language plpgsql security definer set search_path = public, pg_temp
-as $
+as $$
 declare v_user uuid := auth.uid();
 begin
   if v_user is null then raise exception 'Authentication required'; end if;
@@ -294,22 +294,22 @@ begin
     set reaction = excluded.reaction, created_at = now();
   return true;
 end;
-$;
+$$;
 
 create or replace function public.delete_own_confession(target_confession_id uuid)
 returns boolean language plpgsql security definer set search_path = public, pg_temp
-as $
+as $$
 declare v_user uuid := auth.uid();
 begin
   if v_user is null then raise exception 'Authentication required'; end if;
   delete from public.confessions where id = target_confession_id and author_id = v_user;
   return found;
 end;
-$;
+$$;
 
 create or replace function public.get_random_chat_room_status(target_room_id uuid)
 returns text language plpgsql security definer set search_path = public, pg_temp
-as $
+as $$
 declare v_user uuid := auth.uid(); v_status text;
 begin
   if v_user is null then raise exception 'Authentication required'; end if;
@@ -317,7 +317,7 @@ begin
   where r.id = target_room_id and (r.user1_id = v_user or r.user2_id = v_user);
   return v_status;
 end;
-$;
+$$;
 
 revoke all on function public.find_random_chat_partner() from public, anon;
 grant execute on function public.find_random_chat_partner() to authenticated;
