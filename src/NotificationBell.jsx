@@ -130,7 +130,7 @@ function NotificationBell({ user, onMatches }) {
       );
       if (error) { console.error("Не удалось скрыть анкету:", error); alert("Не удалось отклонить анкету. Возможно, не выполнена SQL-миграция."); return; }
     }
-    await markRead(item.id);
+    await removeNotification(item.id);
   }
 
   async function markRead(id) {
@@ -142,6 +142,18 @@ function NotificationBell({ user, onMatches }) {
 
     if (!error) {
       setNotifications((current) => current.map((item) => item.id === id ? { ...item, is_read: true } : item));
+    }
+  }
+
+  async function removeNotification(id) {
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (!error) {
+      setNotifications((current) => current.filter((item) => item.id !== id));
     }
   }
 
