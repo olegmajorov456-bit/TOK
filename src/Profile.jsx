@@ -14,16 +14,23 @@ function calculateAge(birthDate) {
   return age;
 }
 
+function formatDateForInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function getMaxBirthDate() {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 16);
-  return date.toISOString().split("T")[0];
+  return formatDateForInput(date);
 }
 
 function getMinBirthDate() {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 100);
-  return date.toISOString().split("T")[0];
+  return formatDateForInput(date);
 }
 
 function getHobbies(profile) {
