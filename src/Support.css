@@ -18,3 +18,23 @@
 .tok-theme-light .support-message.admin{background:#fff;color:#222;border:0;box-shadow:0 4px 15px rgba(18,31,54,.05)}
 .tok-theme-light .support-input{background:rgba(255,255,255,.96);border-color:#dfe2e6;box-shadow:0 12px 38px rgba(18,31,54,.13)}
 .tok-theme-light .support-input input{color:#222}.tok-theme-light .support-input input::placeholder{color:#a0a5ad}
+
+
+/* Keep support messages scrollable and the composer above the on-screen keyboard. */
+html.tok-keyboard-open .support-page {
+  height: var(--tok-visual-viewport-height, 100dvh) !important;
+  min-height: 0 !important;
+  max-height: var(--tok-visual-viewport-height, 100dvh) !important;
+  overflow: hidden;
+}
+html.tok-keyboard-open .support-messages {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 90px;
+}
+html.tok-keyboard-open .support-input {
+  position: fixed !important;
+  bottom: calc(8px + var(--tok-keyboard-overlap, 0px)) !important;
+  z-index: 500 !important;
+}
