@@ -13,6 +13,62 @@ function Support({ user, onBack }) {
   const channelRef = useRef(null);
   const runIdRef = useRef(0);
 
+  // Support uses the same keyboard-aware viewport behaviour as the main chat.
+  useEffect(() => {
+    const root = document.documentElement;
+    const viewport = window.visualViewport;
+    const initialHeight = Math.max(window.innerHeight || 0, root.clientHeight || 0);
+    const editableSelector = 'input:not([type="file"]),textarea,select,[contenteditable="true"]';
+
+    function syncKeyboardViewport() {
+      const currentViewport = window.visualViewport;
+      const layoutHeight = window.innerHeight || root.clientHeight || initialHeight;
+      const visibleHeight = currentViewport?.height || layoutHeight;
+      const offsetTop = currentViewport?.offsetTop || 0;
+      const overlap = Math.max(0, layoutHeight - visibleHeight - offsetTop);
+      const layoutLoss = Math.max(0, initialHeight - layoutHeight);
+      const visualLoss = Math.max(0, initialHeight - visibleHeight);
+      const active = document.activeElement;
+      const editableFocused = !!(active?.matches && active.matches(editableSelector));
+      const keyboardOpen = editableFocused && (overlap > 100 || layoutLoss > 120 || visualLoss > 120);
+
+      root.classList.toggle("tok-keyboard-open", keyboardOpen);
+      root.style.setProperty("--tok-keyboard-overlap", keyboardOpen ? overlap + "px" : "0px");
+      root.style.setProperty("--tok-visual-viewport-height", (visibleHeight || layoutHeight) + "px");
+    }
+
+    function onFocusIn(event) {
+      if (event.target?.matches?.(editableSelector)) {
+        syncKeyboardViewport();
+        window.setTimeout(syncKeyboardViewport, 80);
+        window.setTimeout(syncKeyboardViewport, 240);
+        window.setTimeout(syncKeyboardViewport, 500);
+      }
+    }
+    function onFocusOut() {
+      window.setTimeout(syncKeyboardViewport, 120);
+      window.setTimeout(syncKeyboardViewport, 300);
+    }
+
+    viewport?.addEventListener("resize", syncKeyboardViewport);
+    viewport?.addEventListener("scroll", syncKeyboardViewport);
+    window.addEventListener("resize", syncKeyboardViewport);
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("focusout", onFocusOut);
+    syncKeyboardViewport();
+
+    return () => {
+      viewport?.removeEventListener("resize", syncKeyboardViewport);
+      viewport?.removeEventListener("scroll", syncKeyboardViewport);
+      window.removeEventListener("resize", syncKeyboardViewport);
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("focusout", onFocusOut);
+      root.classList.remove("tok-keyboard-open");
+      root.style.removeProperty("--tok-keyboard-overlap");
+      root.style.removeProperty("--tok-visual-viewport-height");
+    };
+  }, []);
+
   useEffect(() => {
     const runId = ++runIdRef.current;
     let alive = true;
