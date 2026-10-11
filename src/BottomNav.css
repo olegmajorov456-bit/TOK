@@ -4,6 +4,6 @@
 .app-content{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
 @media(max-width:600px){.bottom-nav{bottom:calc(max(6px,env(safe-area-inset-bottom)) + 2px);padding-bottom:max(4px,env(safe-area-inset-bottom))}.app-content{padding-bottom:calc(112px + env(safe-area-inset-bottom))}}
 html.tok-keyboard-open .bottom-nav{display:none!important}
-html.tok-keyboard-open .chat-input-area{bottom:calc(10px + env(safe-area-inset-bottom))!important}
+html.tok-keyboard-open .chat-input-area{bottom:calc(10px + var(--tok-keyboard-overlap, 0px))!important}
 html.tok-keyboard-open .chat-messages{padding-bottom:90px!important}
 html.tok-keyboard-open .chat-page{padding-bottom:0!important}

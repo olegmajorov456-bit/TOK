@@ -22,7 +22,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -55,13 +58,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-        WindowCompat.setDecorFitsSystemWindows(window, true);
+        WindowCompat.setDecorFitsSystemWindows(window, false);
         window.setStatusBarColor(0xFF08090D);
         window.setNavigationBarColor(0xFF08090D);
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         webView = new WebView(this);
         setContentView(webView);
+
+        // Android 15+ enforces edge-to-edge for targetSdk 35. Keep the WebView's
+        // interactive viewport inside the system bars and display cutout.
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
+            int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
+            Insets bars = insets.getInsets(types);
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return new WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build();
+        });
+        ViewCompat.requestApplyInsets(webView);
 
         configureWebView();
         configureBackNavigation();
@@ -248,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("(function(){\nif(window.__tokKeyboardFix)return;\nwindow.__tokKeyboardFix=true;\nvar root=document.documentElement;\nvar vv=window.visualViewport;\nvar initialHeight=Math.max(window.innerHeight, vv?vv.height:0, root.clientHeight);\nvar inputSelector='input,textarea,select,[contenteditable=\"true\"]';\nfunction sync(){\n  var viewport=window.visualViewport;\n  var currentHeight=viewport?Math.min(viewport.height,window.innerHeight):window.innerHeight;\n  var keyboardHeight=Math.max(0,initialHeight-currentHeight);\n  var active=document.activeElement;\n  var inputFocused=!!(active&&active.matches&&active.matches(inputSelector));\n  var open=inputFocused&&keyboardHeight>100;\n  root.classList.toggle('tok-keyboard-open',open);\n  root.style.setProperty('--tok-keyboard-height',open?keyboardHeight+'px':'0px');\n}\nif(window.visualViewport){\n  window.visualViewport.addEventListener('resize',sync);\n  window.visualViewport.addEventListener('scroll',sync);\n}\nwindow.addEventListener('resize',sync);\ndocument.addEventListener('focusin',function(e){\n  if(e.target&&e.target.matches&&e.target.matches(inputSelector)){\n    setTimeout(sync,50);setTimeout(sync,180);setTimeout(sync,350);\n  }\n});\ndocument.addEventListener('focusout',function(){setTimeout(sync,120);setTimeout(sync,280);});\nsync();\n})();", null);
+                view.evaluateJavascript("(function(){\nif(window.__tokKeyboardFix)return;\nwindow.__tokKeyboardFix=true;\nvar root=document.documentElement;\nvar vv=window.visualViewport;\nvar initialHeight=Math.max(window.innerHeight, vv?vv.height:0, root.clientHeight);\nvar inputSelector='input,textarea,select,[contenteditable=\"true\"]';\nfunction sync(){\n  var viewport=window.visualViewport;\n  var layoutHeight=window.innerHeight||root.clientHeight;\n  var visibleHeight=viewport?viewport.height:layoutHeight;\n  var offsetTop=viewport?(viewport.offsetTop||0):0;\n  var overlap=Math.max(0,layoutHeight-visibleHeight-offsetTop);\n  var heightLoss=Math.max(0,initialHeight-layoutHeight);\n  var active=document.activeElement;\n  var inputFocused=!!(active&&active.matches&&active.matches(inputSelector));\n  var open=inputFocused&&(overlap>100||heightLoss>100);\n  root.classList.toggle('tok-keyboard-open',open);\n  root.style.setProperty('--tok-keyboard-height',open?Math.max(overlap,heightLoss)+'px':'0px');\n  root.style.setProperty('--tok-keyboard-overlap',open?overlap+'px':'0px');\n}\nif(window.visualViewport){\n  window.visualViewport.addEventListener('resize',sync);\n  window.visualViewport.addEventListener('scroll',sync);\n}\nwindow.addEventListener('resize',sync);\ndocument.addEventListener('focusin',function(e){\n  if(e.target&&e.target.matches&&e.target.matches(inputSelector)){\n    setTimeout(sync,50);setTimeout(sync,180);setTimeout(sync,350);setTimeout(sync,600);\n  }\n});\ndocument.addEventListener('focusout',function(){setTimeout(sync,120);setTimeout(sync,280);});\nsync();\n})();", null);
             }
 
             @Override
