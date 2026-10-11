@@ -16,6 +16,14 @@ function calculateAge(birthDate) {
   return age;
 }
 
+function normalizeGender(value) {
+  const gender = String(value || "").trim().toLowerCase().replace(/ё/g, "е");
+  if (["male", "m", "man", "boy", "парень", "парня", "мужчина", "мужской"].includes(gender)) return "male";
+  if (["female", "f", "woman", "girl", "девушка", "девушку", "женщина", "женский"].includes(gender)) return "female";
+  if (["other", "другое", "другой", "другая"].includes(gender)) return "other";
+  return gender;
+}
+
 function getHobbies(profile) {
   if (!profile?.hobbies) return [];
   if (Array.isArray(profile.hobbies)) {
@@ -95,11 +103,11 @@ function Discovery({ user, onHome }) {
   function filterProfiles(items, activeFilters = filters, preference = preferredGender) {
     const minAge = activeFilters.minAge ? Number(activeFilters.minAge) : null;
     const maxAge = activeFilters.maxAge ? Number(activeFilters.maxAge) : null;
-    const genderFilter = activeFilters.gender || preference;
+    const genderFilter = normalizeGender(activeFilters.gender || preference);
 
     return items.filter((profile) => {
       const age = calculateAge(profile.birth_date);
-      if (genderFilter && profile.gender !== genderFilter) return false;
+      if (genderFilter && normalizeGender(profile.gender) !== genderFilter) return false;
       if (activeFilters.faculty && profile.faculty !== activeFilters.faculty) return false;
       if (activeFilters.course && String(profile.course) !== String(activeFilters.course)) return false;
       if (minAge !== null && (!age || age < minAge)) return false;
@@ -136,7 +144,8 @@ function Discovery({ user, onHome }) {
 
     const outgoingLikeIds = new Set((outgoingLikes || []).map((item) => item.liked_user_id));
     const passedIds = new Set((passedProfiles || []).map((item) => item.passed_user_id));
-    const profilePreference = myProfile.looking_for === "male" || myProfile.looking_for === "female" ? myProfile.looking_for : "";
+    const normalizedPreference = normalizeGender(myProfile.looking_for);
+    const profilePreference = normalizedPreference === "male" || normalizedPreference === "female" ? normalizedPreference : "";
     setPreferredGender(profilePreference);
     setFilters((current) => ({ ...current, gender: current.gender || profilePreference }));
     const matchedUserIds = new Set((myMatches || []).map((match) => (
@@ -147,7 +156,7 @@ function Discovery({ user, onHome }) {
       .from("profiles")
       .select("*")
       .neq("id", user.id)
-      .eq("is_blocked", false);
+      .or("is_blocked.is.null,is_blocked.eq.false");
 
     if (error) {
       console.error("Ошибка загрузки анкет:", error);

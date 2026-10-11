@@ -136,12 +136,12 @@ function NotificationBell({ user, onMatches }) {
   async function markRead(id) {
     const { error } = await supabase
       .from("notifications")
-      .delete()
+      .update({ is_read: true })
       .eq("id", id)
       .eq("user_id", user.id);
 
     if (!error) {
-      setNotifications((current) => current.filter((item) => item.id !== id));
+      setNotifications((current) => current.map((item) => item.id === id ? { ...item, is_read: true } : item));
     }
   }
 
@@ -150,11 +150,12 @@ function NotificationBell({ user, onMatches }) {
 
     const { error } = await supabase
       .from("notifications")
-      .delete()
-      .eq("user_id", user.id);
+      .update({ is_read: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false);
 
     if (!error) {
-      setNotifications([]);
+      setNotifications((current) => current.map((item) => ({ ...item, is_read: true })));
     }
   }
 
