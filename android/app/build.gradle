@@ -13,6 +13,24 @@ android {
         versionCode 8
         versionName "1.7"
     }
+
+    // The CI build uses a persistent private key supplied through GitHub Actions
+    // secrets, so users can install future APKs over the previous version.
+    signingConfigs {
+        release {
+            storeFile file("tok-release.jks")
+            storePassword System.getenv("TOK_ANDROID_KEYSTORE_PASSWORD") ?: ""
+            keyAlias System.getenv("TOK_ANDROID_KEY_ALIAS") ?: "tok-release"
+            keyPassword System.getenv("TOK_ANDROID_KEY_PASSWORD") ?: ""
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
 }
 
 dependencies {
