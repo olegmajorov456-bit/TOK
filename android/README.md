@@ -39,9 +39,9 @@ APK должен подписываться одним и тем же ключо
 
 2. Чтобы получить Base64 из `tok-release.jks` в Windows PowerShell, выполните:
    ```powershell
-   [Convert]::ToBase64String([IO.File]::ReadAllBytes(".\tok-release.jks"))
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes(".\tok-release.jks")) | Set-Clipboard
    ```
-   Скопируйте результат целиком в secret `TOK_ANDROID_KEYSTORE_BASE64`. Не добавляйте сам файл или его содержимое в Git.
+   Команда скопирует значение в буфер обмена. Вставьте его в secret `TOK_ANDROID_KEYSTORE_BASE64`. Не добавляйте сам файл или его содержимое в Git.
 
 3. После сохранения секретов откройте **Actions → Build Android APK → Run workflow**. Сборка создаст подписанный APK и GitHub Release.
 
