@@ -132,7 +132,7 @@ function App() {
         const current = match ? match[1].split(".").map(Number) : null;
         const available = updateVersion(data || []);
         const dismissedVersion = localStorage.getItem("tok-dismissed-android-update") || "";
-        if (current && available && compareVersions(available.version, current) > 0 && dismissedVersion !== available.version) {
+        if (current && available && compareVersions(available.version, current) > 0 && (available.force || dismissedVersion !== available.version)) {
           setAndroidUpdate(available);
           setShowAndroidUpdate(true);
         }
