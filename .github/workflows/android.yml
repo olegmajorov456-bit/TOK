@@ -38,10 +38,29 @@ jobs:
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           sed -i "s/versionName \"[^\"]*\"/versionName \"1.7.${{ github.run_number }}\"/" android/app/build.gradle
-      - name: Build APK
-        run: gradle --no-daemon -p android assembleDebug
+      - name: Configure stable release signing
+        env:
+          TOK_ANDROID_KEYSTORE_BASE64: ${{ secrets.TOK_ANDROID_KEYSTORE_BASE64 }}
+          TOK_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.TOK_ANDROID_KEYSTORE_PASSWORD }}
+          TOK_ANDROID_KEY_ALIAS: ${{ secrets.TOK_ANDROID_KEY_ALIAS }}
+          TOK_ANDROID_KEY_PASSWORD: ${{ secrets.TOK_ANDROID_KEY_PASSWORD }}
+        run: |
+          for secret_name in TOK_ANDROID_KEYSTORE_BASE64 TOK_ANDROID_KEYSTORE_PASSWORD TOK_ANDROID_KEY_ALIAS TOK_ANDROID_KEY_PASSWORD; do
+            if [ -z "${!secret_name}" ]; then
+              echo "::error::Add the GitHub Actions secret $secret_name before building a signed APK."
+              exit 1
+            fi
+          done
+          printf '%s' "$TOK_ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/tok-release.jks
+          test -s android/app/tok-release.jks || { echo "::error::The Android signing keystore is empty or invalid."; exit 1; }
+      - name: Build signed APK
+        env:
+          TOK_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.TOK_ANDROID_KEYSTORE_PASSWORD }}
+          TOK_ANDROID_KEY_ALIAS: ${{ secrets.TOK_ANDROID_KEY_ALIAS }}
+          TOK_ANDROID_KEY_PASSWORD: ${{ secrets.TOK_ANDROID_KEY_PASSWORD }}
+        run: gradle --no-daemon -p android assembleRelease
       - name: Prepare APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk TOK-Android.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk TOK-Android.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
