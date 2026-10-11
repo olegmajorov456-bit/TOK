@@ -17,7 +17,6 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const searchTokenRef = useRef(0);
-  const channelRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -68,7 +67,6 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
 
   useEffect(() => () => {
     searchTokenRef.current += 1;
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
   }, []);
 
   async function joinRoom(roomId) {
@@ -83,8 +81,8 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
       return;
     }
     const { data: rows, error: messagesError } = await supabase
-      .from("random_chat_messages")
-      .select("id,room_id,sender_id,body,created_at")
+      .from("random_chat_messages_feed")
+      .select("id,room_id,is_mine,body,created_at")
       .eq("room_id", roomId)
       .order("created_at", { ascending: true })
       .limit(300);
@@ -97,20 +95,30 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
     setMessages(rows || []);
     setSearching(false);
     setNotice("Собеседник найден. Общайтесь уважительно — любой участник может завершить чат.");
-    if (channelRef.current) supabase.removeChannel(channelRef.current);
-    channelRef.current = supabase
-      .channel("random-room-" + roomId)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "random_chat_messages", filter: "room_id=eq." + roomId }, (payload) => {
-        setMessages((current) => current.some((item) => item.id === payload.new.id) ? current : [...current, payload.new]);
-      })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "random_chat_rooms", filter: "id=eq." + roomId }, (payload) => {
-        if (payload.new.status === "ended") {
-          setRoom((current) => current ? { ...current, status: "ended" } : current);
-          setNotice("Собеседник завершил разговор. Можно найти нового человека.");
-        }
-      })
-      .subscribe();
+
   }
+
+  useEffect(() => {
+    if (!room?.id || room.status !== "active") return undefined;
+    let cancelled = false;
+    async function syncRoom() {
+      const statusResult = await supabase.rpc("get_random_chat_room_status", { target_room_id: room.id });
+      if (!cancelled && statusResult.data === "ended") {
+        setRoom((current) => current ? { ...current, status: "ended" } : current);
+        setNotice("Собеседник завершил разговор. Можно найти нового человека.");
+      }
+      const { data, error: messagesError } = await supabase
+        .from("random_chat_messages_feed")
+        .select("id,room_id,is_mine,body,created_at")
+        .eq("room_id", room.id)
+        .order("created_at", { ascending: true })
+        .limit(300);
+      if (!cancelled && !messagesError) setMessages(data || []);
+    }
+    const timer = window.setInterval(syncRoom, 2200);
+    syncRoom();
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [room?.id, room?.status]);
 
   async function startSearch() {
     if (searching) return;
@@ -142,7 +150,7 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
       await new Promise((resolve) => window.setTimeout(resolve, 2200));
     }
     if (searchTokenRef.current === token) {
-      await supabase.from("random_chat_queue").delete().eq("user_id", user.id);
+      await supabase.rpc("leave_random_chat", { target_room_id: null });
       setSearching(false);
       setNotice("Пока никого не нашли. Попробуй ещё раз чуть позже.");
     }
@@ -150,22 +158,15 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
 
   async function cancelSearch() {
     searchTokenRef.current += 1;
-    await supabase.from("random_chat_queue").delete().eq("user_id", user.id);
+    await supabase.rpc("leave_random_chat", { target_room_id: null });
     setSearching(false);
     setNotice("Поиск отменён.");
   }
 
   async function finishRoom() {
     searchTokenRef.current += 1;
-    if (room?.id && room.status === "active") {
-      const { error: leaveError } = await supabase.rpc("leave_random_chat", { target_room_id: room.id });
-      if (leaveError) console.error("Не удалось завершить случайный чат:", leaveError);
-    }
-    await supabase.from("random_chat_queue").delete().eq("user_id", user.id);
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
+    const { error: leaveError } = await supabase.rpc("leave_random_chat", { target_room_id: room?.id || null });
+    if (leaveError) console.error("Не удалось завершить случайный чат:", leaveError);
     setSearching(false);
     setRoom(null);
     setMessages([]);
@@ -182,17 +183,21 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
     const cleanBody = draft.trim();
     if (!cleanBody || !room?.id || room.status !== "active" || sending) return;
     setSending(true);
-    const { data, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("random_chat_messages")
-      .insert({ room_id: room.id, sender_id: user.id, body: cleanBody })
-      .select("id,room_id,sender_id,body,created_at")
-      .single();
+      .insert({ room_id: room.id, sender_id: user.id, body: cleanBody });
     if (insertError) {
       console.error("Не удалось отправить сообщение:", insertError);
       setError("Сообщение не отправлено. Проверь соединение и попробуй ещё раз.");
     } else {
-      setMessages((current) => current.some((item) => item.id === data.id) ? current : [...current, data]);
       setDraft("");
+      const { data: latestMessages } = await supabase
+        .from("random_chat_messages_feed")
+        .select("id,room_id,is_mine,body,created_at")
+        .eq("room_id", room.id)
+        .order("created_at", { ascending: true })
+        .limit(300);
+      setMessages(latestMessages || []);
     }
     setSending(false);
   }
@@ -215,7 +220,7 @@ function RandomChat({ user, theme = "light", onHome, onDiscovery, onMatches, onP
         {!room && !searching ? <section className="random-chat-welcome"><div className="random-chat-welcome-emoji">🎲</div><h1>Никогда не знаешь, с кем познакомишься</h1><p>Найди случайного студента ИГЭУ для лёгкого разговора. Вы начинаете анонимно: без фотографий, имён и ссылок на профиль.</p><div className="random-chat-rules"><span>🔒 Анонимно</span><span>🤝 По взаимному желанию</span><span>🚫 Можно завершить в любой момент</span></div><button type="button" onClick={startSearch}>Найти собеседника <span>→</span></button></section> : null}
         {searching && <section className="random-chat-searching"><span className="random-chat-search-spinner" /><h2>Ищем собеседника</h2><p>Подбираем человека, который тоже хочет пообщаться.</p><button type="button" onClick={cancelSearch}>Отменить поиск</button></section>}
         {room && <div className="random-chat-system-note">Вы общаетесь анонимно. Не отправляй личные данные незнакомым людям.</div>}
-        {messages.map((item) => <article key={item.id} className={"random-message " + (item.sender_id === user.id ? "mine" : "theirs")}><p>{item.body}</p><time>{formatTime(item.created_at)}</time></article>)}
+        {messages.map((item) => <article key={item.id} className={"random-message " + (item.is_mine ? "mine" : "theirs")}><p>{item.body}</p><time>{formatTime(item.created_at)}</time></article>)}
         {room?.status === "ended" && <section className="random-chat-ended"><div>👋</div><strong>Разговор завершён</strong><p>Спасибо за общение. Можно сразу начать новый чат.</p><button type="button" onClick={startSearch}>Найти другого собеседника</button></section>}
         <div ref={messagesEndRef} />
       </main>
