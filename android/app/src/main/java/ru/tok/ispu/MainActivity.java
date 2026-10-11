@@ -21,6 +21,7 @@ import java.net.URL;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.view.WindowManager;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -61,20 +62,35 @@ public class MainActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(window, false);
         window.setStatusBarColor(0xFF08090D);
         window.setNavigationBarColor(0xFF08090D);
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        // Apply Android system-bar insets to a native container, not directly to
+        // WebView. This keeps the HTML viewport below the status bar and above
+        // the gesture/navigation area on Android 15+ edge-to-edge devices.
+        FrameLayout appRoot = new FrameLayout(this);
+        appRoot.setBackgroundColor(0xFF08090D);
         webView = new WebView(this);
-        setContentView(webView);
+        webView.setBackgroundColor(0xFF08090D);
+        appRoot.addView(webView, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(appRoot);
 
-        // Android 15+ enforces edge-to-edge for targetSdk 35. Keep the WebView's
-        // interactive viewport inside the system bars and display cutout.
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
-            int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
+        ViewCompat.setOnApplyWindowInsetsListener(appRoot, (view, insets) -> {
+            int types = WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout();
             Insets bars = insets.getInsets(types);
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return new WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build();
+            return new WindowInsetsCompat.Builder(insets)
+                    .setInsets(types, Insets.NONE)
+                    .build();
         });
-        ViewCompat.requestApplyInsets(webView);
+        ViewCompat.requestApplyInsets(appRoot);
 
         configureWebView();
         configureBackNavigation();
@@ -261,7 +277,40 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("(function(){\nif(window.__tokKeyboardFix)return;\nwindow.__tokKeyboardFix=true;\nvar root=document.documentElement;\nvar vv=window.visualViewport;\nvar initialHeight=Math.max(window.innerHeight, vv?vv.height:0, root.clientHeight);\nvar inputSelector='input,textarea,select,[contenteditable=\"true\"]';\nfunction sync(){\n  var viewport=window.visualViewport;\n  var layoutHeight=window.innerHeight||root.clientHeight;\n  var visibleHeight=viewport?viewport.height:layoutHeight;\n  var offsetTop=viewport?(viewport.offsetTop||0):0;\n  var overlap=Math.max(0,layoutHeight-visibleHeight-offsetTop);\n  var heightLoss=Math.max(0,initialHeight-layoutHeight);\n  var active=document.activeElement;\n  var inputFocused=!!(active&&active.matches&&active.matches(inputSelector));\n  var open=inputFocused&&(overlap>100||heightLoss>100);\n  root.classList.toggle('tok-keyboard-open',open);\n  root.style.setProperty('--tok-keyboard-height',open?Math.max(overlap,heightLoss)+'px':'0px');\n  root.style.setProperty('--tok-keyboard-overlap',open?overlap+'px':'0px');\n}\nif(window.visualViewport){\n  window.visualViewport.addEventListener('resize',sync);\n  window.visualViewport.addEventListener('scroll',sync);\n}\nwindow.addEventListener('resize',sync);\ndocument.addEventListener('focusin',function(e){\n  if(e.target&&e.target.matches&&e.target.matches(inputSelector)){\n    setTimeout(sync,50);setTimeout(sync,180);setTimeout(sync,350);setTimeout(sync,600);\n  }\n});\ndocument.addEventListener('focusout',function(){setTimeout(sync,120);setTimeout(sync,280);});\nsync();\n})();", null);
+                view.evaluateJavascript("(function(){"
+                        + "if(window.__tokKeyboardFix)return;"
+                        + "window.__tokKeyboardFix=true;"
+                        + "var root=document.documentElement;"
+                        + "var initialHeight=Math.max(window.innerHeight||0,root.clientHeight||0);"
+                        + "var inputSelector='input,textarea,select,[contenteditable=true]';"
+                        + "function sync(){"
+                        + "var vv=window.visualViewport;"
+                        + "var layoutHeight=window.innerHeight||root.clientHeight;"
+                        + "var visibleHeight=vv?vv.height:layoutHeight;"
+                        + "var offsetTop=vv?(vv.offsetTop||0):0;"
+                        + "var overlap=Math.max(0,layoutHeight-visibleHeight-offsetTop);"
+                        + "var heightLoss=Math.max(0,initialHeight-layoutHeight);"
+                        + "var visualLoss=Math.max(0,initialHeight-visibleHeight);"
+                        + "var active=document.activeElement;"
+                        + "var focused=!!(active&&active.matches&&active.matches(inputSelector));"
+                        + "var keyboardOpen=focused&&(overlap>100||heightLoss>120||visualLoss>120);"
+                        + "root.classList.toggle('tok-keyboard-open',keyboardOpen);"
+                        + "root.style.setProperty('--tok-keyboard-overlap',keyboardOpen?overlap+'px':'0px');"
+                        + "root.style.setProperty('--tok-visual-viewport-height',(visibleHeight||layoutHeight)+'px');"
+                        + "}"
+                        + "if(window.visualViewport){"
+                        + "window.visualViewport.addEventListener('resize',sync);"
+                        + "window.visualViewport.addEventListener('scroll',sync);"
+                        + "}"
+                        + "window.addEventListener('resize',sync);"
+                        + "document.addEventListener('focusin',function(e){"
+                        + "if(e.target&&e.target.matches&&e.target.matches(inputSelector)){"
+                        + "setTimeout(sync,50);setTimeout(sync,180);setTimeout(sync,350);setTimeout(sync,600);"
+                        + "}"
+                        + "});"
+                        + "document.addEventListener('focusout',function(){setTimeout(sync,120);setTimeout(sync,280);});"
+                        + "sync();"
+                        + "})();", null);
             }
 
             @Override
