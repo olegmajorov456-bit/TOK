@@ -53,7 +53,7 @@ function Achievements({ user, theme = "light" }) {
       supabase.from("likes").select("id", { count: "exact", head: true }).eq("liked_user_id", user.id),
       supabase.from("matches").select("id", { count: "exact", head: true }).or("user1_id.eq." + user.id + ",user2_id.eq." + user.id),
       supabase.from("messages").select("id", { count: "exact", head: true }).eq("sender_id", user.id),
-      supabase.from("confessions").select("id", { count: "exact", head: true }).eq("author_id", user.id),
+      supabase.from("confessions_feed").select("id", { count: "exact", head: true }).eq("is_mine", true),
       supabase.from("user_daily_activity").select("activity_date").eq("user_id", user.id).order("activity_date", { ascending: false }).limit(90),
     ]);
 

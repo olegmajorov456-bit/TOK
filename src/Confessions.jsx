@@ -33,8 +33,8 @@ function Confessions({ user, theme = "light" }) {
   async function loadFeed(showLoader = true) {
     if (showLoader) setLoading(true);
     const result = await supabase
-      .from("confessions")
-      .select("id,author_id,body,category,created_at")
+      .from("confessions_feed")
+      .select("id,is_mine,body,category,created_at")
       .order("created_at", { ascending: false })
       .limit(40);
 
@@ -60,8 +60,8 @@ function Confessions({ user, theme = "light" }) {
 
     const ids = nextPosts.map((item) => item.id);
     const [reactionResult, commentResult] = await Promise.all([
-      supabase.from("confession_reactions").select("id,confession_id,user_id,reaction").in("confession_id", ids),
-      supabase.from("confession_comments").select("id,confession_id,author_id,body,created_at").in("confession_id", ids).order("created_at", { ascending: true }),
+      supabase.from("confession_reaction_summary").select("confession_id,heart_count,laugh_count,wow_count,my_reaction").in("confession_id", ids),
+      supabase.from("confession_comments_feed").select("id,confession_id,is_mine,body,created_at").in("confession_id", ids).order("created_at", { ascending: true }),
     ]);
 
     if (reactionResult.error || commentResult.error) {
@@ -81,9 +81,7 @@ function Confessions({ user, theme = "light" }) {
   const reactionCounts = useMemo(() => {
     const next = {};
     for (const item of reactions) {
-      if (!next[item.confession_id]) next[item.confession_id] = { heart: 0, laugh: 0, wow: 0, mine: null };
-      if (item.reaction in next[item.confession_id]) next[item.confession_id][item.reaction] += 1;
-      if (item.user_id === user.id) next[item.confession_id].mine = item.reaction;
+      next[item.confession_id] = { heart: Number(item.heart_count) || 0, laugh: Number(item.laugh_count) || 0, wow: Number(item.wow_count) || 0, mine: item.my_reaction || null };
     }
     return next;
   }, [reactions, user.id]);
@@ -123,21 +121,14 @@ function Confessions({ user, theme = "light" }) {
     setBusyId(post.id);
     setError("");
     const current = reactionCounts[post.id]?.mine;
-    let result;
-    if (current === reaction) {
-      result = await supabase.from("confession_reactions").delete().eq("confession_id", post.id).eq("user_id", user.id);
-    } else {
-      result = await supabase.from("confession_reactions").upsert(
-        { confession_id: post.id, user_id: user.id, reaction },
-        { onConflict: "confession_id,user_id" }
-      );
-    }
-    if (result.error) {
-      console.error("Не удалось сохранить реакцию:", result.error);
+    const { error: reactionError } = await supabase.rpc("set_confession_reaction", {
+      target_confession_id: post.id,
+      target_reaction: current === reaction ? null : reaction,
+    });
+    if (reactionError) {
+      console.error("Не удалось сохранить реакцию:", reactionError);
       setError("Не получилось сохранить реакцию. Проверь SQL-миграцию.");
-    } else {
-      await loadFeed(false);
-    }
+    } else await loadFeed(false);
     setBusyId(null);
   }
 
@@ -146,28 +137,22 @@ function Confessions({ user, theme = "light" }) {
     const cleanBody = (commentDrafts[post.id] || "").trim();
     if (!cleanBody || busyId) return;
     setBusyId(post.id);
-    const { data, error: insertError } = await supabase
-      .from("confession_comments")
-      .insert({ confession_id: post.id, author_id: user.id, body: cleanBody })
-      .select("id,confession_id,author_id,body,created_at")
-      .single();
+    const { error: insertError } = await supabase.from("confession_comments")
+      .insert({ confession_id: post.id, author_id: user.id, body: cleanBody });
     if (insertError) {
       console.error("Не удалось добавить комментарий:", insertError);
       setError("Не удалось добавить комментарий. Попробуй ещё раз.");
     } else {
-      setComments((current) => [...current, data]);
       setCommentDrafts((current) => ({ ...current, [post.id]: "" }));
+      await loadFeed(false);
     }
     setBusyId(null);
   }
 
   async function deletePost(post) {
-    if (post.author_id !== user.id || !window.confirm("Удалить своё признание?")) return;
-    const { error: deleteError } = await supabase.from("confessions").delete().eq("id", post.id).eq("author_id", user.id);
-    if (deleteError) {
-      setError("Не удалось удалить публикацию.");
-      return;
-    }
+    if (!post.is_mine || !window.confirm("Удалить своё признание?")) return;
+    const { error: deleteError } = await supabase.rpc("delete_own_confession", { target_confession_id: post.id });
+    if (deleteError) { setError("Не удалось удалить публикацию."); return; }
     setPosts((current) => current.filter((item) => item.id !== post.id));
     setReactions((current) => current.filter((item) => item.confession_id !== post.id));
     setComments((current) => current.filter((item) => item.confession_id !== post.id));
@@ -230,12 +215,12 @@ function Confessions({ user, theme = "light" }) {
                     </div>
                     <button type="button" className="confession-comment-toggle" onClick={() => setExpandedId(expanded ? null : post.id)}>💬 {commentCounts[post.id] || 0} комментариев</button>
                     <div className="confession-more-actions">
-                      {post.author_id === user.id && <button type="button" onClick={() => deletePost(post)} aria-label="Удалить публикацию">Удалить</button>}
+                      {post.is_mine && <button type="button" onClick={() => deletePost(post)} aria-label="Удалить публикацию">Удалить</button>}
                       <button type="button" onClick={() => { setReportingId(reportingId === post.id ? null : post.id); setReportReason("Оскорбление или травля"); }}>Пожаловаться</button>
                     </div>
                   </div>
                   {reportingId === post.id && <form className="confession-report-form" onSubmit={(event) => submitReport(event, post)}><select value={reportReason} onChange={(event) => setReportReason(event.target.value)}><option>Оскорбление или травля</option><option>Личные данные</option><option>Спам</option><option>Неподходящее содержание</option><option>Другое</option></select><button disabled={busyId === post.id} type="submit">Отправить жалобу</button></form>}
-                  {expanded && <section className="confession-comments"><h3>Комментарии <span>{postComments.length}</span></h3>{postComments.length === 0 ? <p className="confession-no-comments">Пока нет комментариев. Будь первым.</p> : postComments.map((item) => <div className="confession-comment" key={item.id}><span className="confession-comment-avatar">◌</span><div><strong>{item.author_id === user.id ? "Ты" : "Аноним"}</strong><p>{item.body}</p><time>{formatTime(item.created_at)}</time></div></div>)}<form className="confession-comment-form" onSubmit={(event) => addComment(event, post)}><input value={commentDrafts[post.id] || ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={500} placeholder="Написать комментарий…" aria-label="Комментарий" /><button type="submit" disabled={!(commentDrafts[post.id] || "").trim() || busyId === post.id}>↑</button></form></section>}
+                  {expanded && <section className="confession-comments"><h3>Комментарии <span>{postComments.length}</span></h3>{postComments.length === 0 ? <p className="confession-no-comments">Пока нет комментариев. Будь первым.</p> : postComments.map((item) => <div className="confession-comment" key={item.id}><span className="confession-comment-avatar">◌</span><div><strong>{item.is_mine ? "Ты" : "Аноним"}</strong><p>{item.body}</p><time>{formatTime(item.created_at)}</time></div></div>)}<form className="confession-comment-form" onSubmit={(event) => addComment(event, post)}><input value={commentDrafts[post.id] || ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={500} placeholder="Написать комментарий…" aria-label="Комментарий" /><button type="submit" disabled={!(commentDrafts[post.id] || "").trim() || busyId === post.id}>↑</button></form></section>}
                 </article>
               );
             })}

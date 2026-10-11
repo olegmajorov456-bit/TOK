@@ -76,6 +76,33 @@ create index if not exists random_chat_messages_room_time_idx on public.random_c
 create index if not exists random_chat_rooms_user1_status_idx on public.random_chat_rooms (user1_id, status);
 create index if not exists random_chat_rooms_user2_status_idx on public.random_chat_rooms (user2_id, status);
 
+-- Client-facing views never reveal confession authors, commenters, or random chat participants.
+create or replace view public.confessions_feed as
+  select id, body, category, created_at, (author_id = auth.uid()) as is_mine
+  from public.confessions;
+
+create or replace view public.confession_reaction_summary as
+  select confession_id,
+    count(*) filter (where reaction = 'heart')::integer as heart_count,
+    count(*) filter (where reaction = 'laugh')::integer as laugh_count,
+    count(*) filter (where reaction = 'wow')::integer as wow_count,
+    max(reaction) filter (where user_id = auth.uid()) as my_reaction
+  from public.confession_reactions
+  group by confession_id;
+
+create or replace view public.confession_comments_feed as
+  select id, confession_id, body, created_at, (author_id = auth.uid()) as is_mine
+  from public.confession_comments;
+
+create or replace view public.random_chat_messages_feed as
+  select m.id, m.room_id, (m.sender_id = auth.uid()) as is_mine, m.body, m.created_at
+  from public.random_chat_messages m
+  where exists (
+    select 1 from public.random_chat_rooms r
+    where r.id = m.room_id and (r.user1_id = auth.uid() or r.user2_id = auth.uid())
+  );
+
+
 alter table public.confessions enable row level security;
 alter table public.confession_reactions enable row level security;
 alter table public.confession_comments enable row level security;
@@ -144,14 +171,21 @@ create policy random_chat_messages_insert_participant on public.random_chat_mess
     )
   );
 
-grant select, insert, delete on public.confessions to authenticated;
-grant select, insert, update, delete on public.confession_reactions to authenticated;
-grant select, insert, delete on public.confession_comments to authenticated;
-grant select, insert on public.confession_reports to authenticated;
+-- Restrict base-table access: anonymous authors/participants are exposed only via safe views.
+revoke all on public.confessions, public.confession_reactions, public.confession_comments,
+  public.confession_reports, public.random_chat_rooms, public.random_chat_queue,
+  public.random_chat_messages from anon, authenticated;
+
+grant select on public.confessions_feed to authenticated;
+grant select on public.confession_reaction_summary to authenticated;
+grant select on public.confession_comments_feed to authenticated;
+grant select on public.random_chat_messages_feed to authenticated;
+grant insert (author_id, body, category) on public.confessions to authenticated;
+grant insert (confession_id, author_id, body) on public.confession_comments to authenticated;
+grant insert (confession_id, reporter_id, reason) on public.confession_reports to authenticated;
 grant select, insert on public.user_daily_activity to authenticated;
-grant select on public.random_chat_rooms to authenticated;
-grant insert, select on public.random_chat_messages to authenticated;
-grant insert, delete on public.random_chat_queue to authenticated;
+grant select (id, status, created_at) on public.random_chat_rooms to authenticated;
+grant insert (room_id, sender_id, body) on public.random_chat_messages to authenticated;
 
 create or replace function public.find_random_chat_partner()
 returns uuid
@@ -216,7 +250,7 @@ begin
 end;
 $$;
 
-create or replace function public.leave_random_chat(target_room_id uuid)
+create or replace function public.leave_random_chat(target_room_id uuid default null)
 returns boolean
 language plpgsql
 security definer
@@ -232,8 +266,9 @@ begin
 
   update public.random_chat_rooms
   set status = 'ended', ended_at = now()
-  where id = target_room_id and status = 'active'
-    and (user1_id = v_user or user2_id = v_user);
+  where status = 'active'
+    and (user1_id = v_user or user2_id = v_user)
+    and (target_room_id is null or id = target_room_id);
   v_changed := found;
 
   delete from public.random_chat_queue where user_id = v_user;
@@ -241,26 +276,61 @@ begin
 end;
 $$;
 
+
+create or replace function public.set_confession_reaction(target_confession_id uuid, target_reaction text)
+returns boolean language plpgsql security definer set search_path = public, pg_temp
+as $
+declare v_user uuid := auth.uid();
+begin
+  if v_user is null then raise exception 'Authentication required'; end if;
+  if target_reaction is null then
+    delete from public.confession_reactions where confession_id = target_confession_id and user_id = v_user;
+    return false;
+  end if;
+  if target_reaction not in ('heart', 'laugh', 'wow') then raise exception 'Invalid reaction'; end if;
+  insert into public.confession_reactions (confession_id, user_id, reaction)
+  values (target_confession_id, v_user, target_reaction)
+  on conflict (confession_id, user_id) do update
+    set reaction = excluded.reaction, created_at = now();
+  return true;
+end;
+$;
+
+create or replace function public.delete_own_confession(target_confession_id uuid)
+returns boolean language plpgsql security definer set search_path = public, pg_temp
+as $
+declare v_user uuid := auth.uid();
+begin
+  if v_user is null then raise exception 'Authentication required'; end if;
+  delete from public.confessions where id = target_confession_id and author_id = v_user;
+  return found;
+end;
+$;
+
+create or replace function public.get_random_chat_room_status(target_room_id uuid)
+returns text language plpgsql security definer set search_path = public, pg_temp
+as $
+declare v_user uuid := auth.uid(); v_status text;
+begin
+  if v_user is null then raise exception 'Authentication required'; end if;
+  select r.status into v_status from public.random_chat_rooms r
+  where r.id = target_room_id and (r.user1_id = v_user or r.user2_id = v_user);
+  return v_status;
+end;
+$;
+
 revoke all on function public.find_random_chat_partner() from public, anon;
 grant execute on function public.find_random_chat_partner() to authenticated;
 revoke all on function public.leave_random_chat(uuid) from public, anon;
 grant execute on function public.leave_random_chat(uuid) to authenticated;
+revoke all on function public.set_confession_reaction(uuid, text) from public, anon;
+grant execute on function public.set_confession_reaction(uuid, text) to authenticated;
+revoke all on function public.delete_own_confession(uuid) from public, anon;
+grant execute on function public.delete_own_confession(uuid) to authenticated;
+revoke all on function public.get_random_chat_room_status(uuid) from public, anon;
+grant execute on function public.get_random_chat_room_status(uuid) to authenticated;
 
-do $$
-begin
-  execute 'alter publication supabase_realtime add table public.random_chat_messages';
-exception
-  when duplicate_object then null;
-  when undefined_object then null;
-  when insufficient_privilege then null;
-end;
-$$;
-do $$
-begin
-  execute 'alter publication supabase_realtime add table public.random_chat_rooms';
-exception
-  when duplicate_object then null;
-  when undefined_object then null;
-  when insufficient_privilege then null;
-end;
-$$;
+-- Random chat uses participant-scoped polling, so raw realtime rows aren't published.
+
+
+notify pgrst, 'reload schema';
