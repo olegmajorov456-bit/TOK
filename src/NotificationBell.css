@@ -31,3 +31,6 @@
 .notification-panel-footer button:hover{border-color:#ff3975;background:#221821}.notification-panel-footer button span{font-size:16px;color:#ff6f98}
 .tok-theme-light .notification-panel-footer{border-color:#eceef1;background:#fff}.tok-theme-light .notification-panel-footer button{background:#f8f9fb;border-color:#e2e5e9;color:#383e47}.tok-theme-light .notification-panel-footer button:hover{background:#fff4f7;border-color:#e83c6d}
 @media(max-width:600px){.notification-panel{position:fixed;top:calc(70px + env(safe-area-inset-top));right:8px;max-height:calc(100dvh - 90px - env(safe-area-inset-top));width:min(390px,calc(100vw - 16px));display:flex;flex-direction:column}.notification-list{max-height:none;min-height:0;flex:1;overflow-y:auto}.notification-panel-footer{flex:0 0 auto}}
+
+.notification-group-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:18px;padding:0 5px;border-radius:99px;background:rgba(232,60,109,.13);color:#e83c6d;font-size:9px;font-weight:900}
+.tok-theme-neon .notification-group-count{background:#351725;color:#ff7aa0}

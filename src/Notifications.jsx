@@ -25,6 +25,31 @@ function Icon({ type, size = 21 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[key]} /></svg>;
 }
 
+function groupNotifications(list) {
+  const sorted = [...(list || [])].sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
+  const groups = [];
+  const byKey = new Map();
+  for (const item of sorted) {
+    const timestamp = Date.parse(item.created_at || "");
+    const canGroup = item.type === "message" && Boolean(item.actor_id) && Number.isFinite(timestamp);
+    const bodyKey = String(item.body || "").trim().toLocaleLowerCase("ru-RU");
+    const key = canGroup
+      ? "message|" + item.user_id + "|" + item.actor_id + "|" + bodyKey + "|" + Math.floor(timestamp / 60000)
+      : "id|" + item.id;
+    const existing = byKey.get(key);
+    if (existing) {
+      if (item.id && !existing.notificationIds.includes(item.id)) existing.notificationIds.push(item.id);
+      existing.eventCount += 1;
+      existing.is_read = existing.is_read && Boolean(item.is_read);
+      continue;
+    }
+    const group = { ...item, notificationIds: item.id ? [item.id] : [], eventCount: 1 };
+    byKey.set(key, group);
+    groups.push(group);
+  }
+  return groups;
+}
+
 function labelFor(item) {
   if (item.type === "message") return "Новое сообщение";
   if (item.type === "match") return "Взаимная симпатия";
@@ -67,13 +92,14 @@ function Notifications({ user, theme = "light", onHome }) {
     };
   }, [user.id]);
 
-  async function markRead(id) {
-    const { error: updateError } = await supabase.from("notifications").update({ is_read: true }).eq("id", id).eq("user_id", user.id);
+  async function markRead(item) {
+    const ids = item.notificationIds?.length ? item.notificationIds : [item.id];
+    const { error: updateError } = await supabase.from("notifications").update({ is_read: true }).in("id", ids).eq("user_id", user.id);
     if (updateError) {
       setError("Не удалось отметить уведомление прочитанным.");
       return;
     }
-    setItems((current) => current.map((item) => item.id === id ? { ...item, is_read: true } : item));
+    setItems((current) => current.map((row) => ids.includes(row.id) ? { ...row, is_read: true } : row));
   }
 
   async function markAllRead() {
@@ -85,11 +111,12 @@ function Notifications({ user, theme = "light", onHome }) {
     setItems((current) => current.map((item) => ({ ...item, is_read: true })));
   }
 
-  const unread = useMemo(() => items.filter((item) => !item.is_read).length, [items]);
-  const filtered = useMemo(() => items.filter((item) => {
+  const groupedItems = useMemo(() => groupNotifications(items), [items]);
+  const unread = useMemo(() => groupedItems.filter((item) => !item.is_read).length, [groupedItems]);
+  const filtered = useMemo(() => groupedItems.filter((item) => {
     if (filter === "unread") return !item.is_read;
     return filter === "all" || item.type === filter;
-  }), [items, filter]);
+  }), [groupedItems, filter]);
 
   return (
     <div className={"notifications-page tok-theme-" + theme}>
@@ -109,9 +136,9 @@ function Notifications({ user, theme = "light", onHome }) {
           <section className="notifications-empty"><div className="notifications-empty-icon"><Icon type="bell" size={29} /></div><h2>{filter === "unread" ? "Всё прочитано" : "Пока тихо"}</h2><p>{filter === "unread" ? "Непрочитанных уведомлений больше нет." : "Новые события появятся здесь автоматически."}</p></section>
         ) : (
           <section className="notifications-list">
-            {filtered.map((item) => <button type="button" key={item.id} className={"notification-page-item " + (item.is_read ? "" : "unread")} onClick={() => !item.is_read && markRead(item.id)}>
+            {filtered.map((item) => <button type="button" key={item.id} className={"notification-page-item " + (item.is_read ? "" : "unread")} onClick={() => !item.is_read && markRead(item)}>
               <span className={"notification-page-icon " + item.type}><Icon type={item.type} size={19} /></span>
-              <span className="notification-page-copy"><strong>{labelFor(item)}</strong><span>{item.body || (item.type === "message" ? "Вам отправили сообщение." : item.type === "like" ? "Кто-то поставил вам лайк." : "Есть новости в ТОК.")}</span><small>{new Date(item.created_at).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</small></span>
+              <span className="notification-page-copy"><strong>{labelFor(item)}{item.eventCount > 1 ? " · " + item.eventCount + " событий" : ""}</strong><span>{item.body || (item.type === "message" ? "Вам отправили сообщение." : item.type === "like" ? "Кто-то поставил вам лайк." : "Есть новости в ТОК.")}</span><small>{new Date(item.created_at).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</small></span>
               {!item.is_read && <i className="notification-unread-dot" />}
             </button>)}
           </section>

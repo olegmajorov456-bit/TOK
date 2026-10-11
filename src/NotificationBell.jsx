@@ -12,6 +12,31 @@ function dedupeNotifications(list) {
   });
 }
 
+function groupNotifications(list) {
+  const sorted = [...(list || [])].sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
+  const groups = [];
+  const byKey = new Map();
+  for (const item of sorted) {
+    const timestamp = Date.parse(item.created_at || "");
+    const canGroup = item.type === "message" && Boolean(item.actor_id) && Number.isFinite(timestamp);
+    const bodyKey = String(item.body || "").trim().toLocaleLowerCase("ru-RU");
+    const key = canGroup
+      ? "message|" + item.user_id + "|" + item.actor_id + "|" + bodyKey + "|" + Math.floor(timestamp / 60000)
+      : "id|" + item.id;
+    const existing = byKey.get(key);
+    if (existing) {
+      if (item.id && !existing._notificationIds.includes(item.id)) existing._notificationIds.push(item.id);
+      existing._eventCount += 1;
+      existing.is_read = existing.is_read && Boolean(item.is_read);
+      continue;
+    }
+    const group = { ...item, _notificationIds: item.id ? [item.id] : [], _eventCount: 1 };
+    byKey.set(key, group);
+    groups.push(group);
+  }
+  return groups;
+}
+
 function formatNotificationTime(value) {
   const date = new Date(value);
   const diff = Math.max(0, Date.now() - date.getTime());
@@ -109,11 +134,11 @@ function NotificationBell({ user, onMatches, onAllNotifications }) {
     };
   }, [user?.id]);
 
+  const groupedNotifications = useMemo(() => groupNotifications(notifications), [notifications]);
   const unreadCount = useMemo(
-    () => notifications.filter((item) => !item.is_read).length,
-    [notifications]
+    () => groupedNotifications.filter((item) => !item.is_read).length,
+    [groupedNotifications]
   );
-
 
   async function respondToLike(item, liked) {
     if (!item?.actor_id || !user?.id) return;
@@ -130,31 +155,23 @@ function NotificationBell({ user, onMatches, onAllNotifications }) {
       );
       if (error) { console.error("Не удалось скрыть анкету:", error); alert("Не удалось отклонить анкету. Возможно, не выполнена SQL-миграция."); return; }
     }
-    await removeNotification(item.id);
+    await removeNotification(item);
   }
 
-  async function markRead(id) {
-    const { error } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", id)
-      .eq("user_id", user.id);
-
+  async function markRead(item) {
+    const ids = item?._notificationIds?.length ? item._notificationIds : [item?.id].filter(Boolean);
+    if (!ids.length) return;
+    const { error } = await supabase.from("notifications").update({ is_read: true }).in("id", ids).eq("user_id", user.id);
     if (!error) {
-      setNotifications((current) => current.map((item) => item.id === id ? { ...item, is_read: true } : item));
+      setNotifications((current) => current.map((row) => ids.includes(row.id) ? { ...row, is_read: true } : row));
     }
   }
 
-  async function removeNotification(id) {
-    const { error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", user.id);
-
-    if (!error) {
-      setNotifications((current) => current.filter((item) => item.id !== id));
-    }
+  async function removeNotification(item) {
+    const ids = item?._notificationIds?.length ? item._notificationIds : [item?.id].filter(Boolean);
+    if (!ids.length) return;
+    const { error } = await supabase.from("notifications").delete().in("id", ids).eq("user_id", user.id);
+    if (!error) setNotifications((current) => current.filter((row) => !ids.includes(row.id)));
   }
 
   async function markAllRead() {
@@ -207,17 +224,17 @@ function NotificationBell({ user, onMatches, onAllNotifications }) {
                   <p>Здесь появятся лайки и новые сообщения.</p>
                 </div>
               ) : (
-                notifications.map((item) => {
+                groupedNotifications.map((item) => {
                   const actor = actors[item.actor_id];
                   return (
                     <div key={item.id} className={"notification-item-wrap " + (item.is_read ? "" : "unread")}>
                       <button className={"notification-item " + (item.is_read ? "" : "unread")}
-                        onClick={() => { if (item.type === "message") { markRead(item.id); setOpen(false); onMatches?.(); } else markRead(item.id); }}>
+                        onClick={() => { if (item.type === "message") { markRead(item); setOpen(false); onMatches?.(); } else markRead(item); }}>
                         <div className="notification-avatar">
                           {actor?.avatar_url ? <img src={actor.avatar_url} alt="" /> : <span>👤</span>}
                         </div>
                         <div className="notification-item-content">
-                          <div className="notification-item-top"><strong>{actor?.name || "Пользователь"}</strong>{!item.is_read && <span className="notification-unread-dot" />}</div>
+                          <div className="notification-item-top"><strong>{actor?.name || "Пользователь"}</strong>{item._eventCount > 1 && <span className="notification-group-count">×{item._eventCount}</span>}{!item.is_read && <span className="notification-unread-dot" />}</div>
                           <p>{item.body || (item.type === "like" ? "Поставил(а) вам лайк" : "Отправил(а) вам сообщение")}</p>
                           <time>{formatNotificationTime(item.created_at)}</time>
                         </div>
