@@ -68,3 +68,20 @@
 .chat-reply-preview-content em{font-size:10px;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px}
 .chat-reply-preview{position:absolute;left:8px;right:8px;bottom:62px;margin:0}
 @media(max-width:600px){.chat-reply-preview{bottom:60px}}
+
+/* Keyboard-aware viewport: keep the composer at the visible screen edge. */
+html.tok-keyboard-open .chat-page {
+  height: var(--tok-visual-viewport-height, 100dvh) !important;
+  min-height: 0 !important;
+  max-height: var(--tok-visual-viewport-height, 100dvh) !important;
+}
+html.tok-keyboard-open .chat-input-area {
+  position: fixed !important;
+  bottom: calc(8px + var(--tok-keyboard-overlap, 0px)) !important;
+  z-index: 500 !important;
+}
+html.tok-keyboard-open .chat-messages {
+  padding-bottom: 90px !important;
+  scroll-padding-bottom: 90px;
+  overscroll-behavior: contain;
+}
