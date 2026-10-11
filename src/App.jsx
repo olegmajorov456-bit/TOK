@@ -131,7 +131,8 @@ function App() {
         const match = ua.match(/TOK-Android\/([0-9.]+)/i);
         const current = match ? match[1].split(".").map(Number) : null;
         const available = updateVersion(data || []);
-        if (current && available && compareVersions(available.version, current) > 0) {
+        const dismissedVersion = localStorage.getItem("tok-dismissed-android-update") || "";
+        if (current && available && compareVersions(available.version, current) > 0 && dismissedVersion !== available.version) {
           setAndroidUpdate(available);
           setShowAndroidUpdate(true);
         }
@@ -281,7 +282,10 @@ function App() {
           <strong>Версия {androidUpdate.version}</strong>
           {androidUpdate.notes && <p>{androidUpdate.notes}</p>}
           <a className="tok-update-button" href={androidUpdate.url}>Скачать обновление</a>
-          {!androidUpdate.force && <button className="tok-update-later" onClick={() => setShowAndroidUpdate(false)}>Позже</button>}
+          {!androidUpdate.force && <button className="tok-update-later" onClick={() => {
+            localStorage.setItem("tok-dismissed-android-update", androidUpdate.version);
+            setShowAndroidUpdate(false);
+          }}>Позже</button>}
           {androidUpdate.force && <small>Обновление обязательно для продолжения.</small>}
         </div>
       </div>

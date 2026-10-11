@@ -22,10 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -58,23 +55,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Window window = getWindow();
-        WindowCompat.setDecorFitsSystemWindows(window, false);
+        WindowCompat.setDecorFitsSystemWindows(window, true);
         window.setStatusBarColor(0xFF08090D);
         window.setNavigationBarColor(0xFF08090D);
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         webView = new WebView(this);
         setContentView(webView);
-
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
-            int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
-            Insets bars = insets.getInsets(types);
-            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            return new WindowInsetsCompat.Builder(insets)
-                    .setInsets(types, Insets.NONE)
-                    .build();
-        });
-        ViewCompat.requestApplyInsets(webView);
 
         configureWebView();
         configureBackNavigation();
@@ -117,8 +104,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 String installedVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-                if (!apkUrl.isEmpty() && !tag.equals("android-v" + installedVersion)) {
-                    String finalApkUrl = apkUrl; String finalTag = tag;
+                String targetVersion = tag.startsWith("android-v") ? tag.substring("android-v".length()) : tag;
+                String dismissedTag = getSharedPreferences("tok_update_preferences", MODE_PRIVATE)
+                        .getString("dismissed_release_tag", "");
+                if (!apkUrl.isEmpty() && compareVersions(targetVersion, installedVersion) > 0 && !tag.equals(dismissedTag)) {
+                    String finalApkUrl = apkUrl;
+                    String finalTag = tag;
                     runOnUiThread(() -> showUpdateDialog(finalTag, finalApkUrl));
                 }
             } catch (Exception ignored) { }
@@ -126,11 +117,28 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+
+    private int compareVersions(String candidate, String installed) {
+        String[] left = candidate.replaceAll("[^0-9.]", "").split("\\.");
+        String[] right = installed.replaceAll("[^0-9.]", "").split("\\.");
+        int length = Math.max(left.length, right.length);
+        for (int i = 0; i < length; i++) {
+            int a = 0;
+            int b = 0;
+            try { if (i < left.length && !left[i].isEmpty()) a = Integer.parseInt(left[i]); } catch (NumberFormatException ignored) { }
+            try { if (i < right.length && !right[i].isEmpty()) b = Integer.parseInt(right[i]); } catch (NumberFormatException ignored) { }
+            if (a != b) return Integer.compare(a, b);
+        }
+        return 0;
+    }
+
     private void showUpdateDialog(String tag, String apkUrl) {
         if (isFinishing() || isDestroyed()) return;
         new AlertDialog.Builder(this).setTitle("Доступно обновление ТОК")
             .setMessage("Найдена новая версия " + tag.replace("android-v", "") + ". Обновить приложение сейчас? Удалять текущую версию не нужно.")
-            .setNegativeButton("Позже", (dialog, which) -> { })
+            .setNegativeButton("Позже", (dialog, which) ->
+                    getSharedPreferences("tok_update_preferences", MODE_PRIVATE).edit()
+                            .putString("dismissed_release_tag", tag).apply())
             .setPositiveButton("Обновить", (dialog, which) -> downloadUpdate(apkUrl, tag)).show();
     }
 
@@ -196,9 +204,11 @@ public class MainActivity extends AppCompatActivity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
-        settings.setUserAgentString(
-                settings.getUserAgentString() + " TOK-Android/1.5"
-        );
+        String appVersion = "0";
+        try {
+            appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception ignored) { }
+        settings.setUserAgentString(settings.getUserAgentString() + " TOK-Android/" + appVersion);
 
         CookieManager cookies = CookieManager.getInstance();
         cookies.setAcceptCookie(true);
@@ -238,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript("(function(){if(window.__tokKeyboardFix)return;window.__tokKeyboardFix=true;var root=document.documentElement;var initialViewportHeight=window.visualViewport?window.visualViewport.height:window.innerHeight;function sync(){var vv=window.visualViewport;var h=vv?Math.max(0,initialViewportHeight-vv.height):0;root.classList.toggle('tok-keyboard-open',h>120);root.style.setProperty('--tok-keyboard-height',h+'px');}if(window.visualViewport){window.visualViewport.addEventListener('resize',sync);window.visualViewport.addEventListener('scroll',sync);}window.addEventListener('resize',sync);document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){setTimeout(sync,100);setTimeout(sync,350);}});document.addEventListener('focusout',function(){setTimeout(sync,150);});sync();})();", null);
+                view.evaluateJavascript("(function(){\nif(window.__tokKeyboardFix)return;\nwindow.__tokKeyboardFix=true;\nvar root=document.documentElement;\nvar vv=window.visualViewport;\nvar initialHeight=Math.max(window.innerHeight, vv?vv.height:0, root.clientHeight);\nvar inputSelector='input,textarea,select,[contenteditable=\"true\"]';\nfunction sync(){\n  var viewport=window.visualViewport;\n  var currentHeight=viewport?Math.min(viewport.height,window.innerHeight):window.innerHeight;\n  var keyboardHeight=Math.max(0,initialHeight-currentHeight);\n  var active=document.activeElement;\n  var inputFocused=!!(active&&active.matches&&active.matches(inputSelector));\n  var open=inputFocused&&keyboardHeight>100;\n  root.classList.toggle('tok-keyboard-open',open);\n  root.style.setProperty('--tok-keyboard-height',open?keyboardHeight+'px':'0px');\n}\nif(window.visualViewport){\n  window.visualViewport.addEventListener('resize',sync);\n  window.visualViewport.addEventListener('scroll',sync);\n}\nwindow.addEventListener('resize',sync);\ndocument.addEventListener('focusin',function(e){\n  if(e.target&&e.target.matches&&e.target.matches(inputSelector)){\n    setTimeout(sync,50);setTimeout(sync,180);setTimeout(sync,350);\n  }\n});\ndocument.addEventListener('focusout',function(){setTimeout(sync,120);setTimeout(sync,280);});\nsync();\n})();", null);
             }
 
             @Override
