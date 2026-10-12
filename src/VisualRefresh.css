@@ -565,3 +565,252 @@ button.home-activity-tile:hover {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+
+/* === Reference-faithful component pass: selectors match the actual React screens. === */
+.app-shell {
+  min-height: 100dvh;
+  background: var(--tok-shell-background, #f8f7fb) !important;
+}
+.app-content { min-height: calc(100dvh - 72px); }
+.app-content > * { isolation: isolate; }
+
+/* Main navigation and brand */
+.app-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 200 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  border-radius: 0 0 22px 22px;
+}
+.app-header:after { display: none !important; }
+.app-header-logo { display: flex !important; align-items: center; justify-content: flex-start; padding: 0 !important; }
+.app-header-logo-image { width: 100%; height: 100%; object-fit: contain; }
+.header-action { min-height: 42px !important; padding: 0 12px !important; gap: 7px !important; font-size: 11px !important; font-weight: 750 !important; transition: transform .18s, background .18s, border-color .18s !important; }
+.header-action:hover { transform: translateY(-1px); }
+.header-action:before { display: none !important; }
+.header-profile-button { width: 44px !important; height: 44px !important; padding: 3px !important; border-radius: 16px !important; }
+.header-profile-avatar-wrap { width: 100% !important; height: 100% !important; border-radius: 12px !important; }
+.header-profile-avatar { border-radius: 10px !important; }
+.notification-bell { border-radius: 15px !important; }
+.tok-theme-neon .app-header { background: rgba(25, 21, 34, .9) !important; border-color: #35283c !important; }
+.tok-theme-neon .header-action, .tok-theme-neon .header-profile-button { background: #211a2b !important; border-color: #35283c !important; color: #f8f2f7 !important; }
+.tok-theme-neon .header-action:hover { background: rgba(255,79,145,.13) !important; }
+.bottom-nav { z-index: 300 !important; }
+.bottom-nav-item { position: relative; min-width: 0; transition: color .18s, background .18s, transform .18s !important; }
+.bottom-nav-item.active:after { bottom: 4px !important; width: 16px !important; height: 3px !important; border-radius: 99px !important; background: var(--tok-accent) !important; }
+.tok-theme-neon .bottom-nav { background: rgba(25,21,34,.95) !important; border-color: #35283c !important; }
+.tok-theme-neon .bottom-nav-item { color: #a99eb1 !important; }
+.tok-theme-neon .bottom-nav-item.active { color: #ff6da4 !important; background: rgba(255,79,145,.12) !important; }
+
+/* Discovery: an editorial photo card with real hierarchy and generous controls. */
+.discovery-page {
+  min-height: calc(100dvh - 72px);
+  padding: 26px 16px 130px !important;
+  background: transparent !important;
+}
+.discovery-container { max-width: 540px !important; }
+.discovery-header { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:20px !important; }
+.discovery-title-block { min-width:0; }
+.discovery-header h1 { font-size: clamp(29px, 4vw, 38px) !important; line-height:1.05; letter-spacing:-.06em !important; }
+.discovery-header p { margin-top:8px !important; font-size:13px !important; line-height:1.5; }
+.filters-toggle { min-height:43px; padding:0 14px !important; border-radius:15px !important; font-size:12px !important; font-weight:800 !important; }
+.filters-panel { padding:17px !important; border-radius:22px !important; }
+.discovery-card { overflow:hidden; border-radius:30px !important; border:1px solid var(--tok-border) !important; box-shadow:0 20px 60px rgba(59,34,51,.12) !important; background:var(--tok-surface) !important; }
+.discovery-photo { background:var(--tok-surface-2) !important; }
+.discovery-photo img { object-position:center 35%; }
+.discovery-gradient { background:linear-gradient(180deg,transparent 48%,rgba(22,13,24,.08) 64%,rgba(22,13,24,.82) 100%) !important; }
+.discovery-info { padding:0 22px 14px !important; }
+.discovery-info h2 { font-size:clamp(27px,4vw,34px) !important; line-height:1.06 !important; letter-spacing:-.055em !important; }
+.profile-meta { gap:7px !important; margin-top:9px !important; }
+.profile-meta span { padding:6px 9px !important; border-radius:10px !important; font-size:10px !important; }
+.discovery-content { padding:18px 22px 22px !important; background:var(--tok-surface) !important; }
+.discovery-description { color:var(--tok-muted) !important; font-size:13px !important; line-height:1.7 !important; }
+.hobbies { gap:7px !important; margin:12px 0 !important; }
+.hobbies span { padding:7px 10px !important; border-radius:10px !important; background:var(--tok-accent-soft) !important; border:1px solid color-mix(in srgb,var(--tok-accent) 12%,transparent) !important; color:var(--tok-accent) !important; font-size:10px !important; }
+.discovery-actions { gap:14px !important; padding:18px 18px 22px !important; background:var(--tok-surface) !important; }
+.discovery-actions:before { display:none !important; }
+.discovery-actions .discovery-button { width:58px !important; height:58px !important; border:1px solid var(--tok-border) !important; box-shadow:0 8px 22px rgba(45,24,39,.07) !important; }
+.discovery-actions .discovery-button.undo,.discovery-actions .discovery-button.skip { background:var(--tok-surface-2) !important; color:var(--tok-muted) !important; }
+.discovery-actions .discovery-button.like { width:68px !important; height:68px !important; background:linear-gradient(145deg,#ff5593,#ed2e75) !important; color:white !important; border:0 !important; box-shadow:0 12px 28px rgba(237,46,117,.28) !important; }
+.discovery-actions .discovery-button svg { width:25px !important; height:25px !important; }
+.discovery-actions .discovery-button.like svg { width:31px !important; height:31px !important; }
+.discovery-report-button { color:var(--tok-muted) !important; border-radius:12px !important; font-size:11px !important; }
+.tok-theme-neon .discovery-card,.tok-theme-neon .discovery-content,.tok-theme-neon .discovery-actions { background:var(--tok-surface) !important; border-color:var(--tok-border) !important; }
+.tok-theme-neon .discovery-info h2 { color:#fff !important; }
+.tok-theme-neon .discovery-description { color:#c1b7c8 !important; }
+.tok-theme-neon .discovery-actions .discovery-button.undo,.tok-theme-neon .discovery-actions .discovery-button.skip { background:#241d30 !important; color:#d6c9dc !important; border-color:#3a2e45 !important; }
+
+/* Inbox / matches: the list is a stack of separated, tactile rows. */
+.matches-page { min-height:calc(100dvh - 72px); padding:28px 16px 130px !important; background:transparent !important; }
+.matches-container { max-width:760px !important; padding:0 !important; }
+.matches-heading { align-items:flex-end !important; margin-bottom:22px !important; }
+.matches-kicker { display:block; margin-bottom:8px !important; color:var(--tok-accent) !important; font-size:10px !important; font-weight:900 !important; letter-spacing:1.6px !important; }
+.matches-heading h1 { font-size:clamp(30px,4vw,39px) !important; letter-spacing:-.06em !important; line-height:1.05 !important; }
+.matches-heading p { margin-top:8px !important; color:var(--tok-muted) !important; font-size:13px !important; }
+.matches-refresh { width:43px !important; height:43px !important; border-radius:15px !important; background:var(--tok-surface) !important; border:1px solid var(--tok-border) !important; color:var(--tok-text) !important; }
+.matches-list { display:flex; flex-direction:column; gap:0; overflow:hidden; padding:5px !important; border:1px solid var(--tok-border) !important; border-radius:27px !important; background:var(--tok-surface) !important; box-shadow:var(--tok-shadow) !important; }
+.match-card { display:flex; gap:14px !important; min-height:92px !important; padding:15px 16px !important; border:0 !important; border-bottom:1px solid var(--tok-border) !important; border-radius:18px !important; background:transparent !important; color:var(--tok-text) !important; text-align:left; }
+.match-card:last-child { border-bottom:0 !important; }
+.match-card:hover { transform:none !important; background:var(--tok-surface-2) !important; }
+.match-avatar { width:60px !important; height:60px !important; flex:0 0 60px !important; border-radius:20px !important; background:var(--tok-accent-soft) !important; box-shadow:none !important; }
+.match-info { justify-content:center; gap:6px !important; }
+.match-info strong { font-size:14px !important; font-weight:850 !important; color:var(--tok-text) !important; }
+.match-info span { color:var(--tok-muted) !important; font-size:12px !important; }
+.match-chat-icon { align-self:center; width:38px !important; height:38px !important; flex:0 0 38px; display:grid; place-items:center; border-radius:14px !important; background:var(--tok-accent-soft) !important; color:var(--tok-accent) !important; }
+.match-card:hover .match-chat-icon { background:var(--tok-accent) !important; color:white !important; }
+.matches-empty { padding:50px 25px !important; border:1px solid var(--tok-border) !important; border-radius:27px !important; background:var(--tok-surface) !important; box-shadow:var(--tok-shadow) !important; }
+.matches-empty h2 { color:var(--tok-text) !important; letter-spacing:-.04em; }
+.matches-empty p { color:var(--tok-muted) !important; }
+.matches-home-button { min-height:47px; border-radius:15px !important; background:linear-gradient(110deg,#ff5593,#ed2e75) !important; }
+
+/* Chat: polish the header, conversation canvas and composer without changing behavior. */
+.chat-page { background:var(--tok-page-background) !important; }
+.chat-header { height:76px !important; flex:0 0 76px; padding:0 max(16px,calc((100vw - 860px)/2)) !important; gap:12px; }
+.chat-back { width:42px !important; height:42px !important; border-radius:15px !important; }
+.chat-profile-button { border-radius:16px !important; }
+.chat-avatar { width:46px !important; height:46px !important; border-radius:17px !important; }
+.chat-user { margin-left:0 !important; }
+.chat-user strong { font-size:14px !important; font-weight:850 !important; }
+.chat-user span { font-size:11px !important; }
+.chat-messages { padding-top:25px !important; gap:11px !important; }
+.chat-message { max-width:min(78%,560px) !important; padding:12px 15px !important; border-radius:20px !important; font-size:13px !important; line-height:1.55 !important; }
+.chat-message.mine { border-bottom-right-radius:7px !important; box-shadow:0 8px 20px rgba(237,46,117,.13) !important; }
+.chat-message.theirs { border-bottom-left-radius:7px !important; }
+.chat-message-time { opacity:.65; font-size:9px !important; }
+.chat-reply-button { border-radius:8px !important; }
+.chat-input-area { bottom:max(92px,calc(env(safe-area-inset-bottom) + 78px)) !important; min-height:62px !important; border-radius:22px !important; padding:6px 7px 6px 17px !important; }
+.chat-input-area input { font-size:14px !important; }
+.chat-input-area button { width:48px !important; height:48px !important; border-radius:16px !important; }
+.chat-page.tok-theme-light .chat-header { background:rgba(255,255,255,.93) !important; }
+.tok-theme-neon .chat-page,.chat-page.tok-theme-neon { background:var(--tok-page-background) !important; }
+.chat-page.tok-theme-neon .chat-header { background:rgba(25,21,34,.93) !important; border-color:var(--tok-border) !important; }
+.chat-page.tok-theme-neon .chat-message.theirs { background:#211a2b !important; border-color:#35283c !important; color:#f8f2f7 !important; }
+.chat-page.tok-theme-neon .chat-input-area { background:#191522 !important; border-color:#35283c !important; }
+.chat-page.tok-theme-neon .chat-input-area input { color:#f8f2f7 !important; }
+
+/* Profile: photo-led card, refined information panels and an actual theme chooser. */
+.profile-page { padding:28px 16px 135px !important; background:transparent !important; }
+.profile-container { max-width:760px !important; }
+.profile-card { border:1px solid var(--tok-border) !important; border-radius:30px !important; background:var(--tok-surface) !important; box-shadow:var(--tok-shadow) !important; }
+.profile-photo-wrapper { height:clamp(340px,58vw,530px) !important; background:var(--tok-surface-2) !important; }
+.profile-photo-wrapper::after { height:220px !important; background:linear-gradient(to top,rgba(21,12,23,.7),transparent) !important; }
+.change-photo-button { border:1px solid rgba(255,255,255,.25) !important; border-radius:15px !important; background:rgba(27,18,30,.68) !important; backdrop-filter:blur(16px); }
+.profile-identity { padding:25px 28px 21px !important; background:var(--tok-surface) !important; }
+.profile-name-block h1 { font-size:clamp(29px,4vw,38px) !important; letter-spacing:-.06em !important; color:var(--tok-text) !important; }
+.profile-status { color:var(--tok-muted) !important; }
+.profile-study { border:1px solid var(--tok-border) !important; border-radius:16px !important; background:var(--tok-surface-2) !important; }
+.profile-study strong { color:var(--tok-text) !important; }
+.profile-study span:last-child { color:var(--tok-muted) !important; }
+.profile-details,.profile-section,.profile-theme-section { border:1px solid var(--tok-border) !important; border-radius:22px !important; background:var(--tok-surface) !important; }
+.profile-details { margin:0 24px !important; padding:18px !important; }
+.profile-details-heading,.profile-section h3,.profile-theme-title strong { color:var(--tok-text) !important; font-size:14px !important; font-weight:850 !important; }
+.profile-detail-grid { gap:10px !important; }
+.profile-detail-item { border:1px solid var(--tok-border) !important; border-radius:15px !important; background:var(--tok-surface-2) !important; }
+.profile-detail-item .detail-icon { border-radius:11px !important; background:var(--tok-accent-soft) !important; }
+.profile-detail-item small { color:var(--tok-muted) !important; }
+.profile-detail-item strong { color:var(--tok-text) !important; }
+.profile-section { margin:12px 24px 0 !important; padding:19px !important; }
+.profile-description { color:var(--tok-muted) !important; line-height:1.75 !important; }
+.hobby-tag { padding:7px 11px !important; border-radius:11px !important; background:var(--tok-accent-soft) !important; border-color:color-mix(in srgb,var(--tok-accent) 18%,transparent) !important; color:var(--tok-accent) !important; }
+.profile-theme-section { margin:14px 24px 0 !important; padding:20px !important; }
+.profile-theme-option { border:1px solid var(--tok-border) !important; border-radius:18px !important; background:var(--tok-surface-2) !important; }
+.profile-theme-option.active { border-color:var(--tok-accent) !important; box-shadow:0 0 0 3px var(--tok-accent-soft) !important; }
+.profile-actions { padding:22px 24px 26px !important; }
+.profile-primary-button,.profile-save-button { min-height:49px !important; border-radius:15px !important; background:linear-gradient(110deg,#ff5593,#ed2e75) !important; box-shadow:0 10px 23px rgba(237,46,117,.16) !important; }
+.profile-admin-button,.profile-logout-button,.profile-cancel-button { border-radius:15px !important; }
+.profile-edit-form { padding:25px !important; }
+.profile-edit-form input,.profile-edit-form select,.profile-edit-form textarea { min-height:45px; border-radius:14px !important; border-color:var(--tok-border) !important; background:var(--tok-surface-2) !important; color:var(--tok-text) !important; }
+.profile-edit-form label { color:var(--tok-muted) !important; }
+.tok-theme-neon .profile-card,.tok-theme-neon .profile-identity,.tok-theme-neon .profile-details,.tok-theme-neon .profile-section,.tok-theme-neon .profile-theme-section { background:var(--tok-surface) !important; border-color:var(--tok-border) !important; }
+.tok-theme-neon .profile-name-block h1,.tok-theme-neon .profile-details-heading,.tok-theme-neon .profile-section h3,.tok-theme-neon .profile-theme-title strong { color:var(--tok-text) !important; }
+.tok-theme-neon .profile-detail-item,.tok-theme-neon .profile-study,.tok-theme-neon .profile-edit-form input,.tok-theme-neon .profile-edit-form select,.tok-theme-neon .profile-edit-form textarea { background:var(--tok-surface-2) !important; border-color:var(--tok-border) !important; color:var(--tok-text) !important; }
+
+/* Notifications: filters become chips, events become clear list items. */
+.notifications-page { min-height:calc(100dvh - 72px) !important; padding:28px 16px 130px !important; background:transparent !important; }
+.notifications-container { max-width:800px !important; }
+.notifications-heading { margin-bottom:23px !important; }
+.notifications-kicker { font-size:10px !important; letter-spacing:1.6px !important; }
+.notifications-heading h1 { font-size:clamp(30px,4vw,39px) !important; letter-spacing:-.06em !important; }
+.notifications-heading>div:first-child p { color:var(--tok-muted) !important; font-size:13px !important; line-height:1.55; }
+.notifications-back,.notifications-read-all { min-height:42px; border-radius:14px !important; padding:0 13px !important; font-size:11px !important; font-weight:800 !important; }
+.notifications-back { border:1px solid var(--tok-border) !important; background:var(--tok-surface) !important; color:var(--tok-text) !important; }
+.notifications-filters { gap:8px !important; margin-bottom:15px !important; }
+.notifications-filters button { min-height:37px !important; padding:0 14px !important; border-radius:13px !important; border-color:var(--tok-border) !important; background:var(--tok-surface) !important; color:var(--tok-muted) !important; font-size:11px !important; }
+.notifications-filters button.active { background:var(--tok-accent) !important; border-color:var(--tok-accent) !important; color:white !important; box-shadow:0 7px 17px rgba(237,46,117,.17); }
+.notifications-list { border:1px solid var(--tok-border) !important; border-radius:25px !important; padding:5px !important; background:var(--tok-surface) !important; box-shadow:var(--tok-shadow) !important; }
+.notification-page-item { gap:14px !important; min-height:82px; padding:14px 15px !important; border-radius:17px !important; border-bottom:1px solid var(--tok-border) !important; background:transparent !important; color:var(--tok-text) !important; }
+.notification-page-item.unread { background:var(--tok-accent-soft) !important; }
+.notification-page-icon { width:46px !important; height:46px !important; flex-basis:46px !important; border-radius:16px !important; }
+.notification-page-copy strong { color:var(--tok-text) !important; font-size:13px !important; }
+.notification-page-copy span { color:var(--tok-muted) !important; font-size:12px !important; }
+.notification-page-copy small { color:var(--tok-muted) !important; font-size:10px !important; }
+.notifications-empty { padding:58px 24px !important; border:1px solid var(--tok-border) !important; border-radius:25px !important; background:var(--tok-surface) !important; box-shadow:var(--tok-shadow) !important; }
+.notifications-empty h2 { color:var(--tok-text) !important; letter-spacing:-.04em; }
+.notifications-empty p { color:var(--tok-muted) !important; }
+.tok-theme-neon.notifications-page { background:transparent !important; }
+.tok-theme-neon .notifications-list,.tok-theme-neon .notifications-empty { background:var(--tok-surface) !important; border-color:var(--tok-border) !important; }
+.tok-theme-neon .notification-page-item { background:transparent !important; border-color:var(--tok-border) !important; color:var(--tok-text) !important; }
+.tok-theme-neon .notification-page-item.unread { background:var(--tok-accent-soft) !important; }
+
+/* Auth and onboarding use the same signature as the product itself. */
+.auth-page { min-height:100dvh !important; padding:24px !important; }
+.auth-card { width:min(100%,440px) !important; padding:clamp(27px,5vw,42px) !important; }
+.auth-logo { width:min(190px,60%) !important; max-height:100px; object-fit:contain; }
+.auth-card h2 { margin-top:18px !important; font-size:32px !important; line-height:1.05; letter-spacing:-.06em !important; }
+.auth-subtitle { margin-top:9px !important; font-size:13px !important; }
+.auth-card form { gap:12px !important; margin-top:26px !important; }
+.auth-card input { min-height:49px !important; border-radius:15px !important; padding:0 15px !important; }
+.auth-card form button { min-height:50px !important; border-radius:15px !important; font-size:13px !important; font-weight:850 !important; }
+.auth-card form button:hover { transform:translateY(-1px); }
+.switch-button { min-height:40px; border-radius:12px !important; }
+.tok-auth-neon .auth-page,.tok-auth-neon { background:var(--tok-page-background) !important; }
+.tok-auth-neon .auth-card { background:var(--tok-surface) !important; border-color:var(--tok-border) !important; }
+.tok-auth-neon .auth-card h2 { color:var(--tok-text) !important; }
+.tok-auth-neon .auth-subtitle { color:var(--tok-muted) !important; }
+.tok-auth-neon .auth-card input { background:var(--tok-surface-2) !important; border-color:var(--tok-border) !important; color:var(--tok-text) !important; }
+
+/* Mobile-safe spacing and card proportions across the whole app. */
+@media (max-width:700px) {
+  .discovery-page,.matches-page,.profile-page,.notifications-page { padding:19px 12px 125px !important; }
+  .discovery-header { align-items:flex-start !important; }
+  .discovery-card { border-radius:25px !important; }
+  .discovery-info { padding-left:17px !important; padding-right:17px !important; }
+  .discovery-content { padding:15px 17px 18px !important; }
+  .discovery-actions { gap:11px !important; padding:15px 12px 18px !important; }
+  .discovery-actions .discovery-button { width:52px !important; height:52px !important; }
+  .discovery-actions .discovery-button.like { width:62px !important; height:62px !important; }
+  .matches-heading { align-items:flex-start !important; }
+  .match-card { min-height:80px !important; padding:11px 10px !important; gap:11px !important; }
+  .match-avatar { width:53px !important; height:53px !important; flex-basis:53px !important; border-radius:17px !important; }
+  .match-info strong { font-size:13px !important; }
+  .match-info span { font-size:11px !important; }
+  .profile-photo-wrapper { height:clamp(300px,105vw,450px) !important; }
+  .profile-identity { flex-direction:column; padding:20px 18px 17px !important; gap:13px !important; }
+  .profile-study { width:100% !important; }
+  .profile-details,.profile-section,.profile-theme-section { margin-left:14px !important; margin-right:14px !important; }
+  .profile-details { padding:14px !important; }
+  .profile-detail-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .profile-section { padding:15px !important; }
+  .profile-theme-section { padding:15px !important; }
+  .profile-actions { padding:18px 14px 20px !important; }
+  .notifications-heading { align-items:flex-start !important; }
+  .notifications-heading-actions { width:100%; justify-content:flex-start !important; }
+  .notifications-filters { overflow-x:auto; flex-wrap:nowrap !important; padding-bottom:4px; scrollbar-width:none; }
+  .notifications-filters::-webkit-scrollbar { display:none; }
+  .notifications-filters button { flex:0 0 auto; }
+  .notification-page-item { padding:12px 10px !important; gap:10px !important; }
+  .notification-page-icon { width:40px !important; height:40px !important; flex-basis:40px !important; border-radius:14px !important; }
+  .chat-header { height:66px !important; flex-basis:66px !important; padding:0 12px !important; }
+  .chat-input-area { bottom:calc(76px + env(safe-area-inset-bottom)) !important; }
+}
+@media (max-width:380px) {
+  .home-activity-tile { min-width:0; }
+  .home-activity-copy small { overflow-wrap:anywhere; }
+  .profile-detail-grid { grid-template-columns:1fr !important; }
+  .discovery-actions { gap:8px !important; }
+  .discovery-actions .discovery-button { width:47px !important; height:47px !important; }
+  .discovery-actions .discovery-button.like { width:57px !important; height:57px !important; }
+  .header-action { padding:0 8px !important; }
+}
