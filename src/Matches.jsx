@@ -6,23 +6,41 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chatPreview, setChatPreview] = useState({});
-  const reloadRef = useRef(false);
-  const mountedRef = useRef(true);
+  const requestInFlightRef = useRef(false);
+  const refreshQueuedRef = useRef(false);
+  const queuedShowLoadingRef = useRef(false);
+  const mountedRef = useRef(false);
 
-  const loadMatches = useCallback(async (showLoading = false) => {
-    if (!user?.id) return;
-    if (reloadRef.current) return;
-    reloadRef.current = true;
-    if (showLoading) setLoading(true);
+  const loadMatches = useCallback(async function loadMatchesImpl(showLoading = false) {
+    if (!user?.id) {
+      if (mountedRef.current) {
+        setMatches([]);
+        setChatPreview({});
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Do not drop realtime refreshes that arrive while a previous query is running.
+    if (requestInFlightRef.current) {
+      refreshQueuedRef.current = true;
+      queuedShowLoadingRef.current = queuedShowLoadingRef.current || showLoading;
+      return;
+    }
+
+    requestInFlightRef.current = true;
+    if (showLoading && mountedRef.current) setLoading(true);
+
     try {
-      const { data, error } = await supabase
+      const { data: matchRows, error: matchError } = await supabase
         .from("matches")
         .select("*")
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      const matchList = data || [];
+      if (matchError) throw matchError;
+      const matchList = matchRows || [];
+
       if (!matchList.length) {
         if (mountedRef.current) {
           setMatches([]);
@@ -31,64 +49,99 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
         return;
       }
 
-      const otherUserIds = matchList.map((match) =>
+      const otherUserIds = [...new Set(matchList.map((match) =>
         match.user1_id === user.id ? match.user2_id : match.user1_id
-      );
-      const [{ data: profiles, error: profilesError }, { data: conversations, error: conversationsError }] = await Promise.all([
-        supabase.from("profiles").select("id,name,avatar_url,age,faculty,course").in("id", otherUserIds),
-        supabase.from("conversations").select("id,match_id").in("match_id", matchList.map((match) => match.id)),
-      ]);
-      if (profilesError) throw profilesError;
-      if (conversationsError) throw conversationsError;
+      ).filter(Boolean))];
 
-      const conversationList = conversations || [];
-      const conversationIds = conversationList.map((item) => item.id);
-      let recentMessages = [];
+      // Select all columns: older database schemas may not contain optional
+      // profile fields such as age/faculty/course. A missing column must never
+      // make the whole matches list disappear.
+      const { data: profileRows, error: profilesError } = await supabase
+        .from("profiles")
+        .select("*")
+        .in("id", otherUserIds);
+
+      if (profilesError) console.warn("Не удалось загрузить часть профилей мэтчей:", profilesError);
+
+      // Chat previews are enhancement-only. A missing conversation/message policy
+      // must not hide the match cards themselves.
+      let conversationRows = [];
+      let messageRows = [];
+      const matchIds = matchList.map((match) => match.id).filter((id) => id != null);
+      if (matchIds.length) {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("id,match_id")
+          .in("match_id", matchIds);
+        if (error) console.warn("Не удалось загрузить список переписок:", error);
+        else conversationRows = data || [];
+      }
+
+      const conversationIds = conversationRows.map((item) => item.id).filter(Boolean);
       if (conversationIds.length) {
-        const { data: messages, error: messagesError } = await supabase
+        const { data, error } = await supabase
           .from("messages")
           .select("conversation_id,body,image_url,created_at,sender_id")
           .in("conversation_id", conversationIds)
-          .order("created_at", { ascending: false });
-        if (messagesError) throw messagesError;
-        recentMessages = messages || [];
+          .order("created_at", { ascending: false })
+          .limit(Math.max(100, conversationIds.length * 30));
+        if (error) console.warn("Не удалось загрузить превью сообщений:", error);
+        else messageRows = data || [];
       }
 
-      const previewByConversation = {};
-      for (const message of recentMessages) {
-        if (!previewByConversation[message.conversation_id]) {
-          previewByConversation[message.conversation_id] = message;
+      const profilesById = new Map((profileRows || []).map((profile) => [profile.id, profile]));
+      const lastMessageByConversation = new Map();
+      for (const message of messageRows) {
+        if (!lastMessageByConversation.has(message.conversation_id)) {
+          lastMessageByConversation.set(message.conversation_id, message);
         }
       }
-      const conversationByMatch = {};
-      for (const conversation of conversationList) {
-        conversationByMatch[conversation.match_id] = conversation;
+
+      const conversationByMatch = new Map();
+      for (const conversation of conversationRows) {
+        if (conversation.match_id != null) conversationByMatch.set(conversation.match_id, conversation);
       }
 
       const nextPreviews = {};
       const result = matchList.map((match) => {
         const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
-        const profile = (profiles || []).find((item) => item.id === otherUserId);
-        const conversation = conversationByMatch[match.id];
-        const preview = conversation ? previewByConversation[conversation.id] : null;
+        // Keep a match visible even if profile RLS/data temporarily fails.
+        const profile = profilesById.get(otherUserId) || {
+          id: otherUserId,
+          name: "Пользователь",
+          avatar_url: null,
+        };
+        const conversation = conversationByMatch.get(match.id);
+        const preview = conversation ? lastMessageByConversation.get(conversation.id) : null;
         if (preview) nextPreviews[match.id] = preview;
         return {
           ...match,
           profile,
           _lastActivityAt: preview?.created_at || match.created_at || "",
         };
-      }).filter((match) => match.profile)
-        .sort((a, b) => Date.parse(b._lastActivityAt || 0) - Date.parse(a._lastActivityAt || 0));
+      }).sort((a, b) => {
+        const aTime = Date.parse(a._lastActivityAt) || 0;
+        const bTime = Date.parse(b._lastActivityAt) || 0;
+        return bTime - aTime;
+      });
 
       if (mountedRef.current) {
         setMatches(result);
         setChatPreview(nextPreviews);
       }
     } catch (error) {
-      console.error("Ошибка загрузки чатов:", error);
+      // Leave the current list on screen during transient errors instead of
+      // replacing it with an empty list.
+      console.error("Ошибка загрузки мэтчей:", error);
     } finally {
-      reloadRef.current = false;
+      requestInFlightRef.current = false;
       if (mountedRef.current) setLoading(false);
+      if (refreshQueuedRef.current) {
+        const nextShowLoading = queuedShowLoadingRef.current;
+        refreshQueuedRef.current = false;
+        queuedShowLoadingRef.current = false;
+        Promise.resolve().then(() => loadMatchesImpl(nextShowLoading));
+      }
     }
   }, [user?.id]);
 
@@ -96,34 +149,60 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
     mountedRef.current = true;
     loadMatches(true);
 
-    if (!user?.id) return () => { mountedRef.current = false; };
+    if (!user?.id) {
+      return () => { mountedRef.current = false; };
+    }
 
-    const channel = supabase.channel("matches-list-" + user.id)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "matches" }, (payload) => {
-        const row = payload.new;
-        if (row?.user1_id === user.id || row?.user2_id === user.id) loadMatches(false);
+    const channel = supabase
+      .channel("matches-list-" + user.id)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "matches",
+      }, (payload) => {
+        const row = payload.new || payload.old;
+        if (!row || row.user1_id === user.id || row.user2_id === user.id) loadMatches(false);
       })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
-        // New messages reorder conversations so the most recently active chat stays on top.
-        loadMatches(false);
-      })
-      .subscribe();
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+      }, () => loadMatches(false))
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.warn("Realtime списка чатов временно недоступен:", status);
+        }
+      });
 
     const onFocus = () => loadMatches(false);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") loadMatches(false);
+    };
     window.addEventListener("focus", onFocus);
-    const onVisible = () => { if (document.visibilityState === "visible") loadMatches(false); };
     document.addEventListener("visibilitychange", onVisible);
+    // A low-frequency fallback keeps chat order correct if a realtime connection drops.
+    const refreshInterval = window.setInterval(() => {
+      if (document.visibilityState === "visible") loadMatches(false);
+    }, 45000);
 
     return () => {
       mountedRef.current = false;
+      window.clearInterval(refreshInterval);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
       supabase.removeChannel(channel);
     };
   }, [user?.id, loadMatches]);
 
-  if (loading) {
-    return <div className={`matches-page tok-theme-${theme}`}><div className="matches-loading"><div className="matches-spinner" /><p>Загружаем чаты...</p></div></div>;
+  if (loading && matches.length === 0) {
+    return (
+      <div className={`matches-page tok-theme-${theme}`}>
+        <div className="matches-loading">
+          <div className="matches-spinner" />
+          <p>Загружаем чаты...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -133,9 +212,11 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
           <div>
             <span className="matches-kicker">ОБЩАЯ СИМПАТИЯ</span>
             <h1>Чаты <span className="matches-title-heart">♡</span></h1>
-            <p>Последние сообщения — сверху.</p>
+            <p>Последние активные переписки — сверху.</p>
           </div>
+          <button type="button" className="matches-refresh" onClick={() => loadMatches(false)} aria-label="Обновить чаты" title="Обновить чаты">↻</button>
         </div>
+
         {matches.length === 0 ? (
           <div className="matches-empty">
             <div className="matches-empty-icon">💕</div>
@@ -144,7 +225,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
             <button onClick={onHome} className="matches-home-button">Перейти домой</button>
           </div>
         ) : (
-          <div className="matches-list">
+          <div className="matches-list" aria-label="Чаты по последней активности">
             {matches.map((match) => {
               const profile = match.profile;
               const preview = chatPreview[match.id];
