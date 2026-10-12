@@ -44,7 +44,11 @@
   --tok-shell-background: radial-gradient(circle at 85% -8%, rgba(255, 64, 136, .13), transparent 28%), #100e17;
 }
 
-html { background: var(--tok-bg, #f8f7fb); }
+html { background: #f8f7fb; }
+html:has(.tok-theme-neon), html:has(.tok-auth-neon), html:has(.tok-onboarding-neon) { background: #100e17; color-scheme: dark; }
+html:has(.tok-theme-light), html:has(.tok-auth-light), html:has(.tok-onboarding-light) { background: #f8f7fb; color-scheme: light; }
+body:has(.tok-theme-neon), body:has(.tok-auth-neon), body:has(.tok-onboarding-neon) { background: #100e17; }
+body:has(.tok-theme-light), body:has(.tok-auth-light), body:has(.tok-onboarding-light) { background: #f8f7fb; }
 body {
   background: var(--tok-bg, #f8f7fb);
   color: var(--tok-text, #282432);
