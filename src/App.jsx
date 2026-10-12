@@ -31,7 +31,31 @@ function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(() => sessionStorage.getItem("tok-page") || "home");
+  const [page, setPage] = useState(() => {
+    const savedPage = sessionStorage.getItem("tok-page") || "home";
+    const supportedPages = new Set([
+      "home", "discovery", "matches", "chat", "view-profile", "support",
+      "admin", "confessions", "interest-rooms", "achievements",
+      "notifications", "profile", "random-chat",
+    ]);
+    if (!supportedPages.has(savedPage)) return "home";
+
+    // A direct chat requires a valid serialized match/profile. If Android
+    // restored only the route (or the JSON became stale), recover to Matches
+    // instead of rendering an empty app shell.
+    if (savedPage === "chat") {
+      try {
+        const savedChat = JSON.parse(sessionStorage.getItem("tok-selected-chat") || "null");
+        if (savedChat?.match && savedChat?.profile) return "chat";
+      } catch {
+        // Fall through to the safe matches screen.
+      }
+      return "matches";
+    }
+    // Viewed profiles are transient and aren't persisted with the route.
+    if (savedPage === "view-profile") return "matches";
+    return savedPage;
+  });
   const [selectedChat, setSelectedChat] = useState(() => {
     try {
       const saved = sessionStorage.getItem("tok-selected-chat");
