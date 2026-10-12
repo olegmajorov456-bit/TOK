@@ -12,10 +12,13 @@
   --tok-border: #292e43;
   --tok-text: #f4f5fa;
   --tok-muted: #9ca4b7;
-  --tok-accent: #ff4d88;
-  --tok-accent-hover: #f13b78;
-  --tok-accent-soft: rgba(255, 77, 136, .13);
+  --tok-accent: #ff3975;
+  --tok-accent-hover: #ff4d82;
+  --tok-accent-soft: rgba(255, 57, 117, .13);
   --tok-shadow: 0 14px 38px rgba(0, 0, 0, .2);
+  --tok-page-background: linear-gradient(180deg, #11131d 0%, #0b0d14 100%);
+  --tok-shell-background: radial-gradient(circle at 50% -12%, rgba(255, 57, 117, .10), transparent 34%),
+    radial-gradient(circle at 100% 30%, rgba(155, 92, 255, .055), transparent 36%), #0b0d14;
 }
 .app-shell.tok-theme-neon,
 .tok-theme-neon {
@@ -25,10 +28,13 @@
   --tok-border: #292e43;
   --tok-text: #f4f5fa;
   --tok-muted: #9ca4b7;
-  --tok-accent: #ff4d88;
-  --tok-accent-hover: #ff6b9b;
-  --tok-accent-soft: rgba(255, 77, 136, .13);
+  --tok-accent: #ff3975;
+  --tok-accent-hover: #ff4d82;
+  --tok-accent-soft: rgba(255, 57, 117, .13);
   --tok-shadow: 0 18px 44px rgba(0, 0, 0, .24);
+  --tok-page-background: linear-gradient(180deg, #11131d 0%, #0b0d14 100%);
+  --tok-shell-background: radial-gradient(circle at 50% -12%, rgba(255, 57, 117, .10), transparent 34%),
+    radial-gradient(circle at 100% 30%, rgba(155, 92, 255, .055), transparent 36%), #0b0d14;
 }
 .app-shell.tok-theme-light,
 .tok-theme-light {
@@ -38,10 +44,12 @@
   --tok-border: #e3e7ef;
   --tok-text: #222736;
   --tok-muted: #70798a;
-  --tok-accent: #d93668;
-  --tok-accent-hover: #c92b5c;
+  --tok-accent: #e83c6d;
+  --tok-accent-hover: #d92766;
   --tok-accent-soft: #fff0f4;
   --tok-shadow: 0 12px 34px rgba(32, 40, 56, .07);
+  --tok-page-background: linear-gradient(180deg, #fbfbfc 0%, #f2f4f7 100%);
+  --tok-shell-background: radial-gradient(circle at 50% -10%, rgba(232, 60, 109, .055), transparent 34%), #f3f5f9;
 }
 
 html { color-scheme: light; }
@@ -55,11 +63,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   outline: 3px solid color-mix(in srgb, var(--tok-accent) 48%, transparent);
   outline-offset: 2px;
 }
-.app-shell { background: var(--tok-bg) !important; color: var(--tok-text); }
+.app-shell { background: var(--tok-shell-background, var(--tok-bg)) !important; color: var(--tok-text); }
 .app-content { width: 100%; min-width: 0; background: transparent; }
 .home-page, .discovery-page, .matches-page, .profile-page, .notifications-page,
 .interest-rooms-page, .random-chat-page, .feature-page {
-  background-color: var(--tok-bg) !important;
+  background: var(--tok-page-background, var(--tok-bg)) !important;
   color: var(--tok-text);
 }
 .home-feed, .discovery-container, .matches-container, .profile-container,
@@ -160,7 +168,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .matches-empty p { color: var(--tok-muted); line-height: 1.7; }
 
 /* Chat: line up header, message column and composer */
-.chat-page { background: var(--tok-bg) !important; color: var(--tok-text); }
+.chat-page { background: var(--tok-page-background, var(--tok-bg)) !important; color: var(--tok-text); }
 .chat-header { border-color: var(--tok-border) !important; }
 .chat-messages { width: min(100%, 820px); padding-inline: clamp(14px, 3vw, 24px); }
 .chat-message { overflow-wrap: anywhere; }
@@ -337,14 +345,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .tok-auth-light, .tok-onboarding-light {
   --tok-bg: #f3f5f9; --tok-surface: #fff; --tok-surface-2: #f8f9fc;
   --tok-border: #e3e7ef; --tok-text: #222736; --tok-muted: #70798a;
-  --tok-accent: #d93668; --tok-accent-hover: #c92b5c; --tok-accent-soft: #fff0f4;
+  --tok-accent: #e83c6d; --tok-accent-hover: #d92766; --tok-accent-soft: #fff0f4;
   --tok-shadow: 0 12px 34px rgba(32,40,56,.08);
+  --tok-page-background: linear-gradient(180deg, #fbfbfc 0%, #f2f4f7 100%);
+  --tok-shell-background: radial-gradient(circle at 50% -10%, rgba(232,60,109,.055), transparent 34%), #f3f5f9;
 }
 .tok-auth-neon, .tok-onboarding-neon {
   --tok-bg: #0b0d14; --tok-surface: #121522; --tok-surface-2: #191c2b;
   --tok-border: #292e43; --tok-text: #f4f5fa; --tok-muted: #9ca4b7;
-  --tok-accent: #ff4d88; --tok-accent-hover: #ff6b9b; --tok-accent-soft: rgba(255,77,136,.13);
+  --tok-accent: #ff3975; --tok-accent-hover: #ff4d82; --tok-accent-soft: rgba(255,57,117,.13);
   --tok-shadow: 0 20px 60px rgba(0,0,0,.28);
+  --tok-page-background: linear-gradient(180deg, #11131d 0%, #0b0d14 100%);
+  --tok-shell-background: radial-gradient(circle at 50% -12%, rgba(255,57,117,.10), transparent 34%), #0b0d14;
 }
 .auth-page.tok-auth-light, .onboarding-page.tok-onboarding-light {
   background: radial-gradient(circle at 50% 8%, rgba(217,54,104,.09), transparent 35%), var(--tok-bg) !important;
@@ -387,12 +399,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .support-page.tok-theme-light, .admin-page.tok-theme-light, .public-profile-page.tok-theme-light,
 .interest-rooms-page.tok-theme-light, .feature-page.tok-theme-light,
 .random-chat-page.tok-theme-light {
-  background: var(--tok-bg) !important; color: var(--tok-text) !important;
+  background: var(--tok-page-background, var(--tok-bg)) !important; color: var(--tok-text) !important;
 }
 .support-page.tok-theme-neon, .admin-page.tok-theme-neon, .public-profile-page.tok-theme-neon,
 .interest-rooms-page.tok-theme-neon, .feature-page.tok-theme-neon,
 .random-chat-page.tok-theme-neon {
-  background: var(--tok-bg) !important; color: var(--tok-text) !important;
+  background: var(--tok-page-background, var(--tok-bg)) !important; color: var(--tok-text) !important;
 }
 .tok-theme-light .support-header, .support-page.tok-theme-light .support-header,
 .tok-theme-light .admin-header, .admin-page.tok-theme-light .admin-header,
@@ -546,7 +558,7 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
 /* Light-theme surfaces for every secondary area, not only the home screen. */
 .tok-theme-light.support-page, .tok-theme-light.admin-page,
 .tok-theme-light.public-profile-page, .tok-theme-light.random-chat-page {
-  background: var(--tok-bg) !important;
+  background: var(--tok-page-background, var(--tok-bg)) !important;
   color: var(--tok-text) !important;
 }
 .tok-theme-light .admin-section, .tok-theme-light .admin-chat,
@@ -661,7 +673,7 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
 .tok-theme-neon .home-post-card:hover, .tok-theme-neon .home-matches-card:hover,
 .tok-theme-neon .interest-room-card:hover, .tok-theme-neon .confession-card:hover,
 .tok-theme-neon .achievement-card:hover {
-  box-shadow: 0 18px 46px rgba(0, 0, 0, .25), 0 0 0 1px rgba(255,77,136,.05);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .25), 0 0 0 1px rgba(255,57,117,.05);
 }
 .match-card:focus-visible { position: relative; z-index: 1; }
 .match-card .match-chat-icon { transition: background .18s ease, color .18s ease, transform .18s ease; }
@@ -707,7 +719,7 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
   border-color: #f0dfe6 !important;
 }
 .tok-theme-neon .home-welcome {
-  background: radial-gradient(circle at 100% 0%, rgba(255,77,136,.13), transparent 42%),
+  background: radial-gradient(circle at 100% 0%, rgba(255,57,117,.13), transparent 42%),
               linear-gradient(135deg, #181b2b, #121522 72%) !important;
   border-color: #35334a !important;
 }
@@ -852,8 +864,8 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
   color: var(--tok-text);
   border-color: var(--tok-border);
 }
-.tok-theme-light.privacy-page { background: var(--tok-bg) !important; color: var(--tok-text); }
-.tok-theme-neon.privacy-page { background: var(--tok-bg) !important; color: var(--tok-text); }
+.tok-theme-light.privacy-page { background: var(--tok-page-background, var(--tok-bg)) !important; color: var(--tok-text); }
+.tok-theme-neon.privacy-page { background: var(--tok-page-background, var(--tok-bg)) !important; color: var(--tok-text); }
 .tok-theme-light.privacy-page .privacy-card,
 .tok-theme-neon.privacy-page .privacy-card {
   background: var(--tok-surface);
