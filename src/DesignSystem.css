@@ -330,3 +330,144 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Auth, onboarding and standalone screens follow the selected theme too. */
+.tok-auth-light, .tok-onboarding-light {
+  --tok-bg: #f3f5f9; --tok-surface: #fff; --tok-surface-2: #f8f9fc;
+  --tok-border: #e3e7ef; --tok-text: #222736; --tok-muted: #70798a;
+  --tok-accent: #d93668; --tok-accent-hover: #c92b5c; --tok-accent-soft: #fff0f4;
+  --tok-shadow: 0 12px 34px rgba(32,40,56,.08);
+}
+.tok-auth-neon, .tok-onboarding-neon {
+  --tok-bg: #0b0d14; --tok-surface: #121522; --tok-surface-2: #191c2b;
+  --tok-border: #292e43; --tok-text: #f4f5fa; --tok-muted: #9ca4b7;
+  --tok-accent: #ff4d88; --tok-accent-hover: #ff6b9b; --tok-accent-soft: rgba(255,77,136,.13);
+  --tok-shadow: 0 20px 60px rgba(0,0,0,.28);
+}
+.auth-page.tok-auth-light, .onboarding-page.tok-onboarding-light {
+  background: radial-gradient(circle at 50% 8%, rgba(217,54,104,.09), transparent 35%), var(--tok-bg) !important;
+  color: var(--tok-text);
+}
+.auth-page.tok-auth-neon, .onboarding-page.tok-onboarding-neon {
+  background: radial-gradient(circle at 50% 8%, rgba(255,77,136,.15), transparent 35%), var(--tok-bg) !important;
+  color: var(--tok-text);
+}
+.tok-auth-light .auth-card, .tok-onboarding-light .onboarding-card,
+.tok-auth-neon .auth-card, .tok-onboarding-neon .onboarding-card {
+  background: var(--tok-surface) !important;
+  border-color: var(--tok-border) !important;
+  color: var(--tok-text);
+  border-radius: 26px;
+  box-shadow: var(--tok-shadow);
+}
+.tok-auth-light .auth-card h2, .tok-onboarding-light .onboarding-card h1,
+.tok-auth-neon .auth-card h2, .tok-onboarding-neon .onboarding-card h1 { color: var(--tok-text) !important; }
+.tok-auth-light .auth-subtitle, .tok-onboarding-light .onboarding-subtitle,
+.tok-auth-neon .auth-subtitle, .tok-onboarding-neon .onboarding-subtitle { color: var(--tok-muted) !important; }
+.tok-auth-light .auth-card input, .tok-auth-light .auth-password-wrap input,
+.tok-onboarding-light .onboarding-card input, .tok-onboarding-light .onboarding-card select,
+.tok-onboarding-light .onboarding-card textarea,
+.tok-auth-neon .auth-card input, .tok-onboarding-neon .onboarding-card input,
+.tok-onboarding-neon .onboarding-card select, .tok-onboarding-neon .onboarding-card textarea {
+  background: var(--tok-surface-2) !important;
+  border-color: var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  border-radius: 13px;
+}
+.tok-auth-light .switch-button, .tok-onboarding-light .onboarding-card button,
+.tok-auth-neon .switch-button, .tok-onboarding-neon .onboarding-card button {
+  border-radius: 13px;
+}
+.tok-auth-light .auth-verification-help { color: var(--tok-muted); }
+.tok-auth-light .auth-verification-card strong { color: var(--tok-text); }
+
+/* Support, admin and public profiles use the same surfaces as the main app. */
+.support-page.tok-theme-light, .admin-page.tok-theme-light, .public-profile-page.tok-theme-light,
+.interest-rooms-page.tok-theme-light, .feature-page.tok-theme-light,
+.random-chat-page.tok-theme-light {
+  background: var(--tok-bg) !important; color: var(--tok-text) !important;
+}
+.support-page.tok-theme-neon, .admin-page.tok-theme-neon, .public-profile-page.tok-theme-neon,
+.interest-rooms-page.tok-theme-neon, .feature-page.tok-theme-neon,
+.random-chat-page.tok-theme-neon {
+  background: var(--tok-bg) !important; color: var(--tok-text) !important;
+}
+.tok-theme-light .support-header, .support-page.tok-theme-light .support-header,
+.tok-theme-light .admin-header, .admin-page.tok-theme-light .admin-header,
+.tok-theme-light .random-chat-header, .random-chat-page.tok-theme-light .random-chat-header {
+  background: color-mix(in srgb, var(--tok-surface) 94%, transparent) !important;
+  border-color: var(--tok-border) !important;
+}
+.support-page.tok-theme-neon .support-header, .admin-page.tok-theme-neon .admin-header,
+.random-chat-page.tok-theme-neon .random-chat-header {
+  background: color-mix(in srgb, var(--tok-surface) 94%, transparent) !important;
+  border-color: var(--tok-border) !important;
+}
+.support-page.tok-theme-light .support-header strong,
+.admin-page.tok-theme-light .admin-header h1,
+.public-profile-page.tok-theme-light .public-profile-content h1,
+.interest-rooms-page.tok-theme-light h1,
+.feature-page.tok-theme-light .feature-heading h1 { color: var(--tok-text) !important; }
+.support-page.tok-theme-neon .support-header strong,
+.admin-page.tok-theme-neon .admin-header h1,
+.public-profile-page.tok-theme-neon .public-profile-content h1,
+.interest-rooms-page.tok-theme-neon h1,
+.feature-page.tok-theme-neon .feature-heading h1 { color: var(--tok-text) !important; }
+.tok-theme-light .support-messages, .support-page.tok-theme-light .support-messages,
+.admin-page.tok-theme-light .admin-support-card, .admin-page.tok-theme-light .admin-report-card,
+.admin-page.tok-theme-light .admin-home-form, .public-profile-page.tok-theme-light .public-profile-card,
+.interest-rooms-page.tok-theme-light .interest-room-card,
+.feature-page.tok-theme-light .confession-card, .feature-page.tok-theme-light .confession-composer,
+.feature-page.tok-theme-light .achievement-card {
+  background: var(--tok-surface) !important; border-color: var(--tok-border) !important;
+  color: var(--tok-text) !important; box-shadow: var(--tok-shadow);
+}
+.support-page.tok-theme-neon .support-messages,
+.admin-page.tok-theme-neon .admin-support-card, .admin-page.tok-theme-neon .admin-report-card,
+.admin-page.tok-theme-neon .admin-home-form, .public-profile-page.tok-theme-neon .public-profile-card,
+.interest-rooms-page.tok-theme-neon .interest-room-card,
+.feature-page.tok-theme-neon .confession-card, .feature-page.tok-theme-neon .confession-composer,
+.feature-page.tok-theme-neon .achievement-card {
+  background: var(--tok-surface) !important; border-color: var(--tok-border) !important;
+  color: var(--tok-text) !important; box-shadow: var(--tok-shadow);
+}
+.tok-theme-light .public-profile-content h1, .tok-theme-light .public-profile-section h3,
+.tok-theme-light .interest-room-title-row strong, .tok-theme-light .confession-card-author,
+.tok-theme-light .achievement-title-row, .tok-theme-light .admin-support-info strong {
+  color: var(--tok-text) !important;
+}
+.tok-theme-neon .public-profile-content h1, .tok-theme-neon .public-profile-section h3,
+.tok-theme-neon .interest-room-title-row strong, .tok-theme-neon .confession-card-author,
+.tok-theme-neon .achievement-title-row, .tok-theme-neon .admin-support-info strong {
+  color: var(--tok-text) !important;
+}
+.tok-theme-light .public-profile-subtitle, .tok-theme-light .interest-rooms-heading p,
+.tok-theme-light .feature-heading p, .tok-theme-light .achievement-copy p,
+.tok-theme-light .admin-section-heading p, .tok-theme-light .support-header span {
+  color: var(--tok-muted) !important;
+}
+.tok-theme-neon .public-profile-subtitle, .tok-theme-neon .interest-rooms-heading p,
+.tok-theme-neon .feature-heading p, .tok-theme-neon .achievement-copy p,
+.tok-theme-neon .admin-section-heading p, .tok-theme-neon .support-header span {
+  color: var(--tok-muted) !important;
+}
+.admin-page .admin-container, .interest-rooms-container, .feature-container {
+  width: min(100% - 32px, var(--tok-content-width));
+  margin-inline: auto;
+}
+.admin-page .admin-section, .admin-page .admin-support-card,
+.admin-page .admin-report-card, .interest-room-card, .confession-card,
+.achievement-card, .public-profile-card { border-radius: 18px; }
+.admin-page .admin-tabs { gap: 8px; flex-wrap: wrap; }
+.support-header { padding-inline: max(14px, calc((100vw - 760px) / 2)); }
+.support-input, .admin-chat-input, .interest-room-composer, .random-chat-composer {
+  border-radius: 15px;
+}
+@media (max-width: 640px) {
+  .auth-page { padding: 18px 12px; }
+  .auth-card, .onboarding-card { padding: 22px 18px !important; }
+  .support-header { padding-inline: 12px; }
+  .admin-page .admin-container, .interest-rooms-container, .feature-container { width: calc(100% - 24px); }
+  .public-profile-photo { height: clamp(290px, 100vw, 430px); }
+  .public-profile-content { padding: 20px 18px 26px; }
+}
