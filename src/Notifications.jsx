@@ -59,11 +59,15 @@ function labelFor(item) {
   return "Уведомление ТОК";
 }
 
-function Notifications({ user, theme = "light", onHome }) {
+function Notifications({ user, theme = "light", onHome, initialFilter = "all" }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(initialFilter === "like" ? "like" : "all");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setFilter(initialFilter === "like" ? "like" : "all");
+  }, [initialFilter]);
 
   useEffect(() => {
     let active = true;
