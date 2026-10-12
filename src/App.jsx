@@ -66,6 +66,7 @@ function App() {
   const [viewedProfile, setViewedProfile] = useState(null);
   const [blocked, setBlocked] = useState(false);
   const [homeSettings, setHomeSettings] = useState(DEFAULT_HOME_SETTINGS);
+  const [notificationsInitialFilter, setNotificationsInitialFilter] = useState("all");
   const [recoveryMode, setRecoveryMode] = useState(() => window.location.hash.includes("type=recovery"));
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("tok-theme");
@@ -305,15 +306,15 @@ function App() {
   return (
     <>
     <div className={`app-shell tok-theme-${theme}`}>
-      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} />
+      <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} onNotifications={() => { setNotificationsInitialFilter("all"); setPage("notifications"); }} />
       <main className="app-content">
-        {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onInterestRooms={() => setPage("interest-rooms")} onNotifications={() => setPage("notifications")} theme={theme} />}
+        {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onInterestRooms={() => setPage("interest-rooms")} onNotifications={() => { setNotificationsInitialFilter("all"); setPage("notifications"); }} onLikes={() => { setNotificationsInitialFilter("like"); setPage("notifications"); }} theme={theme} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} theme={theme} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}
         {page === "confessions" && <Confessions user={session.user} theme={theme} />}
         {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} />}
         {page === "achievements" && <Achievements user={session.user} theme={theme} />}
-        {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} />}
+        {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} initialFilter={notificationsInitialFilter} />}
         {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
       <BottomNav activePage={["confessions", "achievements", "notifications", "interest-rooms"].includes(page) ? "home" : page} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} />
