@@ -49,36 +49,48 @@ jobs:
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           sed -i "s/versionName \"[^\"]*\"/versionName \"1.7.${{ github.run_number }}\"/" android/app/build.gradle
-      - name: Configure stable release signing
+      - name: Determine signing mode
+        id: signing
         env:
           TOK_ANDROID_KEYSTORE_BASE64: ${{ secrets.TOK_ANDROID_KEYSTORE_BASE64 }}
           TOK_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.TOK_ANDROID_KEYSTORE_PASSWORD }}
           TOK_ANDROID_KEY_ALIAS: ${{ secrets.TOK_ANDROID_KEY_ALIAS }}
           TOK_ANDROID_KEY_PASSWORD: ${{ secrets.TOK_ANDROID_KEY_PASSWORD }}
         run: |
-          for secret_name in TOK_ANDROID_KEYSTORE_BASE64 TOK_ANDROID_KEYSTORE_PASSWORD TOK_ANDROID_KEY_ALIAS TOK_ANDROID_KEY_PASSWORD; do
-            if [ -z "${!secret_name}" ]; then
-              echo "::error::Add the GitHub Actions secret $secret_name before building a signed APK."
-              exit 1
-            fi
-          done
-          printf '%s' "$TOK_ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/tok-release.jks
-          test -s android/app/tok-release.jks || { echo "::error::The Android signing keystore is empty or invalid."; exit 1; }
+          if [ -n "$TOK_ANDROID_KEYSTORE_BASE64" ] && [ -n "$TOK_ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$TOK_ANDROID_KEY_ALIAS" ] && [ -n "$TOK_ANDROID_KEY_PASSWORD" ]; then
+            echo "mode=release" >> "$GITHUB_OUTPUT"
+            printf '%s' "$TOK_ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/tok-release.jks
+            test -s android/app/tok-release.jks || { echo "::error::The Android signing keystore is empty or invalid."; exit 1; }
+            echo "Persistent signing key found; building a normal release."
+          else
+            echo "mode=debug" >> "$GITHUB_OUTPUT"
+            echo "::warning::Signing secrets are not configured. Building a temporary debug-signed prerelease; it will not update an existing differently-signed installation."
+          fi
       - name: Build signed APK
+        if: steps.signing.outputs.mode == 'release'
         env:
           TOK_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.TOK_ANDROID_KEYSTORE_PASSWORD }}
           TOK_ANDROID_KEY_ALIAS: ${{ secrets.TOK_ANDROID_KEY_ALIAS }}
           TOK_ANDROID_KEY_PASSWORD: ${{ secrets.TOK_ANDROID_KEY_PASSWORD }}
         run: gradle --no-daemon -p android assembleRelease
+      - name: Build temporary debug APK
+        if: steps.signing.outputs.mode == 'debug'
+        run: gradle --no-daemon -p android assembleDebug
       - name: Prepare APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk TOK-Android.apk
+        run: |
+          if [ "${{ steps.signing.outputs.mode }}" = "release" ]; then
+            cp android/app/build/outputs/apk/release/app-release.apk TOK-Android.apk
+          else
+            cp android/app/build/outputs/apk/debug/app-debug.apk TOK-Android.apk
+          fi
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: TOK-Android
           path: TOK-Android.apk
           retention-days: 30
-      - name: Create GitHub release
+      - name: Create stable GitHub release
+        if: steps.signing.outputs.mode == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -86,5 +98,16 @@ jobs:
           TAG="android-v${VERSION_NAME}"
           gh release create "$TAG" TOK-Android.apk \
             --title "ТОК Android v${VERSION_NAME}" \
-            --notes "Исправления в этом релизе:\n- Исправлено наложение интерфейса на системные панели Android 15+: WebView учитывает системные отступы и вырез экрана при edge-to-edge.\n- Исправлено постоянное уведомление об обновлении: используется фактическая версия APK и показываются только более новые релизы.\n- Отложенное обновление не повторяется при каждом открытии, пока не выйдет следующая версия.\n- При открытии клавиатуры нижняя навигация скрывается, а поле ввода поднимается над клавиатурой и учитывает изменение видимой области WebView.\n- Область сообщений прокручивается отдельно, без сдвига поля ввода.\n- APK подписан постоянным ключом, чтобы следующие версии устанавливались поверх предыдущих.\n- Сохранены исправления логотипа, подтверждения почты и размещения удаления аккаунта в редактировании профиля." \
+            --notes "Сборка подписана постоянным ключом. Исправления включают актуальные изменения интерфейса TOK, системные отступы Android, работу клавиатуры и чата." \
             --latest
+      - name: Create temporary prerelease
+        if: steps.signing.outputs.mode == 'debug'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION_NAME=$(grep -o 'versionName "[^"]*"' android/app/build.gradle | head -1 | cut -d '"' -f2)
+          TAG="android-v${VERSION_NAME}-preview"
+          gh release create "$TAG" TOK-Android.apk \
+            --title "ТОК Android v${VERSION_NAME} — временная сборка" \
+            --prerelease \
+            --notes "ВРЕМЕННАЯ ТЕСТОВАЯ СБОРКА. APK подписан временным debug-ключом GitHub Actions и не установится поверх приложения, подписанного другим ключом. Для установки может потребоваться удалить старую версию; это может удалить локальные данные. Не предназначено для штатного обновления. Когда будет настроен постоянный ключ подписи, появится обычный релиз."
