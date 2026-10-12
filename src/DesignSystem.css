@@ -684,3 +684,36 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
   .bottom-nav { width: calc(100% - 16px); gap: 2px; border-radius: 18px; }
   .bottom-nav-item { border-radius: 13px; font-size: 8px; }
 }
+
+/* Final layout correction: reserve bottom space per screen instead of double-padding. */
+.app-content { padding-bottom: 0 !important; }
+.app-content > .feature-page,
+.app-content > .interest-rooms-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+}
+@media (max-width: 640px) {
+  .app-content { min-height: calc(100dvh - 64px); }
+  .app-content > .feature-page,
+  .app-content > .interest-rooms-page {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Give the primary card a purposeful hierarchy while keeping the palette restrained. */
+.tok-theme-light .home-welcome {
+  background: linear-gradient(135deg, #fff 0%, #fff8fb 100%) !important;
+  border-color: #f0dfe6 !important;
+}
+.tok-theme-neon .home-welcome {
+  background: radial-gradient(circle at 100% 0%, rgba(255,77,136,.13), transparent 42%),
+              linear-gradient(135deg, #181b2b, #121522 72%) !important;
+  border-color: #35334a !important;
+}
+.home-welcome::after { pointer-events: none; }
+.home-profile-card, .home-post-card, .home-matches-card, .home-tip {
+  box-shadow: 0 5px 18px rgba(26, 34, 50, .035);
+}
+.tok-theme-neon .home-profile-card, .tok-theme-neon .home-post-card,
+.tok-theme-neon .home-matches-card, .tok-theme-neon .home-tip {
+  box-shadow: 0 12px 30px rgba(0,0,0,.13);
+}
