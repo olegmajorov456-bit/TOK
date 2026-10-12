@@ -717,3 +717,65 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
 .tok-theme-neon .home-matches-card, .tok-theme-neon .home-tip {
   box-shadow: 0 12px 30px rgba(0,0,0,.13);
 }
+
+/* Explicit font declarations replace legacy shorthand values browsers discard. */
+.bottom-nav-item { font-size: 10px; line-height: 1.05; font-weight: 750; }
+.notifications-read-all, .notifications-filters button {
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 750;
+}
+.notification-read-all { font-family: inherit; font-size: 11px; line-height: 1.15; }
+.filters-actions button, .filters-actions .filters-reset,
+.matches-home-button, .notifications-heading-actions button {
+  font-family: inherit;
+  line-height: 1.15;
+}
+.home-feature-section { border-radius: 22px; }
+.home-feature-heading h2 { font-weight: 800; }
+.home-feature-card { min-height: 64px; }
+.home-feature-icon { border-radius: 13px; }
+.home-feature-copy strong { font-size: 11px; line-height: 1.25; }
+.home-feature-copy small { font-size: 9px; line-height: 1.35; }
+.tok-theme-light .home-feature-section {
+  background: #fff;
+  border-color: var(--tok-border);
+  box-shadow: var(--tok-shadow);
+}
+.tok-theme-light .home-feature-card {
+  background: var(--tok-surface-2);
+  border-color: var(--tok-border);
+}
+.tok-theme-light .home-feature-card:hover {
+  background: #fff5f8;
+  border-color: #f0c9d7;
+}
+.tok-theme-neon .home-feature-section {
+  background: var(--tok-surface);
+  border-color: var(--tok-border);
+  box-shadow: var(--tok-shadow);
+}
+.tok-theme-neon .home-feature-card {
+  background: var(--tok-surface-2);
+  border-color: var(--tok-border);
+}
+.tok-theme-neon .home-feature-card:hover {
+  background: #211a2a;
+  border-color: #493047;
+}
+@media (max-width: 640px) {
+  .bottom-nav-item { font-size: 9.5px; }
+  .home-feature-card { min-height: 62px; padding: 10px; gap: 9px; }
+  .home-feature-icon { width: 32px; height: 32px; flex-basis: 32px; font-size: 15px; }
+  .home-feature-copy strong { font-size: 11px; }
+  .home-feature-copy small { font-size: 9px; }
+}
+@media (max-width: 380px) {
+  .home-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .home-feature-card { gap: 7px; padding: 9px 7px; }
+  .home-feature-copy strong { font-size: 10px; }
+  .home-feature-copy small { font-size: 9px; }
+  .home-feature-icon { width: 30px; height: 30px; flex-basis: 30px; }
+  .bottom-nav-item { font-size: 9px; }
+}
