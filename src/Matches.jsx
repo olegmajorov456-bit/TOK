@@ -6,6 +6,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chatPreview, setChatPreview] = useState({});
+  const [loadError, setLoadError] = useState("");
   const requestInFlightRef = useRef(false);
   const refreshQueuedRef = useRef(false);
   const queuedShowLoadingRef = useRef(false);
@@ -40,6 +41,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
 
       if (matchError) throw matchError;
       const matchList = matchRows || [];
+      if (mountedRef.current) setLoadError("");
 
       if (!matchList.length) {
         if (mountedRef.current) {
@@ -133,6 +135,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
       // Leave the current list on screen during transient errors instead of
       // replacing it with an empty list.
       console.error("Ошибка загрузки мэтчей:", error);
+      if (mountedRef.current) setLoadError("Не удалось обновить чаты. Проверь соединение и попробуй ещё раз.");
     } finally {
       requestInFlightRef.current = false;
       if (mountedRef.current) setLoading(false);
@@ -219,10 +222,14 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
 
         {matches.length === 0 ? (
           <div className="matches-empty">
-            <div className="matches-empty-icon">💕</div>
-            <h2>Пока нет мэтчей</h2>
-            <p>Лайкай понравившихся людей в разделе знакомств. Если симпатия взаимна — человек появится здесь.</p>
-            <button onClick={onHome} className="matches-home-button">Перейти домой</button>
+            <div className="matches-empty-icon">{loadError ? "↻" : "💕"}</div>
+            <h2>{loadError ? "Чаты пока не загрузились" : "Пока нет мэтчей"}</h2>
+            <p>{loadError || "Лайкай понравившихся людей в разделе знакомств. Если симпатия взаимна — человек появится здесь."}</p>
+            {loadError ? (
+              <button onClick={() => loadMatches(true)} className="matches-home-button">Попробовать ещё раз</button>
+            ) : (
+              <button onClick={onHome} className="matches-home-button">Перейти домой</button>
+            )}
           </div>
         ) : (
           <div className="matches-list" aria-label="Чаты по последней активности">
