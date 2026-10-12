@@ -57,6 +57,48 @@ function App() {
 
   useEffect(() => { localStorage.setItem("tok-theme", theme); }, [theme]);
 
+  // Keep incoming-event notifications active on every screen, including the chat page
+  // where the top navigation (and its notification bell) is intentionally not mounted.
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) return undefined;
+
+    const channel = supabase
+      .channel("tok-system-notifications-" + userId)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications",
+        filter: "user_id=eq." + userId,
+      }, async (payload) => {
+        const item = payload.new;
+        let actorName = "";
+        if (item.actor_id) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("name")
+            .eq("id", item.actor_id)
+            .maybeSingle();
+          actorName = data?.name || "";
+        }
+        const title = item.type === "message"
+          ? (actorName ? "Новое сообщение от " + actorName : "Новое сообщение в ТОК")
+          : (actorName ? "Новая симпатия от " + actorName : "Новая симпатия в ТОК");
+        const body = item.body || (item.type === "like" ? "Кто-то поставил тебе лайк 💗" : "Тебе написали сообщение");
+        try {
+          if (window.TOKNative?.showNotification) {
+            window.TOKNative.showNotification(title, body);
+          }
+        } catch (error) {
+          console.debug("Системное уведомление недоступно:", error);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [session?.user?.id]);
+
+
   // Keep the current screen when Android temporarily recreates the WebView
   // while the system file picker is open.
   useEffect(() => {
