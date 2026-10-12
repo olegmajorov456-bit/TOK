@@ -45,7 +45,9 @@
 }
 
 html { color-scheme: light; }
-html:has(.app-shell.tok-theme-neon) { color-scheme: dark; }
+html:has(.tok-theme-neon),
+html:has(.tok-auth-neon),
+html:has(.tok-onboarding-neon) { color-scheme: dark; }
 body { background: var(--tok-bg); color: var(--tok-text); }
 button, input, textarea, select { font-family: inherit; }
 button { transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease; }
@@ -670,7 +672,7 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
 @media (max-width: 420px) {
   .app-header { padding-inline: 10px; }
   .app-header-logo { width: 82px; flex-basis: 82px; }
-  .app-header-logo img { max-width: 82px; }
+  .app-header-logo .app-header-logo-image { width: 82px; height: 42px; }
   .app-header-actions { gap: 5px; }
   .header-action, .notification-bell-button { width: 36px; height: 36px; border-radius: 11px; }
   .header-profile-button { width: 37px; height: 37px; }
