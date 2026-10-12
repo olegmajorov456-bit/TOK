@@ -256,7 +256,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
   const profileHobbies = getHobbies(profile);
 
   return (
-    <div className="profile-page">
+    <div className={"profile-page tok-theme-" + theme}>
       <main className="profile-container">
         <section className="profile-card">
           <div className="profile-photo-wrapper">
