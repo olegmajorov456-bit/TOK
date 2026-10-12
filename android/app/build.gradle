@@ -14,6 +14,7 @@ android {
         versionName "1.7"
     }
 
+    // Release versionCode/versionName are set from the GitHub Actions run number.
     // The CI build uses a persistent private key supplied through GitHub Actions
     // secrets, so users can install future APKs over the previous version.
     signingConfigs {
