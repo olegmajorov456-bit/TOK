@@ -814,3 +814,63 @@ button.home-activity-tile:hover {
   .discovery-actions .discovery-button.like { width:57px !important; height:57px !important; }
   .header-action { padding:0 8px !important; }
 }
+
+
+/* Secondary screens are part of the same product, not separate mini-sites. */
+.feature-page,.interest-rooms-page,.random-chat-page,.support-page,.public-profile-page {
+  min-height:calc(100dvh - 72px);
+  padding:26px 16px 130px !important;
+  background:transparent !important;
+  color:var(--tok-text) !important;
+}
+.feature-container { width:min(100%,800px) !important; max-width:800px !important; margin:0 auto !important; }
+.feature-heading { margin-bottom:23px !important; }
+.feature-kicker { display:inline-block; margin-bottom:8px !important; color:var(--tok-accent) !important; font-size:10px !important; font-weight:900 !important; letter-spacing:1.6px !important; }
+.feature-heading h1,.interest-rooms-page h1,.random-chat-page h1,.support-page h1,.public-profile-page h1 {
+  color:var(--tok-text) !important; font-size:clamp(29px,4vw,38px) !important; line-height:1.08 !important; letter-spacing:-.06em !important;
+}
+.feature-heading p,.interest-rooms-page p,.random-chat-page p,.support-page p,.public-profile-page p { color:var(--tok-muted); line-height:1.65; }
+.feature-quiet-button { min-height:41px !important; padding:0 13px !important; border:1px solid var(--tok-border) !important; border-radius:14px !important; background:var(--tok-surface) !important; color:var(--tok-text) !important; font-weight:750 !important; }
+.feature-message { border-radius:15px !important; }
+.feature-empty { padding:45px 22px !important; border:1px solid var(--tok-border) !important; border-radius:25px !important; background:var(--tok-surface) !important; color:var(--tok-muted) !important; box-shadow:var(--tok-shadow) !important; }
+.feature-loading { min-height:45vh; }
+.feature-spinner { border-top-color:var(--tok-accent) !important; }
+.confession-card,.confession-composer,.achievement-card,.achievement-level-card,.interest-room-card,.random-chat-card,.public-profile-card {
+  border:1px solid var(--tok-border) !important; border-radius:22px !important; background:var(--tok-surface) !important; color:var(--tok-text) !important; box-shadow:var(--tok-shadow) !important;
+}
+.confession-card { padding:21px !important; margin-bottom:13px !important; }
+.confession-composer { padding:20px !important; margin-bottom:17px !important; }
+.confession-card :is(h2,h3,strong),.confession-composer :is(h2,h3,strong),.achievement-card :is(h2,h3,strong),.achievement-level-card :is(h2,h3,strong),.interest-room-card :is(h2,h3,strong) { color:var(--tok-text) !important; }
+.confession-card :is(p,small,time),.confession-composer :is(p,small),.achievement-card :is(p,small),.interest-room-card :is(p,small) { color:var(--tok-muted); }
+.confession-card button,.confession-composer button,.achievement-card button,.interest-room-card button,.random-chat-page button,.support-page button {
+  border-radius:13px;
+}
+.confession-card textarea,.confession-composer textarea,.confession-composer input,.interest-rooms-page input,.interest-rooms-page textarea,.random-chat-page input,.support-page textarea,.support-page input {
+  border:1px solid var(--tok-border) !important; border-radius:14px !important; background:var(--tok-surface-2) !important; color:var(--tok-text) !important;
+}
+.achievement-level-card { padding:25px !important; background:linear-gradient(135deg,var(--tok-surface),var(--tok-surface-2)) !important; }
+.achievement-card { padding:18px !important; transition:transform .18s,border-color .18s !important; }
+.achievement-card:hover { transform:translateY(-2px); border-color:color-mix(in srgb,var(--tok-accent) 38%,var(--tok-border)) !important; }
+.interest-room-card { padding:19px !important; transition:transform .18s,border-color .18s !important; }
+.interest-room-card:hover { transform:translateY(-2px); border-color:color-mix(in srgb,var(--tok-accent) 36%,var(--tok-border)) !important; }
+.tok-theme-neon.feature-page,.tok-theme-neon.interest-rooms-page,.tok-theme-neon.random-chat-page,.tok-theme-neon.support-page,.tok-theme-neon.public-profile-page {
+  background:transparent !important; color:var(--tok-text) !important;
+}
+.tok-theme-neon .confession-card,.tok-theme-neon .confession-composer,.tok-theme-neon .achievement-card,.tok-theme-neon .achievement-level-card,.tok-theme-neon .interest-room-card,.tok-theme-neon .random-chat-card,.tok-theme-neon .public-profile-card {
+  background:var(--tok-surface) !important; border-color:var(--tok-border) !important; color:var(--tok-text) !important;
+}
+.tok-theme-neon .confession-card :is(h2,h3,strong),.tok-theme-neon .confession-composer :is(h2,h3,strong),.tok-theme-neon .achievement-card :is(h2,h3,strong),.tok-theme-neon .interest-room-card :is(h2,h3,strong) { color:var(--tok-text) !important; }
+.tok-theme-neon .confession-card :is(p,small,time),.tok-theme-neon .achievement-card :is(p,small),.tok-theme-neon .interest-room-card :is(p,small) { color:var(--tok-muted) !important; }
+.tok-theme-neon .confession-card textarea,.tok-theme-neon .confession-composer textarea,.tok-theme-neon .confession-composer input,.tok-theme-neon .interest-rooms-page input,.tok-theme-neon .interest-rooms-page textarea,.tok-theme-neon .random-chat-page input,.tok-theme-neon .support-page textarea,.tok-theme-neon .support-page input {
+  background:var(--tok-surface-2) !important; border-color:var(--tok-border) !important; color:var(--tok-text) !important;
+}
+
+/* Focus, touch, and motion details used consistently throughout the experience. */
+.app-shell :is(button,[role="button"]),.auth-page button { touch-action:manipulation; }
+.app-shell button:active:not(:disabled) { transform:scale(.985); }
+.app-shell :is(button,a) { transition-timing-function:cubic-bezier(.2,.75,.25,1); }
+@media (max-width:700px) {
+  .feature-page,.interest-rooms-page,.random-chat-page,.support-page,.public-profile-page { padding:20px 12px 125px !important; }
+  .feature-container { width:100% !important; }
+  .confession-card,.confession-composer { padding:16px !important; border-radius:19px !important; }
+}
