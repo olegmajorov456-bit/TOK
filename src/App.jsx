@@ -20,6 +20,7 @@ import PublicProfile from "./PublicProfile";
 import Header from "./Header";
 import BottomNav from "./BottomNav";
 import "./App.css";
+import "./DesignSystem.css";
 
 const DEFAULT_HOME_SETTINGS = {
   title: "Общайся. Знакомься. Находи своих.",
@@ -284,7 +285,7 @@ function App() {
       <Header user={session.user} profile={profile} onHome={goHome} onSupport={() => setPage("support")} onProfile={() => setPage("profile")} onMatches={() => setPage("matches")} onNotifications={() => setPage("notifications")} />
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onInterestRooms={() => setPage("interest-rooms")} onNotifications={() => setPage("notifications")} theme={theme} />}
-        {page === "discovery" && <Discovery user={session.user} onHome={goHome} />}
+        {page === "discovery" && <Discovery user={session.user} onHome={goHome} theme={theme} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}
         {page === "confessions" && <Confessions user={session.user} theme={theme} />}
         {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} />}
