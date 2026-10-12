@@ -1,0 +1,40 @@
+name: Generate Android signing key (one-time setup)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate a permanent Android signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          STORE_PASSWORD="$(openssl rand -hex 24)"
+          KEY_PASSWORD="$(openssl rand -hex 24)"
+          keytool -genkeypair -noprompt -v \
+            -keystore tok-release.jks \
+            -storetype JKS \
+            -storepass "$STORE_PASSWORD" \
+            -keypass "$KEY_PASSWORD" \
+            -alias tok-release \
+            -keyalg RSA -keysize 3072 -validity 10000 \
+            -dname "CN=TOK Android Release, OU=TOK, O=TOK, C=RU"
+          {
+            echo "TOK_ANDROID_KEYSTORE_BASE64=$(base64 -w 0 tok-release.jks)"
+            echo "TOK_ANDROID_KEYSTORE_PASSWORD=$STORE_PASSWORD"
+            echo "TOK_ANDROID_KEY_ALIAS=tok-release"
+            echo "TOK_ANDROID_KEY_PASSWORD=$KEY_PASSWORD"
+          } > TOK-signing-secrets.txt
+          chmod 600 TOK-signing-secrets.txt
+          rm -f tok-release.jks
+      - name: Upload one-time setup file
+        uses: actions/upload-artifact@v4
+        with:
+          name: TOK-signing-secrets-ONE-TIME
+          path: TOK-signing-secrets.txt
+          retention-days: 1
