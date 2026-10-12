@@ -781,3 +781,86 @@ input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .8
   .home-feature-icon { width: 30px; height: 30px; flex-basis: 30px; }
   .bottom-nav-item { font-size: 9px; }
 }
+
+/* Final source of truth for theme colors: legacy one-off theme files are no longer imported. */
+.tok-theme-light .home-page,
+.tok-theme-light .discovery-page,
+.tok-theme-light .matches-page,
+.tok-theme-light .profile-page,
+.tok-theme-light .notifications-page,
+.tok-theme-light .feature-page,
+.tok-theme-light .interest-rooms-page {
+  background: var(--tok-bg) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-neon .home-page,
+.tok-theme-neon .discovery-page,
+.tok-theme-neon .matches-page,
+.tok-theme-neon .profile-page,
+.tok-theme-neon .notifications-page,
+.tok-theme-neon .feature-page,
+.tok-theme-neon .interest-rooms-page {
+  background: var(--tok-bg) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-light h1, .tok-theme-light h2, .tok-theme-light h3,
+.tok-theme-light strong { color: var(--tok-text); }
+.tok-theme-light p, .tok-theme-light small { color: var(--tok-muted); }
+.tok-theme-neon h1, .tok-theme-neon h2, .tok-theme-neon h3,
+.tok-theme-neon strong { color: var(--tok-text); }
+.tok-theme-neon p, .tok-theme-neon small { color: var(--tok-muted); }
+.tok-theme-light input, .tok-theme-light textarea, .tok-theme-light select {
+  background: var(--tok-surface-2);
+  color: var(--tok-text);
+  border-color: var(--tok-border);
+}
+.tok-theme-neon input, .tok-theme-neon textarea, .tok-theme-neon select {
+  background: var(--tok-surface-2);
+  color: var(--tok-text);
+  border-color: var(--tok-border);
+}
+.tok-theme-light .discovery-content,
+.tok-theme-light .discovery-actions,
+.tok-theme-light .profile-identity,
+.tok-theme-light .notifications-empty {
+  background: var(--tok-surface);
+  border-color: var(--tok-border);
+  color: var(--tok-text);
+}
+.tok-theme-neon .discovery-content,
+.tok-theme-neon .discovery-actions,
+.tok-theme-neon .profile-identity,
+.tok-theme-neon .notifications-empty {
+  background: var(--tok-surface);
+  border-color: var(--tok-border);
+  color: var(--tok-text);
+}
+.tok-theme-light .chat-message.mine,
+.tok-theme-neon .chat-message.mine {
+  background: linear-gradient(135deg, var(--tok-accent), var(--tok-accent-hover));
+  color: #fff;
+}
+.tok-theme-light .notification-page-item,
+.tok-theme-light .notification-item {
+  background: var(--tok-surface);
+  color: var(--tok-text);
+  border-color: var(--tok-border);
+}
+.tok-theme-neon .notification-page-item,
+.tok-theme-neon .notification-item {
+  background: var(--tok-surface);
+  color: var(--tok-text);
+  border-color: var(--tok-border);
+}
+.tok-theme-light.privacy-page { background: var(--tok-bg) !important; color: var(--tok-text); }
+.tok-theme-neon.privacy-page { background: var(--tok-bg) !important; color: var(--tok-text); }
+.tok-theme-light.privacy-page .privacy-card,
+.tok-theme-neon.privacy-page .privacy-card {
+  background: var(--tok-surface);
+  border-color: var(--tok-border);
+  color: var(--tok-text);
+}
+.tok-theme-light.privacy-page h1, .tok-theme-light.privacy-page h2,
+.tok-theme-neon.privacy-page h1, .tok-theme-neon.privacy-page h2 { color: var(--tok-text); }
+.tok-theme-light.privacy-page p, .tok-theme-light.privacy-page li,
+.tok-theme-neon.privacy-page p, .tok-theme-neon.privacy-page li { color: var(--tok-muted); }
