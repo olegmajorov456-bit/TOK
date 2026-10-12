@@ -126,20 +126,18 @@ function NotificationBell({ user, onMatches, onAllNotifications }) {
           }
           setNotifications((current) => dedupeNotifications([notification, ...current]).slice(0, 30));
 
-          // Android WebView exposes a native bridge so incoming Supabase realtime
-          // events can create a system notification while TOK is open.
           const title = actor?.name
             ? (notification.type === "message" ? "Новое сообщение от " : "Новая симпатия от ") + actor.name
             : (notification.type === "message" ? "Новое сообщение в ТОК" : "Новое уведомление в ТОК");
           const body = notification.body || (notification.type === "like" ? "Кто-то поставил тебе лайк 💗" : "Тебе написали сообщение");
+          // Web notifications are only a fallback for browsers. Android's native
+          // bridge is subscribed globally in App.jsx to avoid duplicate alerts.
           try {
-            if (window.TOKNative?.showNotification) {
-              window.TOKNative.showNotification(title, body);
-            } else if ("Notification" in window && Notification.permission === "granted" && document.visibilityState !== "visible") {
+            if ("Notification" in window && Notification.permission === "granted" && document.visibilityState !== "visible") {
               new Notification(title, { body, icon: "/tok-logo.png", tag: "tok-" + notification.id });
             }
           } catch (notificationError) {
-            console.debug("Системное уведомление недоступно:", notificationError);
+            console.debug("Браузерное уведомление недоступно:", notificationError);
           }
         }
       )
