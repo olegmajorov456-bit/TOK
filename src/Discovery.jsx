@@ -67,7 +67,7 @@ function getSharedHobbies(profile, ownHobbies) {
   return [...found.values()];
 }
 
-function Discovery({ user, onHome }) {
+function Discovery({ user, onHome, theme = "light" }) {
   const [allProfiles, setAllProfiles] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -303,13 +303,13 @@ function Discovery({ user, onHome }) {
   }
 
   const activeFiltersCount = useMemo(() => Object.entries(filters).filter(([key, value]) => key === "gender" ? (genderFilterTouched && value !== preferredGender) : Boolean(value)).length, [filters, preferredGender, genderFilterTouched]);
-  if (loading) return <div className="discovery-page"><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{refreshLoading ? "Обновляем все анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
+  if (loading) return <div className={`discovery-page tok-theme-${theme}`}><main className="discovery-container"><div className="discovery-loading"><div className="loading-spinner" /><p>{refreshLoading ? "Обновляем все анкеты..." : "Загрузка анкет..."}</p></div></main></div>;
 
   const profile = profiles[currentIndex];
   const profileHobbies = getHobbies(profile);
   const commonHobbies = profile ? getSharedHobbies(profile, myHobbies) : [];
 
-  return <div className="discovery-page"><main className="discovery-container">
+  return <div className={`discovery-page tok-theme-${theme}`}><main className="discovery-container">
     <div className="discovery-header"><div className="discovery-title-block"><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><div className="discovery-header-controls"><div className="discovery-sort-toggle" role="group" aria-label="Порядок анкет"><button type="button" className={sortMode === "compatibility" ? "active" : ""} onClick={() => changeSortMode("compatibility")}>✦ По интересам</button><button type="button" className={sortMode === "random" ? "active" : ""} onClick={() => changeSortMode("random")}>⇄ Случайно</button></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div></div>
     {filtersOpen && <section className="filters-panel"><div className="filter-grid">
       <label>Пол<select value={filters.gender} onChange={(e) => { setGenderFilterTouched(true); setFilters({ ...filters, gender: e.target.value }); }}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
