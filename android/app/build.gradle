@@ -17,6 +17,7 @@ android {
     // Release versionCode/versionName are set from the GitHub Actions run number.
     // The CI build uses a persistent private key supplied through GitHub Actions
     // secrets, so users can install future APKs over the previous version.
+    // CI may also publish a temporary debug-signed prerelease if signing secrets are absent.
     signingConfigs {
         release {
             storeFile file("tok-release.jks")
