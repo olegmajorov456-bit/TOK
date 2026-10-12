@@ -471,3 +471,216 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .public-profile-photo { height: clamp(290px, 100vw, 430px); }
   .public-profile-content { padding: 20px 18px 26px; }
 }
+
+
+/* ---- Final polish pass: typography, controls, page headers and edge cases ---- */
+:root {
+  --tok-font-size-body: 14px;
+  --tok-line: 1.55;
+  --tok-ease: cubic-bezier(.2, .7, .25, 1);
+}
+body { font-size: var(--tok-font-size-body); line-height: var(--tok-line); }
+h1, h2, h3, h4, p { overflow-wrap: break-word; }
+p { text-wrap: pretty; }
+.app-shell, .auth-page, .onboarding-page, .support-page, .admin-page,
+.public-profile-page, .random-chat-page, .feature-page, .interest-rooms-page {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+.app-content { padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important; }
+.app-header { min-height: 64px; }
+.app-header-logo, .header-profile-button, .header-action, .notification-bell-button {
+  flex-shrink: 0;
+}
+.app-header-actions { min-width: 0; }
+.app-header-logo { overflow: hidden; }
+.app-header-logo img { display: block; }
+.bottom-nav { padding-bottom: max(5px, env(safe-area-inset-bottom)); }
+.bottom-nav-item { font-family: inherit; letter-spacing: -.01em; }
+button:disabled, button[aria-disabled="true"] {
+  opacity: .55;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+input, select, textarea { accent-color: var(--tok-accent); }
+input::placeholder, textarea::placeholder { color: var(--tok-muted); opacity: .85; }
+:where(.home-page, .discovery-page, .matches-page, .profile-page, .notifications-page,
+       .feature-page, .interest-rooms-page, .random-chat-page, .public-profile-page) :where(button, input, select, textarea) {
+  font-family: inherit;
+}
+:where(.matches-heading, .discovery-header, .feature-heading, .interest-rooms-heading) h1 {
+  font-weight: 800;
+}
+.matches-kicker, .home-welcome-small, .discovery-kicker, .feature-kicker,
+.interest-rooms-kicker, .notifications-kicker {
+  line-height: 1.35;
+}
+
+/* Remove theme drift from shared input surfaces. */
+.tok-theme-light :where(.profile-edit-form input, .profile-edit-form select, .profile-edit-form textarea,
+  .filter-grid input, .filter-grid select, .support-input, .admin-chat-input,
+  .admin-user-search, .interest-room-composer input, .random-chat-composer input) {
+  background: #f8f9fc !important;
+  border-color: var(--tok-border) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-neon :where(.profile-edit-form input, .profile-edit-form select, .profile-edit-form textarea,
+  .filter-grid input, .filter-grid select, .support-input, .admin-chat-input,
+  .admin-user-search, .interest-room-composer input, .random-chat-composer input) {
+  background: #0e111b !important;
+  border-color: var(--tok-border) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-light :where(.profile-edit-form label, .filter-grid label, .interest-room-guideline,
+  .random-chat-system-note, .profile-status, .profile-study span, .profile-details p) {
+  color: var(--tok-muted);
+}
+.tok-theme-neon :where(.profile-edit-form label, .filter-grid label, .interest-room-guideline,
+  .random-chat-system-note, .profile-status, .profile-study span, .profile-details p) {
+  color: var(--tok-muted);
+}
+
+/* Light-theme surfaces for every secondary area, not only the home screen. */
+.tok-theme-light.support-page, .tok-theme-light.admin-page,
+.tok-theme-light.public-profile-page, .tok-theme-light.random-chat-page {
+  background: var(--tok-bg) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-light .admin-section, .tok-theme-light .admin-chat,
+.tok-theme-light .admin-home-form, .tok-theme-light .admin-support-card,
+.tok-theme-light .admin-report-card, .tok-theme-light .interest-room-chat-header,
+.tok-theme-light .interest-room-chat-composer, .tok-theme-light .interest-rooms-hero,
+.tok-theme-light .random-chat-welcome, .tok-theme-light .random-chat-ended,
+.tok-theme-light .random-chat-searching {
+  background: var(--tok-surface) !important;
+  color: var(--tok-text) !important;
+  border-color: var(--tok-border) !important;
+  box-shadow: var(--tok-shadow);
+}
+.tok-theme-light .admin-section h2, .tok-theme-light .admin-section h3,
+.tok-theme-light .admin-section-heading h2, .tok-theme-light .admin-chat-header strong,
+.tok-theme-light .interest-room-chat-title strong,
+.tok-theme-light .random-chat-welcome h1, .tok-theme-light .random-chat-welcome h2,
+.tok-theme-light .public-profile-section h3 {
+  color: var(--tok-text) !important;
+}
+.tok-theme-light .admin-support-info span, .tok-theme-light .admin-report-date,
+.tok-theme-light .interest-room-chat-title span, .tok-theme-light .random-chat-welcome p,
+.tok-theme-light .public-profile-section p { color: var(--tok-muted) !important; }
+.tok-theme-light .admin-back, .tok-theme-light .admin-refresh,
+.tok-theme-light .admin-tabs button, .tok-theme-light .admin-chat-back,
+.tok-theme-light .support-back, .tok-theme-light .random-chat-back {
+  color: var(--tok-text);
+  background: var(--tok-surface-2);
+  border-color: var(--tok-border);
+}
+.tok-theme-light .admin-tabs button.active {
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  border-color: color-mix(in srgb, var(--tok-accent) 24%, var(--tok-border)) !important;
+}
+.tok-theme-light .support-message.admin, .tok-theme-light .interest-room-message.theirs,
+.tok-theme-light .random-message.theirs, .tok-theme-light .admin-message.theirs {
+  background: #eef1f6 !important;
+  color: #2c3342 !important;
+  border-color: var(--tok-border) !important;
+}
+.tok-theme-light .profile-study { background: var(--tok-surface-2); border-color: var(--tok-border); }
+.tok-theme-light .profile-study strong { color: var(--tok-text); }
+.tok-theme-light .profile-section, .tok-theme-light .profile-theme-option {
+  border-color: var(--tok-border);
+}
+.tok-theme-light .profile-theme-option.active {
+  border-color: var(--tok-accent) !important;
+  box-shadow: 0 0 0 3px var(--tok-accent-soft);
+}
+.tok-theme-light .public-profile-back {
+  background: var(--tok-surface); color: var(--tok-text); border-color: var(--tok-border);
+}
+
+/* Neon mode is dark throughout, including secondary chat and admin screens. */
+.tok-theme-neon.support-page, .tok-theme-neon.admin-page,
+.tok-theme-neon.public-profile-page, .tok-theme-neon.random-chat-page {
+  background: var(--tok-bg) !important;
+  color: var(--tok-text) !important;
+}
+.tok-theme-neon .admin-section, .tok-theme-neon .admin-chat,
+.tok-theme-neon .admin-home-form, .tok-theme-neon .admin-support-card,
+.tok-theme-neon .admin-report-card, .tok-theme-neon .interest-room-chat-header,
+.tok-theme-neon .interest-room-chat-composer, .tok-theme-neon .interest-rooms-hero,
+.tok-theme-neon .random-chat-welcome, .tok-theme-neon .random-chat-ended,
+.tok-theme-neon .random-chat-searching {
+  background: var(--tok-surface) !important;
+  color: var(--tok-text) !important;
+  border-color: var(--tok-border) !important;
+}
+.tok-theme-neon .admin-section h2, .tok-theme-neon .admin-section h3,
+.tok-theme-neon .admin-section-heading h2, .tok-theme-neon .admin-chat-header strong,
+.tok-theme-neon .interest-room-chat-title strong,
+.tok-theme-neon .random-chat-welcome h1, .tok-theme-neon .random-chat-welcome h2,
+.tok-theme-neon .public-profile-section h3 { color: var(--tok-text) !important; }
+.tok-theme-neon .admin-support-info span, .tok-theme-neon .admin-report-date,
+.tok-theme-neon .interest-room-chat-title span, .tok-theme-neon .random-chat-welcome p,
+.tok-theme-neon .public-profile-section p { color: var(--tok-muted) !important; }
+.tok-theme-neon .admin-back, .tok-theme-neon .admin-refresh,
+.tok-theme-neon .admin-tabs button, .tok-theme-neon .admin-chat-back,
+.tok-theme-neon .support-back, .tok-theme-neon .random-chat-back,
+.tok-theme-neon .public-profile-back {
+  color: var(--tok-text);
+  background: var(--tok-surface-2);
+  border-color: var(--tok-border);
+}
+.tok-theme-neon .admin-tabs button.active {
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  border-color: var(--tok-accent) !important;
+}
+.tok-theme-neon .support-message.admin, .tok-theme-neon .interest-room-message.theirs,
+.tok-theme-neon .random-message.theirs, .tok-theme-neon .admin-message.theirs {
+  background: var(--tok-surface-2) !important;
+  color: var(--tok-text) !important;
+  border-color: var(--tok-border) !important;
+}
+.tok-theme-neon .profile-study { background: var(--tok-surface-2); border-color: var(--tok-border); }
+.tok-theme-neon .profile-study strong { color: var(--tok-text); }
+
+/* More deliberate hover states and a consistent card rhythm. */
+.home-post-card:hover, .home-matches-card:hover, .interest-room-card:hover,
+.confession-card:hover, .achievement-card:hover, .admin-support-card:hover,
+.admin-report-card:hover {
+  border-color: color-mix(in srgb, var(--tok-accent) 30%, var(--tok-border)) !important;
+}
+.tok-theme-light .home-post-card:hover, .tok-theme-light .home-matches-card:hover,
+.tok-theme-light .interest-room-card:hover, .tok-theme-light .confession-card:hover,
+.tok-theme-light .achievement-card:hover {
+  box-shadow: 0 16px 40px rgba(31, 36, 49, .1);
+}
+.tok-theme-neon .home-post-card:hover, .tok-theme-neon .home-matches-card:hover,
+.tok-theme-neon .interest-room-card:hover, .tok-theme-neon .confession-card:hover,
+.tok-theme-neon .achievement-card:hover {
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .25), 0 0 0 1px rgba(255,77,136,.05);
+}
+.match-card:focus-visible { position: relative; z-index: 1; }
+.match-card .match-chat-icon { transition: background .18s ease, color .18s ease, transform .18s ease; }
+.match-card:hover .match-chat-icon { transform: translateX(2px); }
+.notification-page-item:focus-visible, .notification-item:focus-visible { outline-offset: -3px; }
+
+/* Preserve touch targets and prevent overflow on small Android devices. */
+@media (max-width: 420px) {
+  .app-header { padding-inline: 10px; }
+  .app-header-logo { width: 82px; flex-basis: 82px; }
+  .app-header-logo img { max-width: 82px; }
+  .app-header-actions { gap: 5px; }
+  .header-action, .notification-bell-button { width: 36px; height: 36px; border-radius: 11px; }
+  .header-profile-button { width: 37px; height: 37px; }
+  .home-welcome { padding: 20px 17px; }
+  .match-card { gap: 9px; padding-inline: 10px; }
+  .match-info strong { font-size: 13px; }
+  .match-info span { font-size: 11px; }
+  .matches-heading h1 { font-size: 28px; }
+  .matches-refresh { width: 36px; height: 36px; flex-basis: 36px; }
+  .notifications-heading-actions > button { font-size: 11px; }
+  .bottom-nav { width: calc(100% - 16px); gap: 2px; border-radius: 18px; }
+  .bottom-nav-item { border-radius: 13px; font-size: 8px; }
+}
