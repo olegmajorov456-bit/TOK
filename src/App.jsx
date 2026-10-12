@@ -20,7 +20,6 @@ import PublicProfile from "./PublicProfile";
 import Header from "./Header";
 import BottomNav from "./BottomNav";
 import "./App.css";
-import "./DesignSystem.css";
 
 const DEFAULT_HOME_SETTINGS = {
   title: "Общайся. Знакомься. Находи своих.",
