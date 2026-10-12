@@ -1,6 +1,9 @@
 package ru.tok.ispu;
 
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import android.net.Uri;
 import android.os.Bundle;
+import android.content.pm.PackageManager;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.view.WindowManager;
@@ -28,6 +32,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -94,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         ViewCompat.requestApplyInsets(appRoot);
 
         configureWebView();
+        createNotificationChannel();
+        requestNotificationPermissionIfNeeded();
         configureBackNavigation();
 
         if (savedInstanceState == null) {
@@ -235,6 +242,50 @@ public class MainActivity extends AppCompatActivity {
     private void showUpdateError(String message) {
         runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) new AlertDialog.Builder(this).setTitle("Обновление ТОК").setMessage(message).setPositiveButton("ОК", null).show(); });
     }
+
+    private static final String TOK_NOTIFICATION_CHANNEL = "tok_activity";
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    TOK_NOTIFICATION_CHANNEL, "Уведомления ТОК", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Новые сообщения и симпатии в ТОК");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(channel);
+        }
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 2207);
+        }
+    }
+
+    private static class TokNotificationBridge {
+        private final MainActivity activity;
+        TokNotificationBridge(MainActivity activity) { this.activity = activity; }
+
+        @JavascriptInterface
+        public void showNotification(String title, String body) {
+            activity.runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT >= 33
+                        && activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
+                Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                        ? new Notification.Builder(activity, TOK_NOTIFICATION_CHANNEL)
+                        : new Notification.Builder(activity);
+                builder.setSmallIcon(ru.tok.ispu.R.drawable.ic_tok_heart)
+                        .setContentTitle(title == null || title.isEmpty() ? "ТОК" : title.substring(0, Math.min(title.length(), 80)))
+                        .setContentText(body == null ? "" : body.substring(0, Math.min(body.length(), 180)))
+                        .setAutoCancel(true)
+                        .setCategory(Notification.CATEGORY_MESSAGE)
+                        .setPriority(Notification.PRIORITY_HIGH);
+                NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (manager != null) manager.notify((int) (System.currentTimeMillis() & 0x7fffffff), builder.build());
+            });
+        }
+    }
+
     private void configureWebView() {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -260,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
         cookies.setAcceptThirdPartyCookies(webView, true);
 
         webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+        webView.addJavascriptInterface(new TokNotificationBridge(this), "TOKNative");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
