@@ -1,0 +1,1000 @@
+/* ===================================================================
+   TOK — ENERGY SYSTEM
+   Концепция: "ЭНЕРГИЯ ВСТРЕЧИ" — цифровая среда для знакомств в ИГЭУ
+   Тёмная база + электрический жёлтый акцент + крупная типографика
+   =================================================================== */
+
+/* ─── 1. Палитра ─────────────────────────────────────────────── */
+:root,
+.app-shell.tok-theme-light, .tok-theme-light, .tok-auth-light, .tok-onboarding-light,
+.app-shell.tok-theme-neon, .tok-theme-neon, .tok-auth-neon, .tok-onboarding-neon {
+  --tok-bg: #0e0e10;
+  --tok-surface: #16161a;
+  --tok-surface-2: #1e1e24;
+  --tok-surface-3: #26262e;
+  --tok-border: #2a2a32;
+  --tok-border-soft: #1f1f26;
+  --tok-text: #f0f0ee;
+  --tok-text-muted: #9a9a94;
+  --tok-text-dim: #5a5a54;
+  --tok-accent: #ffde3a;
+  --tok-accent-hover: #ffe666;
+  --tok-accent-soft: rgba(255, 222, 58, .12);
+  --tok-accent-strong: #ffd000;
+  --tok-coral: #ff5e3a;
+  --tok-coral-soft: rgba(255, 94, 58, .12);
+  --tok-blue: #5b8def;
+  --tok-blue-soft: rgba(91, 141, 239, .12);
+  --tok-green: #4ade80;
+  --tok-gradient: linear-gradient(135deg, #ffde3a 0%, #ff9533 100%);
+  --tok-gradient-soft: linear-gradient(135deg, rgba(255, 222, 58, .18), rgba(255, 149, 51, .08));
+  --tok-shadow-lg: 0 24px 48px rgba(0, 0, 0, .4);
+  --tok-shadow-md: 0 12px 28px rgba(0, 0, 0, .3);
+  --tok-shadow-sm: 0 4px 14px rgba(0, 0, 0, .25);
+  --tok-radius-xl: 28px;
+  --tok-radius-lg: 22px;
+  --tok-radius-md: 14px;
+  --tok-radius-sm: 10px;
+  --tok-radius-pill: 999px;
+  --tok-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+  --tok-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+  --tok-shell-background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 222, 58, .08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 94, 58, .05), transparent 60%),
+    #0e0e10;
+  --tok-page-background: #0e0e10;
+}
+
+/* Базовые цвета всегда тёмные */
+html, body { background: var(--tok-bg); color: var(--tok-text); }
+html:has(.tok-theme-light), html:has(.tok-theme-neon),
+html:has(.tok-auth-light), html:has(.tok-auth-neon),
+html:has(.tok-onboarding-light), html:has(.tok-onboarding-neon) {
+  background: var(--tok-bg); color-scheme: dark;
+}
+body, .app-shell, .app-content { background: transparent; color: var(--tok-text); }
+
+/* ─── 2. Базовые элементы ────────────────────────────────────── */
+.app-shell {
+  background: var(--tok-shell-background) !important;
+  font-family: var(--tok-font-display);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+.app-content { background: transparent !important; }
+h1, h2, h3, h4, strong { color: var(--tok-text) !important; letter-spacing: -.03em; font-weight: 750; }
+p, span, small, label { color: var(--tok-text-muted); }
+::selection { background: var(--tok-accent); color: #0e0e10; }
+
+/* Скроллбары */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a32; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
+
+/* ─── 3. Шапка (Header) ──────────────────────────────────────── */
+.app-header {
+  height: 68px !important;
+  padding: 0 24px !important;
+  background: rgba(14, 14, 16, .85) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--tok-border) !important;
+  box-shadow: none !important;
+}
+.app-header::after { display: none !important; }
+.app-header-logo { flex: 0 0 84px !important; width: 84px !important; height: 34px !important; }
+.app-header-logo-image, .app-header-logo img { filter: brightness(0) invert(1); }
+.app-header-actions { gap: 10px !important; }
+.header-action, .notification-bell-button {
+  width: 42px !important; height: 42px !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text-muted) !important;
+  box-shadow: none !important;
+  transition: all .2s ease;
+}
+.header-action:hover, .notification-bell-button:hover, .notification-bell-button.open {
+  background: var(--tok-accent-soft) !important;
+  border-color: var(--tok-accent) !important;
+  color: var(--tok-accent) !important;
+  transform: translateY(-1px);
+}
+.header-profile-button {
+  width: 42px !important; height: 42px !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  padding: 3px !important;
+  box-shadow: none !important;
+  transition: all .2s ease;
+}
+.header-profile-button:hover { border-color: var(--tok-accent) !important; }
+.header-profile-avatar-wrap { border-color: var(--tok-border) !important; }
+.header-profile-button:hover .header-profile-avatar-wrap { border-color: var(--tok-accent) !important; }
+
+/* ─── 4. Нижняя навигация ────────────────────────────────────── */
+.bottom-nav {
+  width: min(520px, calc(100% - 32px)) !important;
+  height: 72px !important;
+  bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  padding: 8px !important;
+  gap: 6px !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-xl) !important;
+  background: rgba(22, 22, 26, .88) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: var(--tok-shadow-lg) !important;
+}
+.bottom-nav-item {
+  height: 56px !important;
+  border-radius: 18px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .02em;
+  color: var(--tok-text-muted) !important;
+  transition: all .2s ease;
+}
+.bottom-nav-item:hover {
+  background: var(--tok-surface-2) !important;
+  color: var(--tok-text) !important;
+}
+.bottom-nav-item.active {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-weight: 750 !important;
+  box-shadow: 0 0 0 4px rgba(255, 222, 58, .12), var(--tok-shadow-sm);
+}
+.bottom-nav-item.active::after { display: none !important; }
+
+/* ─── 5. Общие контейнеры и карточки ─────────────────────────── */
+.home-feed, .discovery-container, .matches-container, .profile-container,
+.notifications-container, .feature-container, .interest-rooms-container {
+  width: min(100% - 32px, 920px) !important;
+  max-width: 920px !important;
+}
+:is(.home-page, .discovery-page, .matches-page, .profile-page, .notifications-page,
+    .feature-page, .interest-rooms-page) {
+  padding: 32px 0 140px !important;
+  background: transparent !important;
+}
+
+/* Базовая карточка */
+:is(.home-profile-card, .home-post-card, .home-matches-card, .home-tip,
+    .home-feature-section, .home-activity-tile,
+    .discovery-card, .filters-panel, .discovery-empty,
+    .matches-list, .matches-empty,
+    .profile-card, .profile-details, .profile-section, .profile-theme-section,
+    .notifications-list, .notifications-empty,
+    .confession-card, .confession-composer, .achievement-card, .achievement-level-card,
+    .interest-room-card, .public-profile-card, .random-chat-card) {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+  box-shadow: none !important;
+  transition: border-color .2s ease, transform .2s ease;
+}
+:is(.home-profile-card, .home-post-card, .home-matches-card,
+    .match-card, .home-activity-tile, .confession-card, .achievement-card, .interest-room-card):hover {
+  border-color: var(--tok-border);
+  transform: translateY(-1px);
+}
+
+/* ─── 6. Главная (Home) — "Hero" блок ────────────────────────── */
+.home-feed {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 20px !important;
+  padding: 32px 0 140px !important;
+}
+.home-welcome {
+  position: relative;
+  grid-column: 1 / -1;
+  padding: 48px 40px !important;
+  border-radius: var(--tok-radius-xl) !important;
+  background: 
+    linear-gradient(135deg, rgba(255, 222, 58, .08) 0%, transparent 60%),
+    var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  overflow: hidden;
+  min-height: 240px;
+}
+.home-welcome::before {
+  content: "";
+  position: absolute;
+  top: -40%; right: -10%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255, 222, 58, .12) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.home-welcome::after {
+  content: "01";
+  position: absolute;
+  top: 24px; left: 32px;
+  font-family: var(--tok-font-mono);
+  font-size: 11px;
+  color: var(--tok-accent);
+  letter-spacing: .15em;
+  z-index: 2;
+  opacity: .8;
+}
+.home-welcome > * { position: relative; z-index: 1; }
+.home-welcome-art { display: none !important; }
+.home-welcome-small {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px !important;
+  margin: 0 0 20px !important;
+  background: var(--tok-accent-soft) !important;
+  border: 1px solid rgba(255, 222, 58, .2) !important;
+  border-radius: var(--tok-radius-pill) !important;
+  color: var(--tok-accent) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 10px !important;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.home-welcome-small::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--tok-accent);
+  box-shadow: 0 0 8px var(--tok-accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+.home-welcome h1 {
+  margin: 0 0 16px !important;
+  color: var(--tok-text) !important;
+  font-size: clamp(32px, 4.5vw, 52px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.04em !important;
+  font-weight: 850 !important;
+  max-width: 680px;
+}
+.home-welcome h1::first-word { color: var(--tok-accent); }
+.home-welcome p:last-child {
+  margin: 0 !important;
+  color: var(--tok-text-muted) !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  max-width: 520px;
+}
+
+/* Сетка активностей */
+.home-activity-grid {
+  grid-column: 1 / -1;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 14px !important;
+}
+.home-activity-tile {
+  padding: 18px !important;
+  border-radius: var(--tok-radius-md) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  transition: all .25s ease;
+  cursor: pointer;
+}
+.home-activity-tile:hover {
+  border-color: var(--tok-accent) !important;
+  transform: translateY(-2px);
+}
+.home-activity-tile:hover .home-activity-icon {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+.home-activity-icon {
+  width: 40px !important; height: 40px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-surface-2) !important;
+  color: var(--tok-accent) !important;
+  transition: all .25s ease;
+  margin-bottom: 12px;
+}
+.home-activity-copy strong {
+  display: block;
+  color: var(--tok-text) !important;
+  font-size: 22px !important;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-family: var(--tok-font-display);
+}
+.home-activity-copy small {
+  color: var(--tok-text-muted) !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 500;
+}
+.home-activity-arrow { color: var(--tok-text-dim) !important; }
+.home-activity-status {
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 9px !important;
+}
+
+/* Карточка профиля на главной */
+.home-profile-card {
+  grid-column: 1 / -1;
+  padding: 20px 24px !important;
+  border-radius: var(--tok-radius-lg) !important;
+}
+.home-profile-avatar {
+  width: 64px !important; height: 64px !important;
+  border-radius: 18px !important;
+  background: var(--tok-surface-2) !important;
+  outline: 2px solid var(--tok-border) !important;
+  outline-offset: 2px;
+}
+.home-profile-name {
+  color: var(--tok-text) !important;
+  font-size: 16px !important;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.home-profile-meta { color: var(--tok-text-muted) !important; font-size: 12px; margin-top: 2px; }
+.home-profile-link {
+  color: var(--tok-accent) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* Карточка знакомств (CTA) */
+.home-discovery-card {
+  position: relative;
+  grid-column: 1 / -1;
+  padding: 32px !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-xl) !important;
+  overflow: hidden;
+}
+.home-discovery-card::before {
+  content: "02";
+  position: absolute;
+  top: 24px; right: 28px;
+  font-family: var(--tok-font-mono);
+  font-size: 11px;
+  color: var(--tok-accent);
+  letter-spacing: .15em;
+  opacity: .8;
+  z-index: 2;
+}
+.home-discovery-card::after {
+  content: "";
+  position: absolute;
+  bottom: -30%; right: -10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255, 94, 58, .12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.home-card-top { margin-bottom: 20px !important; }
+.home-card-avatar {
+  width: 44px !important; height: 44px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-coral-soft) !important;
+  color: var(--tok-coral) !important;
+  font-size: 20px !important;
+}
+.home-card-top strong {
+  font-family: var(--tok-font-mono);
+  font-size: 11px !important;
+  color: var(--tok-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-weight: 500;
+}
+.home-card-top span {
+  color: var(--tok-text-dim) !important;
+  font-size: 11px !important;
+  margin-top: 2px;
+}
+.home-discovery-content h2 {
+  color: var(--tok-text) !important;
+  font-size: clamp(26px, 3vw, 36px) !important;
+  letter-spacing: -.03em !important;
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  margin: 0 0 12px !important;
+}
+.home-discovery-content p {
+  color: var(--tok-text-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  margin: 0 0 24px !important;
+}
+.home-discovery-button {
+  width: auto !important;
+  display: inline-flex !important;
+  padding: 16px 28px !important;
+  margin: 0 !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  letter-spacing: .02em;
+  box-shadow: 0 0 0 0 rgba(255, 222, 58, .4);
+  transition: all .25s ease;
+}
+.home-discovery-button:hover {
+  background: var(--tok-accent-hover) !important;
+  box-shadow: 0 0 0 8px rgba(255, 222, 58, .15);
+  transform: translateY(-1px);
+}
+.home-discovery-button span { margin-left: 10px; font-size: 16px; }
+
+/* Карточка поста и мэтчей */
+.home-post-card, .home-matches-card {
+  padding: 24px !important;
+}
+.home-post-header { margin-bottom: 16px !important; }
+.home-post-icon {
+  width: 42px !important; height: 42px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+}
+.home-post-header strong {
+  font-family: var(--tok-font-mono);
+  font-size: 11px !important;
+  color: var(--tok-text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.home-post-header span { color: var(--tok-text-dim) !important; }
+.home-post-card h3 {
+  color: var(--tok-text) !important;
+  font-size: 20px !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0 0 10px !important;
+}
+.home-post-card p { color: var(--tok-text-muted) !important; font-size: 13px; line-height: 1.6; }
+.home-matches-icon {
+  width: 44px !important; height: 44px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-coral-soft) !important;
+  color: var(--tok-coral) !important;
+  font-size: 20px !important;
+}
+.home-matches-info strong {
+  color: var(--tok-text) !important;
+  font-size: 15px !important;
+  font-weight: 700;
+}
+.home-matches-info p { color: var(--tok-text-muted) !important; font-size: 12px; margin-top: 2px; }
+
+/* Feature-секция */
+.home-feature-section {
+  padding: 24px !important;
+  grid-column: 1 / -1;
+  position: relative;
+}
+.home-feature-section::before {
+  content: "03";
+  position: absolute;
+  top: 24px; right: 28px;
+  font-family: var(--tok-font-mono);
+  font-size: 11px;
+  color: var(--tok-accent);
+  letter-spacing: .15em;
+  opacity: .8;
+}
+.home-feature-heading h2 {
+  color: var(--tok-text) !important;
+  font-size: 18px !important;
+  letter-spacing: -.02em !important;
+  margin: 0 0 16px !important;
+}
+.home-feature-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; }
+.home-feature-card {
+  padding: 14px !important;
+  border-radius: var(--tok-radius-md) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border-soft) !important;
+  transition: all .2s ease;
+}
+.home-feature-card:hover {
+  border-color: var(--tok-accent) !important;
+  background: var(--tok-surface-3) !important;
+}
+.home-feature-icon {
+  width: 36px !important; height: 36px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  margin-bottom: 8px;
+}
+.home-feature-copy strong {
+  color: var(--tok-text) !important;
+  font-size: 13px !important;
+  font-weight: 650;
+}
+.home-feature-copy small { color: var(--tok-text-muted) !important; font-size: 11px; }
+
+/* Tip / подсказка */
+.home-tip {
+  grid-column: 1 / -1;
+  padding: 18px 22px !important;
+  background: var(--tok-accent-soft) !important;
+  border: 1px solid rgba(255, 222, 58, .2) !important;
+}
+.home-tip p { color: var(--tok-accent) !important; font-size: 13px; }
+
+/* ─── 7. Знакомства (Discovery) ─────────────────────────────── */
+.discovery-page { padding-top: 32px !important; }
+.discovery-header h1 {
+  color: var(--tok-text) !important;
+  font-size: clamp(28px, 4vw, 40px) !important;
+  letter-spacing: -.035em !important;
+  margin: 0 0 12px !important;
+  font-weight: 850 !important;
+}
+.discovery-header p { color: var(--tok-text-muted) !important; font-size: 14px; margin: 0 0 24px; }
+.discovery-kicker {
+  color: var(--tok-accent) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 11px !important;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.filters-panel {
+  padding: 18px !important;
+  margin-bottom: 20px !important;
+  border-radius: var(--tok-radius-md) !important;
+}
+.filters-toggle {
+  padding: 10px 18px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.filter-grid label {
+  color: var(--tok-text-muted) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 10px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.filter-grid select, .filter-grid input {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text) !important;
+  padding: 10px 14px !important;
+  min-height: 42px !important;
+}
+.filter-grid select:focus, .filter-grid input:focus {
+  border-color: var(--tok-accent) !important;
+  outline: none;
+}
+.filters-actions button {
+  padding: 10px 18px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  border: 0 !important;
+}
+.filters-actions .filters-reset {
+  background: var(--tok-surface-2) !important;
+  color: var(--tok-text) !important;
+  border: 1px solid var(--tok-border) !important;
+}
+
+/* Карточка знакомств */
+.discovery-card {
+  border-radius: var(--tok-radius-xl) !important;
+  overflow: hidden;
+}
+.discovery-photo { background: var(--tok-surface-2); aspect-ratio: 3/4; }
+.discovery-photo img { object-position: center 40%; }
+.discovery-content {
+  padding: 24px !important;
+  background: var(--tok-surface) !important;
+}
+.discovery-info h2, .discovery-info h3, .discovery-info strong {
+  color: var(--tok-text) !important;
+  font-size: 22px !important;
+  letter-spacing: -.02em !important;
+  font-weight: 750;
+}
+.discovery-description { color: var(--tok-text-muted) !important; font-size: 13px; line-height: 1.6; margin: 8px 0 16px; }
+.hobbies { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.hobbies span, .hobby-tag {
+  padding: 5px 12px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 11px !important;
+  font-weight: 500;
+}
+
+/* Панель действий */
+.discovery-actions {
+  padding: 20px !important;
+  background: var(--tok-surface) !important;
+  border-top: 1px solid var(--tok-border);
+  gap: 16px !important;
+}
+.discovery-actions .discovery-button {
+  width: 56px !important; height: 56px !important;
+  border-radius: 50% !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text-muted) !important;
+  transition: all .2s ease;
+}
+.discovery-actions .discovery-button:hover {
+  background: var(--tok-surface-3) !important;
+  border-color: var(--tok-accent) !important;
+  color: var(--tok-accent) !important;
+  transform: scale(1.08);
+}
+.discovery-actions .discovery-button.like {
+  width: 72px !important; height: 72px !important;
+  background: var(--tok-accent) !important;
+  border: 0 !important;
+  color: #0e0e10 !important;
+  box-shadow: 0 0 0 4px rgba(255, 222, 58, .12), var(--tok-shadow-md);
+}
+.discovery-actions .discovery-button.like:hover {
+  background: var(--tok-accent-hover) !important;
+  box-shadow: 0 0 0 8px rgba(255, 222, 58, .18), var(--tok-shadow-lg);
+  transform: scale(1.06);
+}
+.discovery-actions .discovery-button.superlike {
+  background: var(--tok-blue-soft) !important;
+  border-color: var(--tok-blue) !important;
+  color: var(--tok-blue) !important;
+}
+.discovery-actions .discovery-button.skip {
+  background: var(--tok-coral-soft) !important;
+  border-color: var(--tok-coral) !important;
+  color: var(--tok-coral) !important;
+}
+
+/* Пустое состояние */
+.discovery-empty, .matches-empty, .notifications-empty {
+  padding: 60px 32px !important;
+  text-align: center;
+}
+.discovery-empty h2, .matches-empty h2, .notifications-empty h2 {
+  color: var(--tok-text) !important;
+  font-size: 24px !important;
+  margin: 0 0 12px !important;
+}
+.discovery-empty p, .matches-empty p, .notifications-empty p {
+  color: var(--tok-text-muted) !important;
+  font-size: 14px;
+  max-width: 420px;
+  margin: 0 auto 24px;
+}
+.matches-home-button, .empty-home-button {
+  padding: 14px 28px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  border: 0 !important;
+}
+
+/* ─── 8. Мэтчи (Matches) ─────────────────────────────────────── */
+.matches-heading, .notifications-heading, .feature-heading, .interest-rooms-heading {
+  margin-bottom: 28px !important;
+  gap: 16px !important;
+  position: relative;
+}
+.matches-heading::before, .notifications-heading::before, .feature-heading::before, .interest-rooms-heading::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--tok-accent);
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.matches-heading h1, .notifications-heading h1, .feature-heading h1, .interest-rooms-heading h1 {
+  color: var(--tok-text) !important;
+  font-size: clamp(28px, 4vw, 38px) !important;
+  letter-spacing: -.035em !important;
+  margin: 0 !important;
+  font-weight: 850 !important;
+}
+.matches-heading p, .notifications-heading p, .feature-heading p, .interest-rooms-heading p {
+  color: var(--tok-text-muted) !important;
+  font-size: 14px !important;
+  margin: 6px 0 0 !important;
+}
+.matches-title-heart { color: var(--tok-accent) !important; }
+
+/* Список мэтчей */
+.matches-list {
+  border-radius: var(--tok-radius-lg) !important;
+  overflow: hidden;
+}
+.match-card {
+  min-height: 82px !important;
+  padding: 14px 18px !important;
+  background: var(--tok-surface) !important;
+  border-bottom: 1px solid var(--tok-border) !important;
+  transition: background .15s ease;
+}
+.match-card:hover { background: var(--tok-surface-2) !important; }
+.match-card:last-child { border-bottom: 0 !important; }
+.match-avatar {
+  width: 54px !important; height: 54px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--tok-accent) !important;
+  padding: 2px;
+  background: var(--tok-surface) !important;
+}
+.match-avatar img { border-radius: 50%; }
+.match-info strong {
+  color: var(--tok-text) !important;
+  font-size: 14px !important;
+  font-weight: 650;
+}
+.match-info span {
+  color: var(--tok-text-muted) !important;
+  font-size: 12px !important;
+  margin-top: 2px;
+}
+.match-chat-icon {
+  width: 38px !important; height: 38px !important;
+  border-radius: 50% !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  transition: all .2s ease;
+}
+.match-card:hover .match-chat-icon {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+.matches-refresh {
+  width: 42px !important; height: 42px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text-muted) !important;
+  transition: all .2s ease;
+}
+.matches-refresh:hover {
+  border-color: var(--tok-accent) !important;
+  color: var(--tok-accent) !important;
+  transform: rotate(-45deg);
+}
+
+/* ─── 9. Чат ─────────────────────────────────────────────────── */
+.chat-page {
+  background: var(--tok-bg) !important;
+}
+.chat-header {
+  background: rgba(14, 14, 16, .9) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--tok-border) !important;
+}
+.chat-back {
+  width: 42px !important; height: 42px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+}
+.chat-avatar {
+  width: 44px !important; height: 44px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--tok-accent) !important;
+  background: var(--tok-surface-2) !important;
+}
+.chat-user strong { color: var(--tok-text) !important; font-size: 14px !important; font-weight: 650; }
+.chat-user span { color: var(--tok-text-muted) !important; font-size: 11px !important; font-family: var(--tok-font-mono); }
+.chat-messages { padding: 20px 16px 140px !important; }
+.chat-message {
+  padding: 12px 16px !important;
+  border-radius: var(--tok-radius-md) !important;
+  font-size: 14px !important;
+  line-height: 1.5;
+  max-width: min(82%, 540px) !important;
+  margin-bottom: 8px;
+}
+.chat-message.mine {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  border-bottom-right-radius: 4px !important;
+  font-weight: 500;
+  box-shadow: var(--tok-shadow-sm);
+}
+.chat-message.theirs {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  border-bottom-left-radius: 4px !important;
+}
+.chat-message-time { color: var(--tok-text-dim) !important; font-size: 10px !important; font-family: var(--tok-font-mono); }
+.chat-input-area {
+  padding: 12px !important;
+  border-radius: var(--tok-radius-lg) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  box-shadow: var(--tok-shadow-md);
+}
+.chat-input-area input {
+  background: transparent !important;
+  color: var(--tok-text) !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+.chat-input-area input::placeholder { color: var(--tok-text-dim); }
+.chat-input-area button[type="submit"] {
+  width: 42px !important; height: 42px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  border: 0 !important;
+}
+.chat-empty > div {
+  width: 64px !important; height: 64px !important;
+  border-radius: 50% !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+}
+.chat-empty strong { color: var(--tok-text) !important; }
+.chat-empty p { color: var(--tok-text-muted) !important; }
+
+/* ─── 10. Профиль ────────────────────────────────────────────── */
+.profile-container { max-width: 720px !important; }
+.profile-card {
+  border-radius: var(--tok-radius-xl) !important;
+  overflow: hidden;
+}
+.profile-photo-wrapper { background: var(--tok-surface-2); aspect-ratio: 1; max-height: 480px; }
+.profile-photo-wrapper::after {
+  background: linear-gradient(to top, rgba(14, 14, 16, .8), transparent 60%) !important;
+}
+.change-photo-button {
+  padding: 10px 18px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: rgba(14, 14, 16, .7) !important;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .2) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.profile-identity {
+  padding: 28px 28px 20px !important;
+  background: var(--tok-surface) !important;
+}
+.profile-name-block h1 {
+  color: var(--tok-text) !important;
+  font-size: 28px !important;
+  letter-spacing: -.03em !important;
+  font-weight: 850 !important;
+}
+.profile-status {
+  color: var(--tok-text-muted) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 11px !important;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.profile-status-dot { background: var(--tok-green) !important; box-shadow: 0 0 0 3px rgba(74, 222, 128, .2); }
+.profile-study {
+  padding: 14px 18px !important;
+  border-radius: var(--tok-radius-md) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  margin-top: 16px;
+}
+.profile-study strong { color: var(--tok-text) !important; font-size: 13px; }
+.profile-study span { color: var(--tok-text-muted) !important; font-size: 12px; }
+.profile-details, .profile-section, .profile-theme-section {
+  margin: 16px 24px 0 !important;
+  padding: 22px !important;
+  border-radius: var(--tok-radius-md) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+}
+.profile-details { margin-top: 0 !important; }
+.profile-details-heading, .profile-section h3, .profile-theme-title strong {
+  color: var(--tok-text) !important;
+  font-size: 14px !important;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin-bottom: 16px !important;
+}
+.profile-detail-grid { gap: 10px !important; }
+.profile-detail-item {
+  padding: 12px 14px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+}
+.profile-detail-item .detail-icon {
+  width: 32px !important; height: 32px !important;
+  border-radius: 8px !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+}
+.profile-detail-item small {
+  color: var(--tok-text-dim) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 9px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.profile-detail-item strong { color: var(--tok-text) !important; font-size: 13px; font-weight: 600; }
+.profile-description { color: var(--tok-text-muted) !important; font-size: 13px; line-height: 1.6; }
+.profile-actions { padding: 24px !important; display: flex; flex-direction: column; gap: 10px; }
+.profile-primary-button, .profile-save-button {
+  min-height: 48px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-weight: 750;
+  font-size: 13px !important;
+  border: 0 !important;
+  box-shadow: 0 0 0 0 rgba(255, 222, 58, .3);
+  transition: all .25s ease;
+}
+.profile-primary-button:hover, .profile-save-button:hover {
+  box-shadow: 0 0 0 8px rgba(255, 222, 58, .15);
+  transform: translateY(-1px);
+}
+.profile-admin-button, .profile-logout-button, .profile-cancel-button, .profile-delete-account-button {
+  min-height: 46px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 13px !important;
+  font-weight: 600;
+}
+.profile-logout-button, .profile-delete-account-button {
+  border-color: rgba(255, 94, 58, .3) !important;
+  color: var(--tok-coral) !important;
+}
+.profile-edit-form { padding: 24px !important; }
+.profile-edit-form label {
+  color: var(--tok-text-muted) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 10px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.profile-edit-form input, .profile-edit-form select, .profile-edit-form textarea {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text) !important;
+  padding: 12px 16px !important;
+  min-height: 44px !important;
+}
+.profile-edit-form input:focus, .profile-edit-form select:focus, .profile-edit-form textarea:focus {
+  border-color: var(--tok-accent) !important;
+  outline: none;
