@@ -998,3 +998,543 @@ p, span, small, label { color: var(--tok-text-muted); }
 .profile-edit-form input:focus, .profile-edit-form select:focus, .profile-edit-form textarea:focus {
   border-color: var(--tok-accent) !important;
   outline: none;
+}
+.profile-theme-options { gap: 12px !important; }
+.profile-theme-option {
+  padding: 14px !important;
+  border-radius: var(--tok-radius-md) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+}
+.profile-theme-option.active {
+  border-color: var(--tok-accent) !important;
+  background: var(--tok-accent-soft) !important;
+  box-shadow: 0 0 0 2px rgba(255, 222, 58, .2) !important;
+}
+
+/* ─── 11. Уведомления ────────────────────────────────────────── */
+.notifications-list {
+  border-radius: var(--tok-radius-lg) !important;
+  overflow: hidden;
+}
+.notification-page-item {
+  padding: 16px 18px !important;
+  background: var(--tok-surface) !important;
+  border-bottom: 1px solid var(--tok-border) !important;
+  transition: background .15s ease;
+}
+.notification-page-item:hover { background: var(--tok-surface-2) !important; }
+.notification-page-item:last-child { border-bottom: 0 !important; }
+.notification-page-item.unread { background: var(--tok-accent-soft) !important; border-left: 3px solid var(--tok-accent) !important; }
+.notification-page-icon {
+  width: 40px !important; height: 40px !important;
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+}
+.notification-page-copy strong { color: var(--tok-text) !important; font-size: 13px !important; font-weight: 600; }
+.notification-page-copy span { color: var(--tok-text-muted) !important; font-size: 12px; line-height: 1.5; }
+.notification-page-copy small { color: var(--tok-text-dim) !important; font-size: 10px !important; font-family: var(--tok-font-mono); margin-top: 4px; }
+.notification-unread-dot { background: var(--tok-accent) !important; box-shadow: 0 0 6px var(--tok-accent); }
+.notifications-heading-actions { gap: 8px !important; }
+.notifications-read-all {
+  padding: 10px 18px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  border: 0 !important;
+}
+.notifications-filters { gap: 8px !important; margin: 0 0 20px !important; }
+.notifications-filters button {
+  padding: 8px 16px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text-muted) !important;
+  font-size: 11px !important;
+  font-weight: 600;
+}
+.notifications-filters button.active {
+  background: var(--tok-accent) !important;
+  border-color: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+
+/* Панель уведомлений (dropdown) */
+.notification-panel {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+  box-shadow: var(--tok-shadow-lg) !important;
+}
+.notification-panel-header { border-bottom: 1px solid var(--tok-border); padding: 14px 16px; }
+.notification-panel-header h2 { color: var(--tok-text) !important; font-size: 14px !important; }
+.notification-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--tok-border-soft);
+  background: var(--tok-surface) !important;
+}
+.notification-item:hover, .notification-item.unread { background: var(--tok-surface-2) !important; }
+.notification-item-top strong { color: var(--tok-text) !important; font-size: 13px; }
+.notification-item-content p { color: var(--tok-text-muted) !important; font-size: 12px; }
+
+/* ─── 12. Дополнительные страницы ────────────────────────────── */
+.confession-card, .confession-composer, .achievement-card, .achievement-level-card,
+.interest-room-card, .random-chat-card, .public-profile-card {
+  padding: 22px !important;
+}
+.confession-card h2, .confession-card h3, .confession-card strong,
+.confession-composer h2, .confession-composer h3, .confession-composer strong,
+.achievement-card h2, .achievement-card h3, .achievement-card strong,
+.interest-room-card h2, .interest-room-card h3, .interest-room-card strong {
+  color: var(--tok-text) !important;
+  font-size: 16px !important;
+  letter-spacing: -.01em;
+  margin: 0 0 10px !important;
+}
+.confession-card p, .confession-card small, .confession-card time,
+.confession-composer p, .confession-composer small,
+.achievement-card p, .achievement-card small,
+.interest-room-card p, .interest-room-card small {
+  color: var(--tok-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.confession-composer textarea, .interest-room-composer textarea, .random-chat-composer textarea {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text) !important;
+  padding: 12px 14px !important;
+}
+.confession-composer button[type="submit"], .interest-room-composer button,
+.random-chat-welcome button, .random-chat-ended button, .support-page button[type="submit"] {
+  padding: 12px 24px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-weight: 700;
+  font-size: 13px !important;
+  border: 0 !important;
+}
+.achievement-level-card { background: var(--tok-gradient-soft) !important; border-color: rgba(255, 222, 58, .2) !important; }
+.achievement-level-icon, .achievement-icon {
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  border-radius: var(--tok-radius-sm) !important;
+}
+.achievement-progress-track { background: var(--tok-surface-2); border-radius: var(--tok-radius-pill); }
+.achievement-progress-track > span { background: var(--tok-accent) !important; }
+
+/* Комнаты по интересам */
+.interest-rooms-hero {
+  padding: 24px !important;
+  border-radius: var(--tok-radius-lg) !important;
+  background: var(--tok-gradient-soft) !important;
+  border: 1px solid rgba(255, 222, 58, .15) !important;
+  margin-bottom: 20px;
+}
+.interest-rooms-hero-icon {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  border-radius: var(--tok-radius-sm) !important;
+}
+
+/* Случайный чат */
+.random-chat-header {
+  background: var(--tok-surface) !important;
+  border-color: var(--tok-border) !important;
+}
+.random-chat-welcome, .random-chat-ended, .random-chat-searching {
+  padding: 32px 24px !important;
+  text-align: center;
+}
+.random-chat-welcome h1, .random-chat-welcome h2, .random-chat-ended h1, .random-chat-searching h1 {
+  color: var(--tok-text) !important;
+  font-size: 24px !important;
+  letter-spacing: -.02em;
+  margin: 0 0 12px !important;
+}
+.random-chat-welcome p, .random-chat-rules, .random-chat-ended p, .random-chat-searching p {
+  color: var(--tok-text-muted) !important;
+  font-size: 14px;
+}
+.random-message.mine {
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  border-bottom-right-radius: 4px !important;
+}
+.random-message.theirs {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  border-bottom-left-radius: 4px !important;
+}
+.random-chat-composer {
+  background: var(--tok-surface) !important;
+  border-color: var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+  padding: 12px !important;
+}
+.random-chat-composer input {
+  background: transparent !important;
+  color: var(--tok-text) !important;
+}
+.random-chat-composer button {
+  border-radius: var(--tok-radius-sm) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+
+/* Публичный профиль */
+.public-profile-card { padding: 24px !important; }
+.public-profile-content h1 { color: var(--tok-text) !important; font-size: 28px !important; letter-spacing: -.03em; }
+.public-profile-section h3 { color: var(--tok-text) !important; font-size: 16px !important; margin: 0 0 12px; }
+.public-profile-back {
+  padding: 10px 18px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+
+/* ─── 13. Поддержка и админка ────────────────────────────────── */
+.support-page, .admin-page {
+  background: var(--tok-bg) !important;
+  padding: 32px 0 140px !important;
+}
+.support-header, .admin-header {
+  background: rgba(14, 14, 16, .9) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--tok-border) !important;
+}
+.support-back, .admin-back, .admin-chat-back, .admin-refresh {
+  padding: 8px 16px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.support-header strong, .admin-header h1 { color: var(--tok-text) !important; font-size: 15px !important; }
+.support-header span { color: var(--tok-text-muted) !important; font-size: 12px; }
+.support-messages, .admin-support-card, .admin-report-card, .admin-home-form {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+  padding: 20px !important;
+}
+.support-input, .admin-chat-input {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+  padding: 12px !important;
+}
+.support-input input, .admin-chat-input input {
+  background: transparent !important;
+  color: var(--tok-text) !important;
+}
+.support-message.admin, .admin-support-message.user {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  border-radius: var(--tok-radius-md) !important;
+  padding: 12px 16px !important;
+}
+.admin-tabs { gap: 8px !important; }
+.admin-tabs button {
+  padding: 8px 16px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text-muted) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.admin-tabs button.active {
+  background: var(--tok-accent) !important;
+  border-color: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+.admin-section-heading h2, .admin-support-info strong, .admin-report-top h3 {
+  color: var(--tok-text) !important;
+  font-size: 16px !important;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+.admin-support-info span, .admin-support-info small, .admin-report-date, .admin-empty p {
+  color: var(--tok-text-muted);
+  font-size: 12px;
+}
+.admin-report-users, .admin-report-details {
+  background: var(--tok-surface-2);
+  border-radius: var(--tok-radius-sm);
+  padding: 14px;
+}
+
+/* ─── 14. Экран входа и онбординг ────────────────────────────── */
+.auth-page, .onboarding-page {
+  position: relative;
+  overflow: hidden;
+  padding: 32px 24px !important;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(255, 222, 58, .15), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255, 94, 58, .12), transparent 60%),
+    var(--tok-bg) !important;
+}
+.auth-page::before, .onboarding-page::before {
+  content: "";
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255, 222, 58, .2), transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+.auth-page::after, .onboarding-page::after {
+  content: "";
+  position: absolute;
+  bottom: -100px; left: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255, 94, 58, .15), transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+.auth-card, .onboarding-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px) !important;
+  padding: 40px 32px !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-xl) !important;
+  background: rgba(22, 22, 26, .8) !important;
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  box-shadow: var(--tok-shadow-lg) !important;
+  color: var(--tok-text) !important;
+}
+.auth-logo { max-height: 64px; filter: brightness(0) invert(1); margin-bottom: 24px; }
+.auth-card h2, .onboarding-card h1 {
+  color: var(--tok-text) !important;
+  font-size: clamp(26px, 5vw, 34px) !important;
+  letter-spacing: -.035em !important;
+  line-height: 1.1;
+  margin: 0 0 12px !important;
+}
+.auth-subtitle, .onboarding-subtitle {
+  color: var(--tok-text-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.6;
+  margin: 0 0 28px !important;
+}
+.auth-card label, .onboarding-card label {
+  color: var(--tok-text-muted) !important;
+  font-family: var(--tok-font-mono);
+  font-size: 10px !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+.auth-card input, .onboarding-card input, .onboarding-card select, .onboarding-card textarea {
+  width: 100%;
+  min-height: 48px !important;
+  padding: 0 18px !important;
+  background: rgba(30, 30, 36, .6) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text) !important;
+  font-size: 14px !important;
+  margin-bottom: 14px;
+}
+.auth-card input:focus, .onboarding-card input:focus, .onboarding-card select:focus, .onboarding-card textarea:focus {
+  border-color: var(--tok-accent) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 222, 58, .1);
+}
+.auth-card input::placeholder { color: var(--tok-text-dim); }
+.auth-card form button[type="submit"], .onboarding-card button[type="submit"] {
+  width: 100%;
+  min-height: 50px !important;
+  margin-top: 10px;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-weight: 750;
+  font-size: 14px !important;
+  border: 0 !important;
+  box-shadow: 0 0 0 0 rgba(255, 222, 58, .4);
+  transition: all .25s ease;
+}
+.auth-card form button[type="submit"]:hover, .onboarding-card button[type="submit"]:hover {
+  box-shadow: 0 0 0 8px rgba(255, 222, 58, .15);
+  transform: translateY(-1px);
+}
+.switch-button {
+  width: 100%;
+  min-height: 48px !important;
+  margin-top: 12px;
+  border-radius: var(--tok-radius-pill) !important;
+  background: transparent !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-weight: 600;
+  font-size: 13px !important;
+}
+.switch-button:hover { border-color: var(--tok-accent); color: var(--tok-accent); }
+.auth-message, .auth-verification-help { color: var(--tok-text-muted); font-size: 13px; }
+.auth-verification-card {
+  padding: 20px;
+  background: var(--tok-accent-soft);
+  border: 1px solid rgba(255, 222, 58, .2);
+  border-radius: var(--tok-radius-md);
+  margin-top: 16px;
+}
+.auth-verification-card strong { color: var(--tok-accent) !important; }
+.privacy-check a, .auth-card a { color: var(--tok-accent); }
+
+/* ─── 15. Загрузка ───────────────────────────────────────────── */
+.site-loading {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255, 222, 58, .08), transparent 60%),
+    var(--tok-bg) !important;
+}
+.site-loading-logo img { filter: brightness(0) invert(1); max-width: 120px; }
+.site-loading-spinner {
+  border-color: var(--tok-border) !important;
+  border-top-color: var(--tok-accent) !important;
+  border-right-color: var(--tok-accent) !important;
+}
+.profile-loading { background: var(--tok-bg); }
+.profile-loading-card {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-lg) !important;
+}
+.profile-loading-photo { background: linear-gradient(135deg, #1a1a1e, #242428, #1a1a1e); }
+.profile-loading-line, .profile-loading-grid span, .profile-loading-tags span {
+  background: linear-gradient(100deg, #1e1e24 25%, #2a2a32 45%, #1e1e24 65%);
+  background-size: 220% 100%;
+  animation: skeleton 1.5s infinite;
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── 16. Репорт-модалка ─────────────────────────────────────── */
+.report-overlay { background: rgba(10, 10, 12, .85); backdrop-filter: blur(8px); }
+.report-modal {
+  background: var(--tok-surface) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-xl) !important;
+  padding: 28px !important;
+  max-width: 420px;
+  box-shadow: var(--tok-shadow-lg) !important;
+}
+.report-close {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  border-radius: var(--tok-radius-sm) !important;
+}
+.report-reasons button {
+  padding: 10px 16px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  color: var(--tok-text) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.report-reasons button.selected {
+  background: var(--tok-accent) !important;
+  border-color: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+}
+.report-modal textarea {
+  background: var(--tok-surface-2) !important;
+  border: 1px solid var(--tok-border) !important;
+  border-radius: var(--tok-radius-sm) !important;
+  color: var(--tok-text) !important;
+  padding: 12px !important;
+}
+.report-submit, .report-success button {
+  padding: 12px 24px !important;
+  border-radius: var(--tok-radius-pill) !important;
+  background: var(--tok-accent) !important;
+  color: #0e0e10 !important;
+  font-weight: 700;
+  border: 0 !important;
+}
+.report-success-icon {
+  background: var(--tok-accent-soft) !important;
+  color: var(--tok-accent) !important;
+  border-radius: 50% !important;
+}
+
+/* ─── 17. Адаптив ────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .app-header { height: 60px !important; padding: 0 16px !important; }
+  .app-header-logo { flex: 0 0 72px !important; width: 72px !important; }
+  .header-action, .notification-bell-button, .header-profile-button {
+    width: 38px !important; height: 38px !important;
+  }
+  .home-feed { gap: 14px !important; padding: 24px 0 120px !important; }
+  .home-welcome { padding: 36px 24px !important; }
+  .home-welcome h1 { font-size: clamp(28px, 8vw, 40px) !important; }
+  .home-activity-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .home-feature-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .bottom-nav { width: calc(100% - 24px) !important; bottom: max(10px, env(safe-area-inset-bottom)) !important; }
+  .bottom-nav-item { font-size: 9px !important; height: 50px !important; }
+  .match-card { padding: 12px 14px !important; }
+  .match-avatar { width: 48px !important; height: 48px !important; }
+  .profile-details, .profile-section, .profile-theme-section { margin: 12px 16px 0 !important; padding: 18px !important; }
+  .profile-identity { padding: 22px 18px 16px !important; }
+  .profile-name-block h1 { font-size: 24px !important; }
+  .chat-messages { padding: 16px 12px 120px !important; }
+}
+
+@media (max-width: 420px) {
+  .home-activity-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .home-activity-tile { padding: 14px !important; }
+  .home-activity-copy strong { font-size: 18px !important; }
+  .home-welcome { padding: 28px 20px !important; }
+  .home-welcome h1 { font-size: clamp(26px, 9vw, 36px) !important; }
+  .discovery-actions .discovery-button { width: 48px !important; height: 48px !important; }
+  .discovery-actions .discovery-button.like { width: 64px !important; height: 64px !important; }
+  .bottom-nav-item { font-size: 8.5px !important; }
+}
+
+/* ─── 18. Анимации и переходы ────────────────────────────────── */
+button, a, input, select, textarea, .home-activity-tile, .match-card, .match-chat-icon,
+.notification-page-item, .discovery-actions .discovery-button, .profile-card,
+.home-profile-card, .home-discovery-button {
+  transition: all .2s cubic-bezier(.2, .7, .25, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ─── 19. Принудительное отключение старых тёплых тонов ──────── */
+.home-welcome, .home-discovery-card, .auth-page, .onboarding-page, .tok-auth-light, .tok-onboarding-light, .tok-auth-neon, .tok-onboarding-neon {
+  background-image: none !important;
+}
+.home-welcome { background:
+  linear-gradient(135deg, rgba(255, 222, 58, .08) 0%, transparent 60%),
+  var(--tok-surface) !important; }
+.auth-page, .onboarding-page {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(255, 222, 58, .15), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(255, 94, 58, .12), transparent 60%),
+    var(--tok-bg) !important;
+}
