@@ -19,14 +19,19 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConf
     <div className={"home-page tok-theme-" + theme}>
       <main className="home-feed">
         <section className="home-welcome">
-          <p className="home-welcome-small">ТОК · ИГЭУ</p>
+          <div className="home-welcome-art" aria-hidden="true">
+            <span className="home-welcome-heart home-welcome-heart-main">♥</span>
+            <span className="home-welcome-heart home-welcome-heart-mini">♥</span>
+            <span className="home-welcome-spark">✦</span>
+          </div>
+          <p className="home-welcome-small"><span aria-hidden="true">♥</span> ТОК · ИГЭУ</p>
           <h1>Привет, {profile?.name || "друг"} 👋</h1>
           <p>Здесь можно познакомиться со студентами своего университета.</p>
         </section>
 
         <section className="home-activity-grid" aria-label="Быстрые разделы">
           <button type="button" className="home-activity-tile likes" onClick={onLikes || onNotifications}>
-            <span className="home-activity-icon" aria-hidden="true">♥</span>
+            <span className="home-activity-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span>
             <span className="home-activity-copy"><strong>Лайки</strong><small>Кому ты понравился</small></span>
             <span className="home-activity-arrow" aria-hidden="true">↗</span>
           </button>
@@ -36,7 +41,7 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConf
             <span className="home-activity-status">Скоро</span>
           </div>
           <button type="button" className="home-activity-tile matches" onClick={onMatches}>
-            <span className="home-activity-icon" aria-hidden="true">♡</span>
+            <span className="home-activity-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span>
             <span className="home-activity-copy"><strong>Мэтчи</strong><small>Взаимная симпатия</small></span>
             <span className="home-activity-arrow" aria-hidden="true">↗</span>
           </button>
