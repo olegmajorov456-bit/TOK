@@ -1231,3 +1231,67 @@ button.home-activity-tile:hover {
 @media (prefers-reduced-motion: reduce) {
   .app-shell *, .auth-page * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+
+/* Final art direction details: real heart glyphs, subtle apricot glow, consistent controls. */
+.home-welcome-art { position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.home-welcome-heart { position:absolute; display:block; line-height:1; user-select:none; }
+.home-welcome-heart-main {
+  right:clamp(80px, 12vw, 145px); top:19px;
+  color:transparent; -webkit-text-stroke:2px rgba(239,117,148,.40);
+  font-size:clamp(70px, 10vw, 112px); transform:rotate(-14deg);
+}
+.home-welcome-heart-mini {
+  right:clamp(23px, 4vw, 47px); bottom:20px;
+  color:rgba(240,120,139,.65); font-size:clamp(33px, 4vw, 47px);
+  transform:rotate(15deg); text-shadow:0 5px 15px rgba(240,120,139,.10);
+}
+.home-welcome-spark {
+  position:absolute; right:clamp(51px, 8vw, 91px); top:29px;
+  color:#f5b27e; font-size:24px; transform:rotate(13deg);
+}
+.home-welcome-small span { margin-right:4px; font-size:11px; color:#e97588; }
+.home-activity-icon svg { width:23px; height:23px; display:block; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.home-activity-tile.likes .home-activity-icon svg { fill:currentColor; }
+.home-activity-tile.matches .home-activity-icon svg { fill:rgba(240,120,139,.10); }
+.home-activity-tile.likes .home-activity-icon { background:linear-gradient(145deg,#ffe2d5,#ffe3ec) !important; color:#e86f83 !important; }
+.home-activity-copy small { max-width:150px; }
+.home-activity-arrow { border-radius:50%; }
+.home-profile-link { font-weight:850; }
+.home-welcome > :not(.home-welcome-art) { position:relative; z-index:1; }
+.home-welcome-art { z-index:0; }
+.home-welcome::before { z-index:0; }
+
+/* Login, registration and onboarding carry the same warm signature. */
+.auth-card, .onboarding-card {
+  position:relative;
+  overflow:hidden;
+  border-color:color-mix(in srgb, var(--tok-peach, #ffad91) 31%, var(--tok-border)) !important;
+}
+.auth-card::after, .onboarding-card::after {
+  content:"♥";
+  position:absolute;
+  top:13px; right:19px;
+  color:color-mix(in srgb, var(--tok-accent) 12%, transparent);
+  font-size:54px; line-height:1; transform:rotate(12deg);
+  pointer-events:none;
+}
+.auth-card > *, .onboarding-card > * { position:relative; z-index:1; }
+.tok-auth-light .auth-page, .tok-onboarding-light.onboarding-page {
+  background:radial-gradient(circle at 15% 14%,rgba(255,190,160,.28),transparent 30%),radial-gradient(circle at 82% 80%,rgba(255,211,222,.34),transparent 34%),#fff8f5 !important;
+}
+.tok-auth-light .auth-card::after, .tok-onboarding-light .onboarding-card::after { color:rgba(240,120,139,.13); }
+.tok-auth-neon .auth-card::after, .tok-onboarding-neon .onboarding-card::after { color:rgba(255,178,151,.11); }
+
+/* Crisp keyboard states and reduced motion remain available after the visual polish. */
+.app-shell :is(button,a,[role="button"]):focus-visible,
+.auth-page :is(button,a,[role="button"]):focus-visible,
+.onboarding-page :is(button,a,[role="button"]):focus-visible {
+  outline:3px solid color-mix(in srgb, var(--tok-accent) 40%, transparent) !important;
+  outline-offset:3px !important;
+}
+@media (max-width:480px) {
+  .home-welcome-heart-main { right:54px; top:19px; font-size:80px; }
+  .home-welcome-heart-mini { right:20px; bottom:18px; font-size:31px; }
+  .home-welcome-spark { right:38px; top:25px; font-size:18px; }
+}
