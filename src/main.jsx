@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./themes.css";
-// Keep the shared design system last so it resolves component and theme style conflicts.
 import "./DesignSystem.css";
 import "./VisualRefresh.css";
-// Variant 1 visual pass: single light pink concept across every screen.
 import "./Variant1.css";
+// ENERGY SYSTEM — финальный визуальный слой. Перекрывает всё предыдущее.
+import "./Energy.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
