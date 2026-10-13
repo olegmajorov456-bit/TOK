@@ -1,0 +1,169 @@
+/* ============================================================
+   TOK — Variant 1 visual pass (loaded last, wins the cascade).
+   One light pink concept on every screen, in both themes.
+   ============================================================ */
+
+/* 1) Variant 1 palette tokens for :root and both themes */
+:root,
+.app-shell.tok-theme-light, .tok-theme-light, .tok-auth-light, .tok-onboarding-light,
+.app-shell.tok-theme-neon, .tok-theme-neon, .tok-auth-neon, .tok-onboarding-neon {
+  --tok-peach: #ffa9c6;
+  --tok-pink: #ff2d78;
+  --tok-gradient: linear-gradient(135deg, #ff6b9d 0%, #ff2d78 100%);
+  --tok-bg: #f7f8fa;
+  --tok-surface: #ffffff;
+  --tok-surface-2: #f5f6f8;
+  --tok-border: #e7eaf0;
+  --tok-text: #20242b;
+  --tok-muted: #757b86;
+  --tok-accent: #ff2d78;
+  --tok-accent-hover: #e61f69;
+  --tok-accent-soft: #ffe8f1;
+  --tok-peach-soft: #fff0f5;
+  --tok-shadow: 0 12px 34px rgba(31, 36, 45, .07);
+  --tok-shell-background: radial-gradient(ellipse at 85% 0%, rgba(255, 45, 120, .06), transparent 32%), #f7f8fa;
+  --tok-page-background: #fafbfc;
+}
+
+html,
+html:has(.tok-theme-light), html:has(.tok-auth-light), html:has(.tok-onboarding-light),
+html:has(.tok-theme-neon), html:has(.tok-auth-neon), html:has(.tok-onboarding-neon) {
+  background: #f7f8fa;
+  color-scheme: light;
+}
+body:has(.tok-theme-neon), body:has(.tok-auth-neon), body:has(.tok-onboarding-neon) {
+  background: #f7f8fa;
+  color: #20242b;
+}
+
+/* 2) Neutralise leftover dark "neon" surfaces so both themes render Variant 1 */
+.tok-theme-neon .app-content { background: transparent !important; }
+.tok-theme-neon :is(.home-profile-card, .home-post-card, .home-matches-card, .home-tip, .filters-panel,
+  .discovery-card, .discovery-content, .discovery-actions, .matches-list, .matches-empty,
+  .profile-card, .profile-details, .profile-section, .profile-theme-section,
+  .notification-panel, .notifications-list, .notifications-empty) {
+  background: #fff; border-color: var(--tok-border); color: var(--tok-text);
+}
+.tok-theme-neon .home-welcome { border-color: #ffd9e6 !important; background: linear-gradient(115deg, #fff 0%, #fff5f9 60%, #ffeef5 100%) !important; }
+.tok-theme-neon .home-welcome-small { border-color: rgba(255, 45, 120, .16); background: rgba(255, 255, 255, .62); color: #e0447e !important; }
+.tok-theme-neon .home-discovery-card { border-color: #ffd9e6 !important; background: linear-gradient(135deg, #fff0f5 0%, #ffe9f1 58%, #fffafb 100%) !important; }
+.tok-theme-neon :is(.home-post-icon, .home-card-avatar, .home-matches-icon, .home-feature-icon,
+  .match-chat-icon, .notification-page-icon, .profile-detail-item .detail-icon) {
+  background: #ffe8f1 !important; color: #ff2d78 !important;
+}
+.tok-theme-neon .chat-header, .tok-theme-neon .chat-input-area { background: rgba(255, 255, 255, .96); border-color: var(--tok-border); }
+.tok-theme-neon .chat-message.theirs { background: #fff; color: #343840; border-color: var(--tok-border); }
+.tok-theme-neon .chat-empty > div { background: #ffe8f1; color: #ff2d78; }
+.tok-theme-neon .notification-item, .tok-theme-neon .notification-page-item { background: #fff; color: var(--tok-text); border-color: #eceef1; }
+.tok-theme-neon .notification-item:hover, .tok-theme-neon .notification-item.unread { background: #f8f9fb; }
+.tok-theme-neon .match-card { background: #fff; border-bottom-color: #eceef1; }
+.tok-theme-neon .match-card:hover { background: #fafbfc; }
+.tok-theme-neon .bottom-nav-item { color: #98a0ab; }
+.tok-theme-neon .site-loading { background: linear-gradient(180deg, #fbfbfc, #eef0f3) !important; }
+.tok-theme-neon .site-loading-spinner { border-color: #e1e4e8; border-top-color: #ff2d78; border-right-color: #ff9ec0; }
+.tok-theme-neon .profile-loading { background: linear-gradient(180deg, #fbfbfc, #f0f2f5); }
+.tok-theme-neon .profile-loading-card { background: #fff; border-color: var(--tok-border); }
+.tok-theme-neon .profile-loading-photo { background: linear-gradient(135deg, #f4f5f7, #eceef2, #f4f5f7); }
+.tok-theme-neon :is(.profile-loading-line, .profile-loading-grid span, .profile-loading-tags span) {
+  background: linear-gradient(100deg, #eef0f3 25%, #e2e5ea 45%, #eef0f3 65%); background-size: 220% 100%;
+}
+.tok-theme-neon .profile-photo-wrapper, .tok-theme-neon .discovery-photo, .tok-theme-neon .no-photo { background: #f5f6f8; }
+.tok-theme-neon .profile-section-heading span { background: #f5f6f8; color: var(--tok-muted); }
+.tok-theme-neon .support-header { background: rgba(255, 255, 255, .94); border-bottom-color: var(--tok-border); }
+.tok-theme-neon .support-back { background: #f5f6f8; border-color: var(--tok-border); color: #343840; }
+.tok-theme-neon .support-message.admin { background: #fff; color: #343840; }
+.tok-theme-neon .support-input { background: rgba(255, 255, 255, .96); border-color: var(--tok-border); }
+.tok-theme-neon .support-input input { color: #20242b; }
+.tok-theme-neon .report-modal { background: #fff; border-color: var(--tok-border); }
+.tok-theme-neon .report-close, .tok-theme-neon .report-reasons button { background: #f5f6f8; border-color: var(--tok-border); color: #20242b; }
+.tok-theme-neon .report-reasons button.selected { background: #ffe8f1; border-color: #ff9ec0; color: #ff2d78; }
+.tok-theme-neon .report-modal textarea { background: #f5f6f8; border-color: var(--tok-border); color: #20242b; }
+.tok-theme-neon .report-success-icon { background: #ffe8f1; color: #ff2d78; }
+.tok-theme-neon.admin-page, .support-page.tok-theme-neon { background: linear-gradient(180deg, #fafbfc, #f0f2f5) !important; color: var(--tok-text) !important; }
+.tok-theme-neon.admin-page :is(.admin-tabs, .admin-support-card, .admin-chat, .admin-report-card, .admin-empty, .admin-home-form) {
+  background: #fff; color: var(--tok-text); border-color: var(--tok-border);
+}
+.tok-theme-neon.admin-page .admin-tabs button.active { background: #ffe8f1; color: #ff2d78; }
+.tok-theme-neon.admin-page :is(.admin-refresh, .admin-chat-back) { background: #f5f6f8; color: #3f444c; }
+.tok-theme-neon.admin-page .admin-support-messages { background: #f7f8fa; }
+.tok-theme-neon.admin-page .admin-support-message.user { background: #f5f6f8; color: #20242b; }
+.tok-theme-neon.admin-page .admin-chat-input { background: #fff; border-top-color: var(--tok-border); }
+.tok-theme-neon.admin-page .admin-chat-input input, .tok-theme-neon.admin-page .admin-report-top select { background: #f5f6f8; border-color: var(--tok-border); color: var(--tok-text); }
+.tok-theme-neon.admin-page :is(.admin-report-users, .admin-report-details) { background: #f5f6f8; }
+.tok-auth-neon, .tok-onboarding-neon { background: linear-gradient(180deg, #ffe9f0 0%, #ffd2df 58%, #ffb9cd 100%) !important; }
+.tok-auth-neon .auth-card, .tok-onboarding-neon .onboarding-card { border: 0 !important; background: transparent !important; box-shadow: none !important; color: #20242b !important; }
+.tok-auth-neon .auth-card h2, .tok-onboarding-neon .onboarding-card h1 { color: #20242b !important; }
+.tok-auth-neon .auth-subtitle, .tok-onboarding-neon .onboarding-subtitle { color: #6d6470 !important; }
+.tok-auth-neon .auth-card input, .tok-onboarding-neon :is(input, select, textarea) { background: #fff !important; border-color: #ffd3e2 !important; color: #20242b !important; }
+.theme-preview-light, .theme-preview-neon { background: #f2f3f6 !important; }
+.theme-preview-light i, .theme-preview-neon i { background: #fff !important; }
+.theme-preview-light b, .theme-preview-neon b { background: #fff !important; border-color: #dfe2e7 !important; }
+.theme-preview-light em, .theme-preview-neon em { background: #ff2d78 !important; box-shadow: none !important; }
+
+/* 3) Replace warm peach tints with Variant 1 pink tints */
+.home-welcome { border-color: #ffd9e6 !important; background: linear-gradient(115deg, #fff 0%, #fff5f9 60%, #ffeef5 100%) !important; box-shadow: 0 13px 35px rgba(124, 74, 93, .07) !important; }
+.home-welcome h1, .home-card-top strong, .home-discovery-content h2 { color: #20242b !important; }
+.home-welcome p:last-child, .home-card-top span, .home-discovery-content p { color: #757b86 !important; }
+.home-welcome-small { border-color: rgba(255, 45, 120, .16); background: rgba(255, 255, 255, .62); color: #e0447e !important; }
+.home-welcome-heart-main { -webkit-text-stroke: 2px rgba(255, 45, 120, .30); }
+.home-welcome-heart-mini { color: rgba(255, 45, 120, .45); }
+.home-welcome-spark { color: #ff9ec0; }
+.home-discovery-card { border-color: #ffd9e6 !important; background: linear-gradient(135deg, #fff0f5 0%, #ffe9f1 58%, #fffafb 100%) !important; }
+.home-discovery-card::before { color: rgba(255, 45, 120, .10); }
+.home-activity-icon, .home-card-avatar, .home-post-icon, .home-matches-icon, .home-feature-icon,
+.notification-page-icon, .profile-detail-item .detail-icon, .achievement-level-icon, .achievement-icon {
+  background: #ffe8f1 !important; color: #ff2d78 !important;
+}
+.home-activity-tile.matches .home-activity-icon, .home-activity-tile.messages .home-activity-icon { background: #ffe8f1; color: #ff2d78; }
+.home-activity-tile:hover { border-color: #ffc9dc; }
+.home-profile-avatar { outline-color: rgba(255, 45, 120, .25); }
+.match-avatar, .chat-avatar { border-radius: 50% !important; border: 2px solid #ffd3e2 !important; }
+.header-profile-avatar-wrap { border-color: #ffd3e2 !important; }
+.profile-status-dot { background: #22c55e !important; box-shadow: 0 0 0 4px rgba(34, 197, 94, .15); }
+.notification-page-item.unread { background: #fff5f9 !important; }
+.chat-message.theirs { background: #fff !important; border-color: #e7eaf0 !important; color: #20242b !important; }
+.chat-message.mine { background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; color: #fff !important; }
+.app-header { background: rgba(255, 255, 255, .94) !important; border-bottom-color: #eceff3 !important; }
+.header-action, .notification-bell-button { background: transparent !important; border-color: transparent !important; box-shadow: none !important; color: #6b7280 !important; }
+.header-action:hover, .notification-bell-button:hover, .notification-bell-button.open { background: #ffe8f1 !important; color: #ff2d78 !important; }
+.site-loading { background: #fafbfc !important; }
+
+/* 4) Variant 1 shapes: pill CTAs, round action buttons, flat white bottom bar, pink auth screen */
+.auth-page, .onboarding-page { position: relative; overflow: hidden; background: linear-gradient(180deg, #ffe9f0 0%, #ffd2df 58%, #ffb9cd 100%) !important; }
+.auth-page::before, .onboarding-page::before {
+  content: "♥";
+  position: absolute; top: 7%; left: 10%; z-index: 0;
+  color: rgba(255, 255, 255, .55); font-size: 30px; line-height: 1; pointer-events: none;
+  text-shadow:
+    96px 30px 0 rgba(255, 77, 136, .16), 216px -12px 0 rgba(255, 255, 255, .40),
+    306px 64px 0 rgba(255, 77, 136, .13), 44px 138px 0 rgba(255, 255, 255, .32),
+    252px 176px 0 rgba(255, 77, 136, .12), 150px 232px 0 rgba(255, 255, 255, .26),
+    60px 320px 0 rgba(255, 77, 136, .10), 280px 380px 0 rgba(255, 255, 255, .22);
+}
+.auth-card, .onboarding-card { position: relative; z-index: 1; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.auth-card input, .onboarding-card input, .onboarding-card select, .onboarding-card textarea { background: #fff !important; border-color: #ffd3e2 !important; border-radius: 999px !important; }
+.auth-card form button[type="submit"], .onboarding-card button[type="submit"] { border-radius: 999px !important; background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; box-shadow: 0 10px 24px rgba(255, 45, 120, .28) !important; }
+.switch-button { border-radius: 999px !important; background: #fff !important; border: 1px solid #ffd3e2 !important; color: #ff2d78 !important; }
+.home-discovery-button, .matches-home-button, .empty-home-button, .profile-primary-button, .profile-save-button,
+.notifications-read-all, .filters-actions button:not(.filters-reset), .confession-composer button[type="submit"],
+.interest-room-composer button, .support-page button[type="submit"] {
+  border-radius: 999px !important; background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; color: #fff !important;
+}
+.chat-input-area button[type="submit"] { border-radius: 50% !important; background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; }
+.notifications-filters button { border-radius: 999px !important; }
+.notifications-filters button.active { background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; border-color: transparent !important; }
+.hobbies span, .hobby-tag { background: #ffe8f1 !important; border-color: #ffd3e2 !important; color: #ff2d78 !important; }
+.discovery-actions .discovery-button { border: 0 !important; border-radius: 50% !important; background: #eceef2 !important; color: #5b6470 !important; }
+.discovery-actions .discovery-button.skip { background: #ff4d88 !important; color: #fff !important; }
+.discovery-actions .discovery-button.superlike { background: #d9d0ff !important; color: #4e6bff !important; }
+.discovery-actions .discovery-button.like { background: linear-gradient(135deg, #ff6b9d, #ff2d78) !important; color: #fff !important; }
+.bottom-nav {
+  width: 100% !important; left: 0 !important; bottom: 0 !important; transform: none !important;
+  border: 0 !important; border-top: 1px solid #eceff3 !important; border-radius: 0 !important;
+  background: #fff !important; box-shadow: 0 -10px 34px rgba(31, 36, 45, .06) !important;
+  padding: 4px 8px calc(4px + env(safe-area-inset-bottom)) !important;
+}
+.bottom-nav-item { border-radius: 14px !important; background: transparent !important; color: #98a0ab !important; }
+.bottom-nav-item:hover { background: #f7f8fa !important; color: #3d424a !important; }
+.bottom-nav-item.active { background: transparent !important; color: #ff2d78 !important; }
+.bottom-nav-item.active::after { display: none !important; }
