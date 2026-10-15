@@ -78,6 +78,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -211,6 +212,30 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
     setIsEditing(false);
   }
 
+  async function handleToggleVisibility() {
+    if (!profile || visibilitySaving) return;
+    const nextHidden = profile.is_hidden !== true;
+    setVisibilitySaving(true);
+    setMessage("");
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ is_hidden: nextHidden })
+        .eq("id", user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      setProfile(data);
+      setMessage(nextHidden ? "Анкета скрыта от новых знакомств." : "Анкета снова видна в поиске.");
+      onProfileUpdated?.(data);
+    } catch (error) {
+      console.error("Не удалось изменить видимость анкеты:", error);
+      setMessage("Не удалось изменить видимость. Проверьте, что миграция is_hidden выполнена в Supabase.");
+    } finally {
+      setVisibilitySaving(false);
+    }
+  }
+
   async function handleDeleteAccount() {
     const confirmation = window.prompt("Удалить аккаунт ТОК навсегда? Это действие нельзя отменить. Для подтверждения введи УДАЛИТЬ.");
     if (confirmation !== "УДАЛИТЬ") return;
@@ -269,7 +294,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
               <div className="profile-identity">
                 <div className="profile-name-block">
                   <h1>{profile.name || "Без имени"}{age ? <span>, {age}</span> : null}</h1>
-                  <p className="profile-status"><span className="profile-status-dot"></span> Профиль в ТОК</p>
+                  <p className={`profile-status ${profile.is_hidden ? "profile-status-hidden" : ""}`}><span className="profile-status-dot"></span> {profile.is_hidden ? "Анкета скрыта" : "Профиль в ТОК"}</p>
                 </div>
                 {profile.faculty && <div className="profile-study"><span className="profile-study-icon">🎓</span><div><strong>{profile.faculty}</strong><span>{profile.course ? `${profile.course} курс` : "Студент ИГЭУ"}</span></div></div>}
               </div>
@@ -305,6 +330,7 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
               </div>
               <div className="profile-actions">
                 <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
+                <button type="button" className={`profile-visibility-button ${profile.is_hidden ? "is-hidden" : ""}`} onClick={handleToggleVisibility} disabled={visibilitySaving}>{visibilitySaving ? "Сохраняем…" : profile.is_hidden ? "👁️ Вернуть анкету в поиск" : "🙈 Убрать анкету из поиска"}</button>
                 {profile.is_admin === true && <button className="profile-admin-button" onClick={onAdmin}>🛡️ Панель администратора</button>}
                 <button className="profile-logout-button" onClick={handleLogout}>🚪 Выйти из аккаунта</button>
               </div>
