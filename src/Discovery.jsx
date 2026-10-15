@@ -195,7 +195,8 @@ function Discovery({ user, onHome, theme = "light" }) {
       .from("profiles")
       .select("*")
       .neq("id", user.id)
-      .or("is_blocked.is.null,is_blocked.eq.false");
+      .or("is_blocked.is.null,is_blocked.eq.false")
+      .eq("is_hidden", false);
 
     if (error) {
       console.error("Ошибка загрузки анкет:", error);
