@@ -10,7 +10,7 @@ function calculateAge(birthDate) {
   return age;
 }
 
-function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConfessions, onAchievements, onRandomChat, onInterestRooms, onNotifications, onLikes, theme = "light" }) {
+function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConfessions, onAchievements, onRandomChat, onInterestRooms, onNotifications, theme = "light" }) {
   const age = calculateAge(profile?.birth_date);
   const title = homeSettings?.title || "Общайся. Знакомься. Находи своих.";
   const description = homeSettings?.description || "ТОК создан специально для студентов ИГЭУ. Здесь всё начинается с обычной симпатии.";
@@ -24,28 +24,6 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConf
           <p>Здесь можно познакомиться со студентами своего университета.</p>
         </section>
 
-        <section className="home-activity-grid" aria-label="Быстрые разделы">
-          <button type="button" className="home-activity-tile likes" onClick={onLikes || onNotifications}>
-            <span className="home-activity-icon" aria-hidden="true">♥</span>
-            <span className="home-activity-copy"><strong>Лайки</strong><small>Кому ты понравился</small></span>
-            <span className="home-activity-arrow" aria-hidden="true">↗</span>
-          </button>
-          <div className="home-activity-tile guests" aria-label="Гости профиля — скоро">
-            <span className="home-activity-icon" aria-hidden="true">◉</span>
-            <span className="home-activity-copy"><strong>Гости</strong><small>Просмотры профиля</small></span>
-            <span className="home-activity-status">Скоро</span>
-          </div>
-          <button type="button" className="home-activity-tile matches" onClick={onMatches}>
-            <span className="home-activity-icon" aria-hidden="true">♡</span>
-            <span className="home-activity-copy"><strong>Мэтчи</strong><small>Взаимная симпатия</small></span>
-            <span className="home-activity-arrow" aria-hidden="true">↗</span>
-          </button>
-          <button type="button" className="home-activity-tile messages" onClick={onMatches}>
-            <span className="home-activity-icon" aria-hidden="true">▱</span>
-            <span className="home-activity-copy"><strong>Сообщения</strong><small>Продолжить общение</small></span>
-            <span className="home-activity-arrow" aria-hidden="true">↗</span>
-          </button>
-        </section>
 
         <section className="home-profile-card" onClick={onProfile}>
           <div className="home-profile-avatar">
