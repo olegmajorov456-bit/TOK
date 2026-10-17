@@ -45,7 +45,7 @@ function Home({ profile, onDiscovery, onMatches, onProfile, homeSettings, onConf
             <h2>Найди кого-нибудь интересного</h2>
             <p>Листай анкеты студентов, ставь лайки и знакомься. Если симпатия взаимна — у вас будет мэтч ❤️</p>
           </div>
-          <button className="home-discovery-button" onClick={onDiscovery}>Смотреть анкеты <span>→</span></button>
+          <button className="home-discovery-button" onClick={onDiscovery}><span className="home-discovery-button-label">Смотреть анкеты</span><span className="home-discovery-button-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></button>
         </section>
 
         <section className="home-post-card">
