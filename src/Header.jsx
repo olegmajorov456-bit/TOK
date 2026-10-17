@@ -17,7 +17,7 @@ function Header({ onHome, onSupport, onProfile, onMatches, onNotifications, prof
           title="Техническая поддержка"
           aria-label="Техническая поддержка"
         >
-          <span className="header-action-icon">💬</span>
+          <span className="header-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12Z" /></svg></span>
           <span className="header-action-text">Поддержка</span>
         </button>
 
@@ -33,7 +33,7 @@ function Header({ onHome, onSupport, onProfile, onMatches, onNotifications, prof
           title="Поддержать создателя"
           aria-label="Поддержать создателя"
         >
-          <span className="header-action-icon">❤️</span>
+          <span className="header-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span>
           <span className="header-action-text">Поддержать</span>
         </button>
 
