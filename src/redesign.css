@@ -207,3 +207,85 @@
 :root:root:root body .home-feature-card.achievements .home-feature-copy{text-align:left!important}
 :root:root:root body .discovery-header{display:block!important;margin-bottom:16px!important}
 :root:root:root body .discovery-header p{margin:6px 0 0!important}
+/* ===== v3: one spacing grid (16px gutter, 16px rhythm) ===== */
+:root:root:root body .app-header{padding-left:16px!important;padding-right:16px!important}
+:root:root:root body .home-feed{display:flex!important;flex-direction:column!important;gap:16px!important;padding:20px 4px 136px!important}
+:root:root:root body .home-feed>*{margin:0!important}
+:root:root:root body .home-feature-section{margin:6px 0 0!important}
+:root:root:root body .home-feature-heading{margin-bottom:14px!important}
+:root:root:root body .home-feature-grid{gap:12px!important}
+:root:root:root body .home-welcome{padding:30px 24px 60px!important}
+:root:root:root body .home-profile-card{padding:16px!important;gap:16px!important}
+:root:root:root body .home-matches-card{padding:16px 18px!important;gap:16px!important}
+:root:root:root body .home-discovery-card{padding:24px!important}
+:root:root:root body .home-card-top{margin-bottom:20px!important}
+:root:root:root body .home-tip{padding:16px 18px!important;gap:14px!important}
+:root:root:root body .discovery-container{padding-left:4px!important;padding-right:4px!important}
+:root:root:root body .discovery-header{padding:0 2px!important;margin-bottom:18px!important}
+:root:root:root body .discovery-content{padding:20px 22px 6px!important;display:flex!important;flex-direction:column!important;gap:12px!important}
+:root:root:root body .discovery-compatibility,:root:root:root body .discovery-description{margin:0!important}
+:root:root:root body .discovery-common-hobbies,:root:root:root body .hobbies{display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin:0!important}
+:root:root:root body .discovery-actions{padding:18px 20px 26px!important}
+:root:root:root body .auth-card{padding:32px 24px!important}
+:root:root:root body .auth-card form{display:flex!important;flex-direction:column!important;gap:12px!important}
+:root:root:root body .auth-card .auth-logo{margin:0 auto 12px!important}
+:root:root:root body .chat-header{padding:12px 16px!important;gap:12px!important}
+:root:root:root body .chat-messages{padding:20px 16px!important;display:flex!important;flex-direction:column!important;gap:10px!important}
+:root:root:root body .chat-message.mine{align-self:flex-end!important;transform-origin:100% 100%!important}
+:root:root:root body .chat-message.theirs{align-self:flex-start!important;transform-origin:0 100%!important}
+:root:root:root body .chat-input-area{padding:12px 16px 16px!important;gap:10px!important}
+:root:root:root body .home-feature-card,:root:root:root body .discovery-button,:root:root:root body .home-discovery-button,:root:root:root body .home-profile-card,:root:root:root body .home-matches-card,:root:root:root body .bottom-nav-item,:root:root:root body .header-action{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s,background .28s,border-color .28s!important}
+:root:root:root body .home-feature-card:active,:root:root:root body .discovery-button:active,:root:root:root body .home-discovery-button:active,:root:root:root body .bottom-nav-item:active,:root:root:root body .header-action:active,:root:root:root body .home-profile-card:active,:root:root:root body .home-matches-card:active{transform:scale(.965)!important}
+:root:root:root body .home-profile-card:hover,:root:root:root body .home-matches-card:hover{transform:translateY(-3px)!important;box-shadow:0 22px 38px -22px rgba(11,31,77,.5)!important}
+/* ===== v3: motion (only when the user has not asked to reduce it) ===== */
+@media (prefers-reduced-motion:no-preference){@keyframes k-rise{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes k-pop{0%{opacity:0;transform:scale(.8) translateY(10px)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:none}}
+@keyframes k-fade{from{opacity:0}to{opacity:1}}
+@keyframes k-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes k-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+@keyframes k-beat{0%,100%{transform:scale(1)}14%{transform:scale(1.13)}28%{transform:scale(1)}42%{transform:scale(1.09)}70%{transform:scale(1)}}
+@keyframes k-shine{0%{transform:translateX(-140%) skewX(-18deg)}55%,100%{transform:translateX(260%) skewX(-18deg)}}
+@keyframes k-orb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-34px,22px) scale(1.2)}}
+@keyframes k-zoom{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+@keyframes k-ring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
+@keyframes k-spark{from{left:24px}to{left:calc(100% - 36px)}}
+:root:root:root body .home-feed>*{animation:k-rise .65s cubic-bezier(.2,.8,.2,1) backwards}
+:root:root:root body .home-feed>*:nth-child(1){animation-delay:.02s}
+:root:root:root body .home-feed>*:nth-child(2){animation-delay:.1s}
+:root:root:root body .home-feed>*:nth-child(3){animation-delay:.18s}
+:root:root:root body .home-feed>*:nth-child(4){animation-delay:.26s}
+:root:root:root body .home-feed>*:nth-child(5){animation-delay:.34s}
+:root:root:root body .home-feed>*:nth-child(6){animation-delay:.42s}
+:root:root:root body .home-feed>*:nth-child(7){animation-delay:.5s}
+:root:root:root body .app-header{animation:k-fade .5s ease backwards}
+:root:root:root body .bottom-nav{animation:k-fade .7s ease .3s backwards}
+:root:root:root body .home-welcome h1::before{content:"";position:absolute;right:-110px;top:-80px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(255,92,143,.55),transparent 66%);pointer-events:none;z-index:-1;animation:k-orb 9s ease-in-out infinite}
+:root:root:root body .home-discovery-card::after{animation:k-float 5.5s ease-in-out infinite}
+:root:root:root body .home-discovery-button{animation:k-breathe 3.4s ease-in-out 1.2s infinite}
+:root:root:root body .home-matches-icon,:root:root:root body .home-card-avatar{animation:k-float 4.2s ease-in-out infinite}
+:root:root:root body .home-feature-card::after{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.34),transparent);pointer-events:none;animation:k-shine 5.5s ease-in-out infinite}
+:root:root:root body .home-feature-card.confession::after{animation-delay:.8s}
+:root:root:root body .home-feature-card.random::after{animation-delay:1.6s}
+:root:root:root body .home-feature-card.rooms::after{animation-delay:2.4s}
+:root:root:root body .home-feature-card.achievements::after{animation-delay:3.2s}
+:root:root:root body .home-feature-icon{animation:k-float 3.6s ease-in-out infinite}
+:root:root:root body .home-feature-card.random .home-feature-icon{animation-delay:.5s}
+:root:root:root body .home-feature-card.rooms .home-feature-icon{animation-delay:1s}
+:root:root:root body .home-feature-card.achievements .home-feature-icon{animation-delay:1.5s}
+:root:root:root body .discovery-card{animation:k-pop .7s cubic-bezier(.2,.9,.3,1.1) backwards}
+:root:root:root body .discovery-photo img{animation:k-zoom 16s ease-in-out infinite alternate}
+:root:root:root body .discovery-compatibility.has-common{animation:k-breathe 3s ease-in-out infinite}
+:root:root:root body .discovery-button.like{animation:k-beat 2.4s ease-in-out 1s infinite}
+:root:root:root body .discovery-button.like:before{display:block!important}
+:root:root:root body .discovery-button.like::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #E5215F;pointer-events:none;animation:k-ring 2.4s ease-out 1s infinite}
+:root:root:root body .bottom-nav-item.active .bottom-nav-icon{animation:k-pop .5s cubic-bezier(.2,.9,.3,1.3) backwards}
+:root:root:root body .chat-message{animation:k-pop .45s cubic-bezier(.2,.9,.3,1.15) backwards}
+:root:root:root body .chat-message:nth-child(2){animation-delay:.12s}
+:root:root:root body .chat-message:nth-child(3){animation-delay:.24s}
+:root:root:root body .chat-message:nth-child(4){animation-delay:.36s}
+:root:root:root body .auth-card{animation:k-pop .7s cubic-bezier(.2,.9,.3,1.1) backwards}
+:root:root:root body .auth-logo{animation:k-float 4.5s ease-in-out infinite}
+
+}
+:root:root:root body .discovery-header{padding:0!important}
+
