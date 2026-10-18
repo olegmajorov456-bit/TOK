@@ -1,40 +1,18 @@
 import "./Header.css";
 import NotificationBell from "./NotificationBell";
 
-function Header({ onHome, onSupport, onProfile, onMatches, onNotifications, profile, user }) {
+function Header({ onHome, onProfile, onLikes, onMatches, onNotifications, profile, user }) {
   return (
     <header className="app-header">
       <button className="app-header-logo" onClick={onHome} aria-label="ТОК — главная">
-        <img src="/tok-logo.png" alt="ТОК" className="app-header-logo-image" />
+        <img src="/tok-wordmark.svg" alt="ТОК" className="app-header-logo-image" />
       </button>
 
       <div className="app-header-actions">
         {user && <NotificationBell user={user} onMatches={onMatches} onAllNotifications={onNotifications} />}
 
-        <button
-          className="header-action support"
-          onClick={onSupport}
-          title="Техническая поддержка"
-          aria-label="Техническая поддержка"
-        >
-          <span className="header-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12Z" /></svg></span>
-          <span className="header-action-text">Поддержка</span>
-        </button>
-
-        <button
-          className="header-action creator"
-          onClick={() =>
-            window.open(
-              "https://tbank.ru/cf/AWf42bsf9Ry",
-              "_blank",
-              "noopener,noreferrer"
-            )
-          }
-          title="Поддержать создателя"
-          aria-label="Поддержать создателя"
-        >
+        <button className="header-action likes" onClick={onLikes} title="Лайки" aria-label="Лайки">
           <span className="header-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span>
-          <span className="header-action-text">Поддержать</span>
         </button>
 
         <button className="header-profile-button" onClick={onProfile} title="Мой профиль" aria-label="Мой профиль">
