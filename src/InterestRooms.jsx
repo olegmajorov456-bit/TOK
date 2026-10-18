@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ChatTabs from "./ChatTabs";
 import { supabase } from "./supabaseClient";
 import "./InterestRooms.css";
 
@@ -8,7 +9,7 @@ function timeLabel(value) {
   return date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 }
 
-function InterestRooms({ user, theme = "light", onHome }) {
+function InterestRooms({ user, theme = "light", onHome, onPersonal }) {
   const [rooms, setRooms] = useState([]);
   const [joinedIds, setJoinedIds] = useState([]);
   const [activeRoom, setActiveRoom] = useState(null);
@@ -132,7 +133,7 @@ function InterestRooms({ user, theme = "light", onHome }) {
       <main className="interest-rooms-container">
         {!activeRoom ? <>
           <header className="interest-rooms-heading">
-            <div><span className="interest-rooms-kicker">СООБЩЕСТВО СТУДЕНТОВ</span><h1>Комнаты <span>✦</span></h1><p>Общайся с теми, кому интересно то же, что и тебе. Вступай в комнаты и подключайся к разговору.</p></div>
+            <ChatTabs active="rooms" onPersonal={onPersonal} onRooms={() => {}} />
             <button type="button" className="interest-rooms-refresh" onClick={loadRooms} disabled={loading}>↻ Обновить</button>
           </header>
           {notice && <div className="interest-rooms-notice" role="status">{notice}<button type="button" onClick={() => setNotice("")}>×</button></div>}
