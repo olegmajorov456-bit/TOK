@@ -2,9 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Support.css";
 
+const FAQ = [
+  ["Как работает мэтч?", "Ставь лайки анкетам. Если симпатия взаимна, у вас появляется мэтч и можно начать общение."],
+  ["Как скрыть свою анкету?", "Открой профиль и нажми «Скрыть анкету». Её можно вернуть в любой момент."],
+  ["Как пожаловаться на анкету?", "В карточке анкеты нажми значок флажка и опиши причину. Жалобу увидит команда ТОК."],
+  ["Что такое случайный чат?", "Анонимный разговор с другим студентом ИГЭУ. Имена в нём скрыты."],
+];
+
 function Support({ user, onBack }) {
   const theme = localStorage.getItem("tok-theme") || "light";
   const [conversation, setConversation] = useState(null);
+  const [view, setView] = useState("menu");
+  const [faqOpen, setFaqOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
@@ -217,10 +226,35 @@ function Support({ user, onBack }) {
 
   if (loading) return <div className={`support-page tok-theme-${theme}`}><div className="support-loading"><p>Открываем поддержку...</p></div></div>;
 
+  const prefixes = { problem: "Проблема: ", idea: "Идея: " };
+  function openThread(kind) {
+    if (kind && prefixes[kind] && !text) setText(prefixes[kind]);
+    setView("thread");
+  }
+
+  if (view === "menu" && messages.length === 0) {
+    return (
+      <div className={`support-page tok-theme-${theme}`}>
+        <main className="support-menu">
+          <section className="support-hello">
+            <h1>Здравствуйте! 👋</h1>
+            <p>Здесь вы можете получить помощь по любым вопросам, связанным с работой приложения.</p>
+            <button type="button" className="support-menu-button" onClick={() => setFaqOpen(!faqOpen)} aria-expanded={faqOpen}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m10 8.5 5 3.5-5 3.5Z" /></svg>Частые вопросы</button>
+            {faqOpen && <div className="support-faq">{FAQ.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>}
+            <button type="button" className="support-menu-button" onClick={() => openThread()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12Z" /></svg>Написать в поддержку</button>
+            <button type="button" className="support-menu-button" onClick={() => openThread("problem")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 3 20h18Z" /><path d="M12 10v4M12 17h.01" /></svg>Сообщить о проблеме</button>
+            <button type="button" className="support-menu-button" onClick={() => openThread("idea")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" /></svg>Предложить идею</button>
+          </section>
+          <p className="support-status"><span className="support-status-dot" />Обычно отвечаем в течение 24 часов</p>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className={`support-page tok-theme-${theme}`}>
       <header className="support-header">
-        <button className="support-back" onClick={onBack}>←</button>
+        <button className="support-back" onClick={() => (messages.length === 0 ? setView("menu") : onBack())} aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg></button>
         <div><strong>Поддержка ТОК</strong><span>Мы рядом, если что-то не работает</span></div>
       </header>
 
