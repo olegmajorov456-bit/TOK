@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Logo from "./Logo";
 import { supabase } from "./supabaseClient";
 import "./Auth.css";
 
@@ -42,7 +43,7 @@ function PasswordReset() {
   return (
     <div className={`auth-page tok-auth-${localStorage.getItem("tok-theme") || "light"}`}>
       <div className="auth-card">
-        <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
+        <Logo className="auth-logo" />
         <h2>Новый пароль</h2>
         <p className="auth-subtitle">Придумайте новый пароль для аккаунта</p>
 
