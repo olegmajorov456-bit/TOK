@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Logo from "./Logo";
 import { supabase } from "./supabaseClient";
 import AppUpdateAdmin from "./AppUpdateAdmin";
 import "./Admin.css";
@@ -259,7 +260,7 @@ function Admin({ user, onBack }) {
 
   return (
     <div className={`admin-page tok-theme-${theme}`}>
-      <header className="admin-header"><button className="admin-back" onClick={onBack}>←</button><img src="/tok-logo.png" alt="ТОК" className="admin-logo" /></header>
+      <header className="admin-header"><button className="admin-back" onClick={onBack}>←</button><Logo className="admin-logo" /></header>
       <main className="admin-container">
         <div className="admin-tabs" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
           <button style={activeTab === "users" ? activeTabStyle : tabButtonStyle} onClick={() => setActiveTab("users")}>👥 Пользователи <span>{users.length}</span></button>
