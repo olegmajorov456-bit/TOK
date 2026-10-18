@@ -1,4 +1,6 @@
+import { useState } from "react";
 import "./PublicProfile.css";
+import { getPhotos } from "./photos";
 
 function calculateAge(birthDate) {
   if (!birthDate) return "";
@@ -38,6 +40,9 @@ function getHobbies(profile) {
 }
 
 function PublicProfile({ profile, onBack, theme = "light" }) {
+  const photos = getPhotos(profile);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const currentPhoto = photos[Math.min(photoIndex, Math.max(photos.length - 1, 0))];
   const age = calculateAge(profile?.birth_date);
   const hobbies = getHobbies(profile);
   const gender = profile?.gender === "male" ? "Парень" : profile?.gender === "female" ? "Девушка" : "Другое";
@@ -48,7 +53,8 @@ function PublicProfile({ profile, onBack, theme = "light" }) {
       <main className="public-profile-card">
         <button type="button" className="public-profile-back" onClick={onBack}>← Назад</button>
         <div className="public-profile-photo">
-          {profile?.avatar_url ? <img src={profile.avatar_url} alt={profile.name || "Фото профиля"} /> : <span>👤</span>}
+          {currentPhoto ? <img src={currentPhoto} alt={profile.name || "Фото профиля"} onClick={() => photos.length > 1 && setPhotoIndex((photoIndex + 1) % photos.length)} /> : <span>👤</span>}
+          {photos.length > 1 && <div className="public-profile-dots">{photos.map((photo, index) => <button type="button" key={photo + index} className={index === photoIndex ? "active" : ""} onClick={() => setPhotoIndex(index)} aria-label={`Фото ${index + 1}`} />)}</div>}
         </div>
         <section className="public-profile-content">
           <h1>{profile?.name || "Пользователь"}{age ? `, ${age}` : ""}</h1>
