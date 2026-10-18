@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Discovery.css";
+
+const AGE_MIN = 16;
+const AGE_MAX = 40;
 import ReportModal from "./ReportModal";
 
 const FACULTIES = ["ФЭУ", "ИВТФ", "ИФФ", "ЭМФ", "ТЭФ", "ЭЭФ"];
@@ -315,25 +318,49 @@ function Discovery({ user, onHome, theme = "light" }) {
   const profileHobbies = getHobbies(profile);
   const commonHobbies = profile ? getSharedHobbies(profile, myHobbies) : [];
 
+  const ageLow = filters.minAge ? Number(filters.minAge) : AGE_MIN;
+  const ageHigh = filters.maxAge ? Number(filters.maxAge) : AGE_MAX;
+  const agePct = (value) => ((value - AGE_MIN) / (AGE_MAX - AGE_MIN)) * 100;
+  function setAgeRange(low, high) {
+    setFilters({ ...filters, minAge: low <= AGE_MIN ? "" : String(low), maxAge: high >= AGE_MAX ? "" : String(high) });
+  }
+  const genderOptions = [["", "Любой"], ["female", "Девушки"], ["male", "Парни"], ["other", "Другой"]];
+  const sortOptions = [["compatibility", "По совместимости"], ["random", "Случайно"]];
+  const chipMark = (active) => <svg className="chip-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" />{active && <path d="m8 12.5 2.6 2.6L16 9.5" />}</svg>;
   return <div className={`discovery-page tok-theme-${theme}`}><main className="discovery-container">
-    <div className="discovery-header"><div className="discovery-title-block"><h1>Знакомства</h1><p>Найди кого-нибудь из ИГЭУ 💕</p></div><div className="discovery-header-controls"><div className="discovery-sort-toggle" role="group" aria-label="Порядок анкет"><button type="button" className={sortMode === "compatibility" ? "active" : ""} onClick={() => changeSortMode("compatibility")}>✦ По интересам</button><button type="button" className={sortMode === "random" ? "active" : ""} onClick={() => changeSortMode("random")}>⇄ Случайно</button></div><button className="filters-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>⚙️ Фильтры {activeFiltersCount > 0 && <span>{activeFiltersCount}</span>}</button></div></div>
-    {filtersOpen && <section className="filters-panel"><div className="filter-grid">
-      <label>Пол<select value={filters.gender} onChange={(e) => { setGenderFilterTouched(true); setFilters({ ...filters, gender: e.target.value }); }}><option value="">Любой</option><option value="female">Девушки</option><option value="male">Парни</option><option value="other">Другой пол</option></select></label>
-      <label>Факультет<select value={filters.faculty} onChange={(e) => setFilters({ ...filters, faculty: e.target.value })}><option value="">Любой</option>{FACULTIES.map((faculty) => <option key={faculty} value={faculty}>{faculty}</option>)}</select></label>
-      <label>Курс<select value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })}><option value="">Любой</option>{COURSES.map((course) => <option key={course} value={course}>{course} курс</option>)}</select></label>
-      <label>Возраст от<input type="number" min="16" max="100" placeholder="16" value={filters.minAge} onChange={(e) => setFilters({ ...filters, minAge: e.target.value })} /></label>
-      <label>Возраст до<input type="number" min="16" max="100" placeholder="100" value={filters.maxAge} onChange={(e) => setFilters({ ...filters, maxAge: e.target.value })} /></label>
-    </div><div className="filters-actions"><button onClick={applyFilters}>Показать анкеты</button><button className="filters-reset" onClick={resetFilters}>Сбросить</button></div></section>}
-    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Здесь больше нет анкет, которые вы ещё не лайкнули. Можно обновить список после новых анкет."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card" key={profile.id}>{burst && <div key={burst.id} className={"discovery-burst " + burst.type} aria-hidden="true">{burst.type === "like" ? <svg viewBox="0 0 24 24"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg> : <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>}</div>}
-      <div className="discovery-photo"><div className="discovery-photo-top"></div>{profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}<div className="discovery-gradient" /><div className="discovery-info"><h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2><div className="profile-meta">{profile.faculty && <span>🎓 {profile.faculty}</span>}{profile.course && <span>📚 {profile.course} курс</span>}</div></div></div>
-      <div className="discovery-content"><div className={"discovery-compatibility " + (commonHobbies.length ? "has-common" : "")}><span>✦ Совпадение по интересам</span><strong>{commonHobbies.length ? commonHobbies.length + " общих" : "изучите анкету"}</strong></div>{commonHobbies.length > 0 && <div className="discovery-common-hobbies">{commonHobbies.map((hobby) => <span key={hobby}>♡ {hobby}</span>)}</div>}{profileHobbies.length > 0 && <div className="hobbies">{profileHobbies.map((hobby) => <span key={hobby}>{hobby}</span>)}</div>}<p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p></div>
-      <div className="discovery-actions">
-        <div className="discovery-action-row">
-          <div className="discovery-action undo"><button className="discovery-button undo" onClick={handleUndo} disabled={actionLoading} title="Вернуться к предыдущей анкете" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6" /></svg></button><span className="discovery-action-label">Назад</span></div>
-          <div className="discovery-action skip"><button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading} title="Пропустить анкету" aria-label="Пропустить"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button><span className="discovery-action-label">Пропустить</span></div>
-          <div className="discovery-action like"><button className="discovery-button like" onClick={handleLike} disabled={actionLoading} title="Поставить лайк" aria-label="Нравится"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></button><span className="discovery-action-label">Нравится</span></div>
+    {filtersOpen && <div className="filters-overlay" onClick={() => setFiltersOpen(false)}><section className="filters-sheet" role="dialog" aria-label="Фильтры поиска" onClick={(e) => e.stopPropagation()}>
+      <div className="filters-grabber" />
+      <div className="filters-head"><h2>Фильтры поиска</h2><button type="button" className="filters-close" onClick={() => setFiltersOpen(false)} aria-label="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button></div>
+      <div className="filter-block"><span className="filter-label">Пол</span><div className="chip-row">{genderOptions.map(([value, label]) => <button type="button" key={label} className={"filter-chip " + (filters.gender === value ? "active" : "")} onClick={() => { setGenderFilterTouched(true); setFilters({ ...filters, gender: value }); }}>{chipMark(filters.gender === value)}{label}</button>)}</div></div>
+      <div className="filter-block"><label className="filter-label" htmlFor="filter-faculty">Факультет</label><div className="select-wrap"><select id="filter-faculty" value={filters.faculty} onChange={(e) => setFilters({ ...filters, faculty: e.target.value })}><option value="">Все факультеты</option>{FACULTIES.map((faculty) => <option key={faculty} value={faculty}>{faculty}</option>)}</select></div></div>
+      <div className="filter-block"><label className="filter-label" htmlFor="filter-course">Курс</label><div className="select-wrap"><select id="filter-course" value={filters.course} onChange={(e) => setFilters({ ...filters, course: e.target.value })}><option value="">Все курсы</option>{COURSES.map((course) => <option key={course} value={course}>{course} курс</option>)}</select></div></div>
+      <div className="filter-block"><div className="filter-label-row"><span className="filter-label">Возраст</span><strong>{ageLow} — {ageHigh >= AGE_MAX ? AGE_MAX + "+" : ageHigh}</strong></div>
+        <div className="age-range"><div className="age-track"><div className="age-fill" style={{ left: agePct(ageLow) + "%", right: (100 - agePct(ageHigh)) + "%" }} /></div>
+          <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageLow} aria-label="Возраст от" onChange={(e) => setAgeRange(Math.min(Number(e.target.value), ageHigh - 1), ageHigh)} />
+          <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageHigh} aria-label="Возраст до" onChange={(e) => setAgeRange(ageLow, Math.max(Number(e.target.value), ageLow + 1))} /></div>
+        <div className="age-ends"><span>{AGE_MIN}</span><span>{AGE_MAX}+</span></div></div>
+      <div className="filter-block"><span className="filter-label">Сортировка</span><div className="chip-row">{sortOptions.map(([value, label]) => <button type="button" key={value} className={"filter-chip " + (sortMode === value ? "active" : "")} onClick={() => changeSortMode(value)}>{chipMark(sortMode === value)}{label}</button>)}</div></div>
+      <div className="filters-actions"><button type="button" className="filters-apply" onClick={applyFilters}>Применить</button><button type="button" className="filters-reset" onClick={resetFilters}>Сбросить</button></div>
+    </section></div>}
+    {!profile ? <div className="discovery-empty"><div className="empty-icon">💕</div><h2>Анкеты закончились</h2><p>{activeFiltersCount ? "По выбранным фильтрам подходящих анкет пока нет." : "Здесь больше нет анкет, которые вы ещё не лайкнули. Можно обновить список после новых анкет."}</p><button className="empty-home-button" onClick={onHome}><span>⌂</span>Вернуться домой</button><button className="empty-refresh-button" onClick={handleRefreshAll} disabled={refreshLoading}>{refreshLoading ? "Обновляем..." : "Обновить анкеты"}</button></div> : <div className="discovery-card" key={profile.id}>{burst && <div key={burst.id} className={"discovery-burst " + burst.type} aria-hidden="true">{burst.type === "like" ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg> : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>}</div>}
+      <div className="discovery-photo">
+        {profile.avatar_url ? <img src={profile.avatar_url} alt={profile.name} /> : <div className="no-photo"><span>👤</span></div>}
+        <div className="discovery-gradient" />
+        <div className="discovery-photo-top">
+          <button type="button" className="discovery-icon-button" onClick={() => setFiltersOpen(true)} aria-label="Фильтры" title="Фильтры"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" /><circle cx="15" cy="7" r="2" /><circle cx="9" cy="17" r="2" /></svg>{activeFiltersCount > 0 && <span className="discovery-icon-badge">{activeFiltersCount}</span>}</button>
+          <div className="discovery-photo-top-right"><span className="discovery-counter">{currentIndex + 1}/{profiles.length}</span><button type="button" className="discovery-icon-button" onClick={() => setReportOpen(true)} aria-label="Пожаловаться" title="Пожаловаться"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4M6 5h11l-2 4 2 4H6" /></svg></button></div>
         </div>
-        <button className="discovery-report-button" onClick={() => setReportOpen(true)}>Пожаловаться</button>
+        <div className="discovery-info">
+          <h2>{profile.name}{calculateAge(profile.birth_date) ? `, ${calculateAge(profile.birth_date)}` : ""}</h2>
+          <div className="profile-meta">{[profile.faculty, profile.course ? `${profile.course} курс` : ""].filter(Boolean).join(" • ")}</div>
+          {(commonHobbies.length > 0 || profileHobbies.length > 0) && <div className="discovery-chips">{commonHobbies.length > 0 && <span className="chip chip-match">✦ {commonHobbies.length} общих</span>}{profileHobbies.map((hobby) => <span key={hobby} className={"chip " + (commonHobbies.includes(hobby) ? "common" : "")}>{hobby}</span>)}</div>}
+          <p className="discovery-description">{profile.description || "Пользователь пока ничего не написал о себе."}</p>
+        </div>
+        <div className="discovery-actions">
+          <button className="discovery-button undo" onClick={handleUndo} disabled={actionLoading || history.length === 0} title="Вернуться к предыдущей анкете" aria-label="Назад"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6" /></svg></button>
+          <button className="discovery-button skip" onClick={handleSkip} disabled={actionLoading} title="Пропустить анкету" aria-label="Пропустить"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg><span>Пропустить</span></button>
+          <button className="discovery-button like" onClick={handleLike} disabled={actionLoading} title="Поставить лайк" aria-label="Нравится"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg><span>Нравится</span></button>
+        </div>
       </div>
     </div>}
   </main>{reportOpen && profile && <ReportModal user={user} profile={profile} onClose={() => setReportOpen(false)} />}</div>;
