@@ -315,7 +315,7 @@ function App() {
       <main className="app-content">
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onInterestRooms={() => setPage("interest-rooms")} onNotifications={() => { setNotificationsInitialFilter("all"); setPage("notifications"); }} onLikes={() => { setNotificationsInitialFilter("like"); setPage("notifications"); }} theme={theme} />}
         {page === "support" && <Support user={session.user} onBack={() => setPage("profile")} />}
-        {page === "discovery" && <Discovery user={session.user} onHome={goHome} theme={theme} />}
+        {page === "discovery" && <Discovery onChats={() => setPage("matches")} user={session.user} onHome={goHome} theme={theme} />}
         {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} onRooms={() => setPage("interest-rooms")} theme={theme} />}
         {page === "confessions" && <Confessions user={session.user} theme={theme} />}
         {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} onPersonal={() => setPage("matches")} />}
