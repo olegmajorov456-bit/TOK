@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import "./Profile.css";
+import { getPhotos, compressImage, MAX_PHOTOS, MAX_PHOTO_SIZE } from "./photos";
 
 const FACULTIES = ["ФЭУ", "ИВТФ", "ИФФ", "ЭМФ", "ТЭФ", "ЭЭФ"];
 
@@ -72,8 +73,8 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
   const [course, setCourse] = useState("");
   const [description, setDescription] = useState("");
   const [hobbies, setHobbies] = useState("");
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState("");
+  const [photoItems, setPhotoItems] = useState([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -104,24 +105,57 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
     setCourse(data.course || "");
     setDescription(data.description || "");
     setHobbies(getHobbies(data).join(", "));
-    setAvatarPreview(data.avatar_url || "");
+    setPhotoItems(getPhotos(data).map((url) => ({ key: url, url })));
+    setGalleryIndex(0);
     setLoading(false);
   }
 
-  function handleAvatarChange(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setMessage("Можно загружать только изображения.");
+  function handlePhotosChange(event) {
+    const files = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!files.length) return;
+    const room = MAX_PHOTOS - photoItems.length;
+    if (room <= 0) {
+      setMessage(`Можно загрузить не больше ${MAX_PHOTOS} фотографий.`);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("Размер фотографии не должен превышать 5 МБ.");
-      return;
+    const accepted = [];
+    let problem = files.length > room ? `Можно загрузить не больше ${MAX_PHOTOS} фотографий.` : "";
+    for (const file of files.slice(0, room)) {
+      if (!file.type.startsWith("image/")) {
+        problem = "Можно загружать только изображения.";
+        continue;
+      }
+      if (file.size > MAX_PHOTO_SIZE) {
+        problem = "Размер одной фотографии не должен превышать 10 МБ.";
+        continue;
+      }
+      accepted.push({ key: crypto.randomUUID(), url: URL.createObjectURL(file), file });
     }
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
-    setMessage("");
+    setPhotoItems((items) => [...items, ...accepted]);
+    setMessage(problem);
+  }
+
+  function removePhoto(key) {
+    setPhotoItems((items) => items.filter((item) => item.key !== key));
+  }
+
+  function makeMainPhoto(key) {
+    setPhotoItems((items) => {
+      const found = items.find((item) => item.key === key);
+      return found ? [found, ...items.filter((item) => item.key !== key)] : items;
+    });
+  }
+
+  function movePhoto(key, direction) {
+    setPhotoItems((items) => {
+      const index = items.findIndex((item) => item.key === key);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= items.length) return items;
+      const next = [...items];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   }
 
   async function handleSave(event) {
@@ -141,28 +175,32 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
     }
     setSaving(true);
     setMessage("");
-    let avatarUrl = profile?.avatar_url || null;
-
     try {
-      if (avatarFile) {
-        const extension = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+      const photoUrls = [];
+      for (const item of photoItems) {
+        if (!item.file) {
+          photoUrls.push(item.url);
+          continue;
+        }
+        const prepared = await compressImage(item.file);
+        const extension = prepared.type === "image/jpeg" ? "jpg" : (item.file.name.split(".").pop()?.toLowerCase() || "jpg");
         const filePath = `${user.id}/${crypto.randomUUID()}.${extension}`;
-        const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, avatarFile, {
-          contentType: avatarFile.type,
+        const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, prepared, {
+          contentType: prepared.type,
           upsert: true,
         });
         if (uploadError) {
           console.error(uploadError);
-          setMessage("Не удалось загрузить фотографию.");
+          setMessage("Не удалось загрузить фотографию. Проверьте интернет и попробуйте ещё раз.");
           setSaving(false);
           return;
         }
         const { data: publicUrlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
-        avatarUrl = publicUrlData.publicUrl;
+        photoUrls.push(publicUrlData.publicUrl);
       }
 
       const hobbiesValue = hobbies.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 12).join(", ");
-      const { data, error } = await supabase.from("profiles").update({
+      const profileUpdate = {
         name: name.trim(),
         birth_date: birthDate || null,
         gender: gender || null,
@@ -171,8 +209,15 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
         course: course ? Number(course) : null,
         description: description.trim(),
         hobbies: hobbiesValue,
-        avatar_url: avatarUrl,
-      }).eq("id", user.id).select().single();
+        avatar_url: photoUrls[0] || null,
+      };
+      let { data, error } = await supabase.from("profiles").update({ ...profileUpdate, photos: photoUrls }).eq("id", user.id).select().single();
+      let photosWarning = "";
+      if (error && (error.code === "42703" || /photos/i.test(error.message || ""))) {
+        // В базе ещё нет столбца photos: сохраняем хотя бы главное фото.
+        ({ data, error } = await supabase.from("profiles").update(profileUpdate).eq("id", user.id).select().single());
+        photosWarning = photoUrls.length > 1 ? " Но несколько фото пока не поддерживаются базой: выполните supabase_photos_migration.sql." : "";
+      }
 
       if (error) {
         console.error(error);
@@ -182,11 +227,11 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
       }
 
       setProfile(data);
-      setAvatarFile(null);
-      setAvatarPreview(data.avatar_url || "");
+      setPhotoItems((photosWarning ? photoUrls.slice(0, 1) : photoUrls).map((url) => ({ key: url, url })));
+      setGalleryIndex(0);
       setHobbies(getHobbies(data).join(", "));
       setIsEditing(false);
-      setMessage("Профиль сохранён ✓");
+      setMessage("Профиль сохранён ✓" + photosWarning);
       if (onProfileUpdated) onProfileUpdated(data);
     } catch (error) {
       console.error(error);
@@ -206,8 +251,8 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
     setCourse(profile.course || "");
     setDescription(profile.description || "");
     setHobbies(getHobbies(profile).join(", "));
-    setAvatarFile(null);
-    setAvatarPreview(profile.avatar_url || "");
+    setPhotoItems(getPhotos(profile).map((url) => ({ key: url, url })));
+    setGalleryIndex(0);
     setMessage("");
     setIsEditing(false);
   }
@@ -285,9 +330,10 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
       <main className="profile-container">
         <section className="profile-card">
           <div className="profile-photo-wrapper">
-            {avatarPreview ? <img className="profile-photo" src={avatarPreview} alt={profile.name || "Фото профиля"} /> : <div className="profile-no-photo"><span>👤</span><p>Нет фотографии</p></div>}
-            {isEditing && <label className="change-photo-button">📷 <span>Изменить фото</span><input type="file" accept="image/*" onChange={handleAvatarChange} /></label>}
+            {photoItems.length > 0 ? <img className="profile-photo" src={photoItems[Math.min(galleryIndex, photoItems.length - 1)].url} alt={profile.name || "Фото профиля"} onClick={() => !isEditing && photoItems.length > 1 && setGalleryIndex((galleryIndex + 1) % photoItems.length)} /> : <div className="profile-no-photo"><span>👤</span><p>Нет фотографии</p></div>}
+            {photoItems.length > 1 && <span className="profile-photo-count">{Math.min(galleryIndex, photoItems.length - 1) + 1}/{photoItems.length}</span>}
           </div>
+          {!isEditing && photoItems.length > 1 && <div className="profile-gallery">{photoItems.map((item, index) => <button type="button" key={item.key} className={"profile-gallery-thumb " + (index === galleryIndex ? "active" : "")} onClick={() => setGalleryIndex(index)} aria-label={`Фото ${index + 1}`}><img src={item.url} alt="" /></button>)}</div>}
 
           {!isEditing ? (
             <>
@@ -342,6 +388,31 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
             </>
           ) : (
             <form className="profile-edit-form" onSubmit={handleSave}>
+              <div className="photo-manager">
+                <div className="photo-manager-head"><strong>Фотографии</strong><span>{photoItems.length}/{MAX_PHOTOS}</span></div>
+                <div className="photo-manager-grid">
+                  {photoItems.map((item, index) => (
+                    <div className={"photo-slot " + (index === 0 ? "main" : "")} key={item.key}>
+                      <img src={item.url} alt={`Фото ${index + 1}`} />
+                      {index === 0 && <span className="photo-slot-badge">Главное</span>}
+                      <button type="button" className="photo-slot-remove" onClick={() => removePhoto(item.key)} aria-label="Удалить фото"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
+                      <div className="photo-slot-actions">
+                        {index > 0 && <button type="button" onClick={() => makeMainPhoto(item.key)} title="Сделать главным">★</button>}
+                        {index > 0 && <button type="button" onClick={() => movePhoto(item.key, -1)} title="Левее" aria-label="Переместить левее">←</button>}
+                        {index < photoItems.length - 1 && <button type="button" onClick={() => movePhoto(item.key, 1)} title="Правее" aria-label="Переместить правее">→</button>}
+                      </div>
+                    </div>
+                  ))}
+                  {photoItems.length < MAX_PHOTOS && (
+                    <label className="photo-slot add">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                      <span>Добавить</span>
+                      <input type="file" accept="image/*" multiple onChange={handlePhotosChange} />
+                    </label>
+                  )}
+                </div>
+                <p className="photo-manager-hint">Можно выбрать сразу несколько фото. Первое фото показывается в анкете главным.</p>
+              </div>
               <div className="profile-form-title"><h2>Редактирование</h2><p>Обнови информацию о себе</p></div>
               <label>Имя<input type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="Твоё имя" maxLength="50" required /></label>
               <label>Дата рождения<input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} min={getMinBirthDate()} max={getMaxBirthDate()} required /></label>
