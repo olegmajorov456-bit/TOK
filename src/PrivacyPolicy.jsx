@@ -1,10 +1,11 @@
 import "./PrivacyPolicy.css";
+import Logo from "./Logo";
 
 function PrivacyPolicy({ theme = "light" }) {
   return (
     <div className={"privacy-page tok-theme-" + theme}>
       <div className="privacy-card">
-        <img src="/tok-logo.png" alt="ТОК" className="privacy-logo" />
+        <Logo className="privacy-logo" />
         <h1>Политика конфиденциальности</h1>
         <p className="privacy-date">Последнее обновление: 10 сентября 2026 года</p>
 
