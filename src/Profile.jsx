@@ -62,7 +62,7 @@ function getHobbies(profile) {
   return normalizeItems(items);
 }
 
-function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChange }) {
+function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChange, onSupport, onAchievements }) {
   const [profile, setProfile] = useState(null);
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -327,6 +327,11 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
                   <button type="button" className={`profile-theme-option ${theme === "light" ? "active" : ""}`} onClick={() => onThemeChange?.("light")}><span className="theme-preview theme-preview-light"><i></i><b></b><em></em></span><span><strong>Классический</strong><small>Светлый</small></span>{theme === "light" && <mark>✓</mark>}</button>
                   <button type="button" className={`profile-theme-option ${theme === "neon" ? "active" : ""}`} onClick={() => onThemeChange?.("neon")}><span className="theme-preview theme-preview-neon"><i></i><b></b><em></em></span><span><strong>Неоновый</strong><small>Новый TOK</small></span>{theme === "neon" && <mark>✓</mark>}</button>
                 </div>
+              </div>
+              <div className="profile-menu">
+                {onAchievements && <button type="button" className="profile-menu-row" onClick={onAchievements}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0Z" /><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6M10 17h4" /></svg></span><span className="profile-menu-label">Достижения</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>}
+                {onSupport && <button type="button" className="profile-menu-row" onClick={onSupport}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01" /></svg></span><span className="profile-menu-label">Помощь</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>}
+                <button type="button" className="profile-menu-row" onClick={() => window.open("https://tbank.ru/cf/AWf42bsf9Ry", "_blank", "noopener,noreferrer")}><span className="profile-menu-icon heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span><span className="profile-menu-label">Поддержать создателя</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
               </div>
               <div className="profile-actions">
                 <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
