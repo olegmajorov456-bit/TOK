@@ -1,11 +1,12 @@
 import "./Header.css";
+import Logo from "./Logo";
 import NotificationBell from "./NotificationBell";
 
 function Header({ onHome, onProfile, onLikes, onMatches, onNotifications, profile, user }) {
   return (
     <header className="app-header">
       <button className="app-header-logo" onClick={onHome} aria-label="ТОК — главная">
-        <img src="/tok-wordmark.svg" alt="ТОК" className="app-header-logo-image" />
+        <Logo className="app-header-logo-image" />
       </button>
 
       <div className="app-header-actions">
