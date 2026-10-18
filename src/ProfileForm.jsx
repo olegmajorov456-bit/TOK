@@ -131,12 +131,21 @@ function ProfileForm({ user, onProfileCreated }) {
           .from("avatars")
           .getPublicUrl(filePath);
 
-        const { data: updatedProfile, error: avatarUpdateError } = await supabase
+        const photoUrl = publicUrlData.publicUrl;
+        let { data: updatedProfile, error: avatarUpdateError } = await supabase
           .from("profiles")
-          .update({ avatar_url: publicUrlData.publicUrl })
+          .update({ avatar_url: photoUrl, photos: [photoUrl] })
           .eq("id", user.id)
           .select()
           .single();
+        if (avatarUpdateError && /photos/i.test(avatarUpdateError.message || "")) {
+          ({ data: updatedProfile, error: avatarUpdateError } = await supabase
+            .from("profiles")
+            .update({ avatar_url: photoUrl })
+            .eq("id", user.id)
+            .select()
+            .single());
+        }
 
         if (avatarUpdateError) {
           console.error(avatarUpdateError);
