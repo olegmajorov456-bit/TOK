@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Logo from "./Logo";
 import { supabase } from "./supabaseClient";
 import Auth from "./Auth";
 import PasswordReset from "./PasswordReset";
@@ -251,7 +252,7 @@ function App() {
       <div className={`site-loading tok-theme-${theme}`}>
         <div className="site-loading-content">
           <div className="site-loading-logo">
-            <img src="/tok-wordmark.svg" alt="ТОК — Знакомства в ИГЭУ" />
+            <Logo alt="ТОК — Знакомства в ИГЭУ" />
           </div>
           <div className="site-loading-spinner" aria-label="Загрузка" />
         </div>
@@ -265,7 +266,7 @@ function App() {
     return (
       <div className={`auth-page tok-auth-${theme}`}>
         <div className="auth-card">
-          <img className="auth-logo" src="/tok-wordmark.svg" alt="ТОК" />
+          <Logo className="auth-logo" />
           <h2>Аккаунт заблокирован</h2>
           <p className="auth-message">Доступ к ТОК ограничен администрацией. Если вы считаете, что это ошибка, обратитесь в поддержку.</p>
           <button className="switch-button" onClick={() => supabase.auth.signOut()}>Выйти</button>
@@ -302,7 +303,7 @@ function App() {
   );
   if (page === "admin") return <Admin user={session.user} onBack={() => setPage("profile")} />;
 
-  const navActivePage = page === "interest-rooms" ? "rooms"
+  const navActivePage = ["matches", "interest-rooms"].includes(page) ? "chats"
     : ["confessions", "notifications"].includes(page) ? "home"
     : ["achievements", "support"].includes(page) ? "profile"
     : page;
@@ -315,14 +316,14 @@ function App() {
         {page === "home" && <Home profile={profile} homeSettings={homeSettings} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onProfile={() => setPage("profile")} onConfessions={() => setPage("confessions")} onAchievements={() => setPage("achievements")} onRandomChat={() => setPage("random-chat")} onInterestRooms={() => setPage("interest-rooms")} onNotifications={() => { setNotificationsInitialFilter("all"); setPage("notifications"); }} onLikes={() => { setNotificationsInitialFilter("like"); setPage("notifications"); }} theme={theme} />}
         {page === "support" && <Support user={session.user} onBack={() => setPage("profile")} />}
         {page === "discovery" && <Discovery user={session.user} onHome={goHome} theme={theme} />}
-        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} theme={theme} />}
+        {page === "matches" && <Matches user={session.user} onHome={goHome} onOpenChat={openChat} onRooms={() => setPage("interest-rooms")} theme={theme} />}
         {page === "confessions" && <Confessions user={session.user} theme={theme} />}
-        {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} />}
+        {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} onPersonal={() => setPage("matches")} />}
         {page === "achievements" && <Achievements user={session.user} theme={theme} />}
         {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} initialFilter={notificationsInitialFilter} />}
         {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onSupport={() => setPage("support")} onAchievements={() => setPage("achievements")} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
-      <BottomNav activePage={navActivePage} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onMatches={() => setPage("matches")} onRooms={() => setPage("interest-rooms")} onProfile={() => setPage("profile")} />
+      <BottomNav activePage={navActivePage} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onChats={() => setPage("matches")} onProfile={() => setPage("profile")} />
     </div>
     </>
   );
