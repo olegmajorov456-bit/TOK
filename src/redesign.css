@@ -540,4 +540,17 @@
 :root:root:root body .interest-room-action{padding:8px 12px!important;font-size:12.5px!important}
 :root:root:root body .discovery-button.skip svg{width:30px!important;height:30px!important}
 :root:root:root body .tok-theme-neon .app-header{background:rgba(7,14,38,.82)!important}
-:root:root:root body .tok-theme-neon .app-header-logo{padding:5px 10px!important;border-radius:12px!important;background:#fff!important}
+/* ===== round 2: 4-item nav, old-logo wordmark, chat tabs, full-width profile card ===== */
+:root:root:root body .bottom-nav{grid-template-columns:repeat(4,1fr)!important}
+:root:root:root body .tok-logo-dark{display:none!important}
+:root:root:root body .tok-theme-neon .tok-logo-light,:root:root:root body .tok-auth-neon .tok-logo-light,:root:root:root body .tok-onboarding-neon .tok-logo-light{display:none!important}
+:root:root:root body .tok-theme-neon .tok-logo-dark,:root:root:root body .tok-auth-neon .tok-logo-dark,:root:root:root body .tok-onboarding-neon .tok-logo-dark{display:block!important}
+:root:root:root body .app-header-logo-image{height:36px!important;width:auto!important}
+:root:root:root body .tok-theme-neon .app-header-logo{padding:0!important;border-radius:0!important;background:transparent!important}
+:root:root:root body .home-profile-card{margin:-48px 0 0!important}
+:root:root:root body .matches-heading,:root:root:root body .interest-rooms-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin:6px 0 14px!important;padding:0!important}
+:root:root:root body .chat-tabs{display:grid!important;grid-auto-flow:column!important;grid-auto-columns:1fr!important;gap:4px!important;min-width:224px!important;padding:4px!important;border-radius:999px!important;background:rgba(21,40,110,.07)!important}
+:root:root:root body .chat-tabs button{height:38px!important;padding:0 18px!important;border:0!important;border-radius:999px!important;background:transparent!important;color:var(--k-text)!important;font:600 14px/1 var(--k-body)!important;cursor:pointer!important}
+:root:root:root body .chat-tabs button.active{background:var(--k-surface)!important;color:#F0206B!important;box-shadow:0 2px 10px -4px rgba(240,32,107,.5),inset 0 0 0 1.5px rgba(240,32,107,.35)!important}
+:root:root:root body .matches-refresh,:root:root:root body .interest-rooms-refresh{position:static!important;flex:0 0 auto!important;width:auto!important;min-width:38px!important;height:38px!important;padding:0 12px!important;border:0!important;border-radius:999px!important;background:var(--k-surface)!important;color:var(--k-blue)!important;font:600 14px/1 var(--k-body)!important;box-shadow:var(--k-shadow)!important;cursor:pointer!important}
+:root:root:root body .home-tip{background:var(--k-surface-2)!important;border-color:var(--k-line)!important}
