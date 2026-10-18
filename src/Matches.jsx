@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ChatTabs from "./ChatTabs";
 import { supabase } from "./supabaseClient";
 import "./Matches.css";
 
-function Matches({ user, onHome, onOpenChat, theme = "light" }) {
+function Matches({ user, onHome, onOpenChat, onRooms, theme = "light" }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chatPreview, setChatPreview] = useState({});
@@ -212,11 +213,7 @@ function Matches({ user, onHome, onOpenChat, theme = "light" }) {
     <div className={`matches-page tok-theme-${theme}`}>
       <main className="matches-container">
         <div className="matches-heading">
-          <div>
-            <span className="matches-kicker">ОБЩАЯ СИМПАТИЯ</span>
-            <h1>Чаты <span className="matches-title-heart">♡</span></h1>
-            <p>Последние активные переписки — сверху.</p>
-          </div>
+          <ChatTabs active="personal" onPersonal={() => {}} onRooms={onRooms} />
           <button type="button" className="matches-refresh" onClick={() => loadMatches(false)} aria-label="Обновить чаты" title="Обновить чаты">↻</button>
         </div>
 
