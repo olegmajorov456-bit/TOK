@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Logo from "./Logo";
 import { supabase } from "./supabaseClient";
 import "./Auth.css";
 
@@ -88,7 +89,7 @@ function Auth() {
     return (
       <div className={"auth-page tok-auth-" + theme}>
         <div className="auth-card auth-verification-card">
-          <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
+          <Logo className="auth-logo" />
           <div className="auth-mail-icon" aria-hidden="true">✉</div>
           <h2>Проверь почту</h2>
           <p className="auth-subtitle">Мы отправили письмо для подтверждения адреса</p>
@@ -105,7 +106,7 @@ function Auth() {
     return (
       <div className={`auth-page tok-auth-${theme}`}>
         <div className="auth-card">
-          <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
+          <Logo className="auth-logo" />
           <h2>Восстановление пароля</h2>
           <p className="auth-subtitle">Введите email своего аккаунта</p>
           <form onSubmit={handleForgotPassword}>
@@ -122,7 +123,7 @@ function Auth() {
   return (
     <div className={`auth-page tok-auth-${theme}`}>
       <div className="auth-card">
-        <img className="auth-logo" src="/tok-logo.png" alt="ТОК" />
+        <Logo className="auth-logo" />
         <h2>{isLogin ? "Вход" : "Регистрация"}</h2>
         <p className="auth-subtitle">Знакомства внутри ИГЭУ</p>
         <form onSubmit={handleSubmit}>
