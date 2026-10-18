@@ -11,12 +11,11 @@ function Icon({ type }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{icons[type]}</svg>;
 }
 
-function BottomNav({ activePage, onHome, onDiscovery, onMatches, onRooms, onProfile }) {
+function BottomNav({ activePage, onHome, onDiscovery, onChats, onProfile }) {
   const items = [
     ["home", "Главная", "home", onHome],
     ["discovery", "Знакомства", "discovery", onDiscovery],
-    ["matches", "Мэтчи", "heart", onMatches],
-    ["rooms", "Чаты", "rooms", onRooms],
+    ["chats", "Чаты", "rooms", onChats],
     ["profile", "Профиль", "user", onProfile],
   ];
 
