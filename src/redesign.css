@@ -489,7 +489,6 @@
 :root:root:root body .discovery-card{animation:k-pop .55s cubic-bezier(.2,.9,.3,1.05) backwards}
 :root:root:root body .discovery-burst{display:grid!important}
 :root:root:root body .discovery-burst{opacity:0;animation:k-burst .85s cubic-bezier(.2,.9,.3,1.1) forwards}
-:root:root:root body .discovery-button.like::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border:2px solid #FF4D93;border-radius:20px;pointer-events:none;animation:k-halo 2.6s ease-out 1s infinite}
 :root:root:root body .filters-overlay{animation:k-fade .25s ease backwards}
 :root:root:root body .filters-sheet{animation:k-sheet .35s cubic-bezier(.2,.8,.2,1) backwards}
 :root:root:root body .notification-bell-button:has(.notification-badge) .notification-bell-icon{transform-origin:50% 10%;animation:k-bell 4s ease-in-out infinite}
@@ -615,3 +614,50 @@
 @media (max-width:380px){:root:root:root body .discovery-button.skip,:root:root:root body .discovery-button.like{font-size:13px!important;gap:5px!important}
 :root:root:root body .discovery-actions{padding:6px!important;gap:5px!important}
 }
+/* ===== round 4: fixes from real-device screenshots ===== *//* home: icon tiles that do not glare in the dark theme */
+:root:root:root body .tok-theme-neon .home-card-avatar,:root:root:root body .tok-theme-neon .home-post-icon,:root:root:root body .tok-theme-neon .home-matches-icon{background:rgba(255,75,134,.16)!important;color:#FF6B9D!important}
+:root:root:root body .home-post-header{display:flex!important;align-items:center!important;gap:12px!important}
+/* discovery: clean action row (no nested outlines, no ghost ring) */
+:root:root:root body .discovery-actions{right:16px!important;bottom:16px!important;left:16px!important;grid-template-columns:54px 1fr 1.15fr!important;gap:10px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;backdrop-filter:none!important}
+:root:root:root body .discovery-button.undo,:root:root:root body .discovery-button.skip,:root:root:root body .discovery-button.like{height:56px!important;border-radius:18px!important}
+:root:root:root body .discovery-button.undo{border:1px solid rgba(255,255,255,.38)!important;background:rgba(255,255,255,.2)!important;backdrop-filter:blur(12px)!important}
+:root:root:root body .discovery-button.skip{background:#fff!important;color:#0C1B4D!important;box-shadow:0 10px 22px -12px rgba(0,0,0,.55)!important}
+:root:root:root body .discovery-button.like{box-shadow:0 12px 24px -10px rgba(240,32,107,.8)!important}
+:root:root:root body .discovery-button.like::before,:root:root:root body .discovery-button.like::after,:root:root:root body .discovery-button.skip::before,:root:root:root body .discovery-button.skip::after{display:none!important}
+:root:root:root body .discovery-info{bottom:92px!important}
+:root:root:root body .discovery-icon-button,:root:root:root body .discovery-counter{background:rgba(255,255,255,.2)!important;border:1px solid rgba(255,255,255,.38)!important;backdrop-filter:blur(12px)!important}
+:root:root:root body .discovery-photo .no-photo{background:radial-gradient(70% 55% at 85% 15%,rgba(255,92,143,.55),transparent 65%),linear-gradient(155deg,#1B4FE4 0%,#4A3FD8 55%,#8A3FD0 100%)!important;color:rgba(255,255,255,.28)!important;font:800 190px/1 var(--k-display)!important}
+:root:root:root body .discovery-photo .no-photo span{display:block!important;margin-top:-90px!important}
+/* profile */
+:root:root:root body .profile-identity{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;text-align:center!important}
+:root:root:root body .profile-name-block{padding:0!important;background:transparent!important}
+:root:root:root body .profile-name-block h1{margin:0!important;text-align:center!important}
+:root:root:root body .profile-status{justify-content:center!important}
+:root:root:root body .profile-subline{margin:6px 0 14px!important;color:var(--k-muted)!important;font-size:14.5px!important}
+:root:root:root body .profile-edit-pill{display:block!important;min-width:220px!important;margin:0 auto!important;padding:13px 24px!important;border:0!important;border-radius:999px!important;background:var(--k-blue-soft)!important;color:var(--k-blue)!important;font:700 15px/1 var(--k-body)!important;cursor:pointer!important}
+:root:root:root body .profile-details{margin:16px 0 0!important;padding:16px!important;border:0!important;border-radius:20px!important;background:var(--k-surface-2)!important;box-shadow:none!important}
+:root:root:root body .profile-detail-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+:root:root:root body .profile-detail-item{position:static!important;display:flex!important;align-items:center!important;gap:10px!important;min-width:0!important;padding:12px!important;border:0!important;border-radius:16px!important;background:var(--k-surface)!important;box-shadow:none!important}
+:root:root:root body .detail-icon{position:static!important;flex:0 0 36px!important;width:36px!important;height:36px!important;margin:0!important;border-radius:12px!important;display:grid!important;place-items:center!important;background:var(--k-blue-soft)!important;color:var(--k-blue)!important;font-size:0!important}
+:root:root:root body .gender-detail .detail-icon{background:var(--k-blue-soft)!important;color:var(--k-blue)!important}
+:root:root:root body .looking-detail .detail-icon{background:var(--k-pink-soft)!important;color:#F0206B!important}
+:root:root:root body .detail-icon svg{width:20px!important;height:20px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+:root:root:root body .profile-detail-item>div{min-width:0!important}
+:root:root:root body .profile-detail-item small{display:block!important;margin:0 0 2px!important;color:var(--k-muted)!important;font-size:12px!important}
+:root:root:root body .profile-detail-item strong{display:block!important;overflow:hidden!important;color:var(--k-text)!important;font:700 15px/1.2 var(--k-body)!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+:root:root:root body .profile-section{margin:12px 0 0!important;padding:16px!important;border:0!important;border-radius:20px!important;background:var(--k-surface-2)!important;box-shadow:none!important}
+:root:root:root body .profile-section-heading{display:flex!important;align-items:center!important;justify-content:space-between!important}
+:root:root:root body .profile-section-heading h3,:root:root:root body .profile-about-section h3{margin:0 0 10px!important;color:var(--k-text)!important;font:700 15px/1.2 var(--k-body)!important}
+:root:root:root body .profile-section-heading span{color:var(--k-muted)!important;font-size:13px!important}
+:root:root:root body .hobby-tag{padding:8px 14px!important;background:var(--k-blue-soft)!important;color:var(--k-blue)!important}
+:root:root:root body .profile-menu{margin:14px 0 0!important;padding:4px 14px!important;border-radius:20px!important;background:var(--k-surface-2)!important}
+:root:root:root body .profile-menu-row.danger{color:#E01F66!important}
+:root:root:root body .profile-menu-row.is-hidden .profile-menu-label{color:var(--k-blue)!important}
+:root:root:root body .profile-menu-icon.danger{background:var(--k-pink-soft)!important;color:#F0206B!important}
+:root:root:root body .profile-menu-row:disabled{opacity:.6!important}
+:root:root:root body .tok-theme-neon .profile-card::before{background:linear-gradient(120deg,#17327F,#43287A)!important}
+:root:root:root body .tok-theme-neon .profile-photo-wrapper{border-color:var(--k-surface)!important}
+:root:root:root body .profile-name-block,:root:root:root body .profile-name-block h1,:root:root:root body .profile-status{width:100%!important;margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;text-align:center!important}
+:root:root:root body .profile-status{display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important}
+:root:root:root body .profile-subline{text-align:center!important}
+:root:root:root body .discovery-chips{max-height:72px!important}

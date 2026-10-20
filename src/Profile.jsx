@@ -342,23 +342,24 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
                   <h1>{profile.name || "Без имени"}{age ? <span>, {age}</span> : null}</h1>
                   <p className={`profile-status ${profile.is_hidden ? "profile-status-hidden" : ""}`}><span className="profile-status-dot"></span> {profile.is_hidden ? "Анкета скрыта" : "Профиль в ТОК"}</p>
                 </div>
-                {profile.faculty && <div className="profile-study"><span className="profile-study-icon">🎓</span><div><strong>{profile.faculty}</strong><span>{profile.course ? `${profile.course} курс` : "Студент ИГЭУ"}</span></div></div>}
+                <p className="profile-subline">{[profile.faculty, profile.course ? `${profile.course} курс` : ""].filter(Boolean).join(" • ") || "Студент ИГЭУ"}</p>
+                <button type="button" className="profile-edit-pill" onClick={() => { setMessage(""); setIsEditing(true); }}>Редактировать профиль</button>
               </div>
 
               <div className="profile-details">
                 <div className="profile-details-heading">О тебе</div>
                 <div className="profile-detail-grid">
-                  {profile.gender && <div className="profile-detail-item gender-detail"><span className="detail-icon">👤</span><div><small>Пол</small><strong>{genderText}</strong></div></div>}
-                  {profile.looking_for && <div className="profile-detail-item looking-detail"><span className="detail-icon">💗</span><div><small>Ищет</small><strong>{lookingForText}</strong></div></div>}
-                  {profile.course && <div className="profile-detail-item"><span className="detail-icon">📚</span><div><small>Курс</small><strong>{profile.course}</strong></div></div>}
-                  {profile.faculty && <div className="profile-detail-item"><span className="detail-icon">🏛️</span><div><small>Факультет</small><strong>{profile.faculty}</strong></div></div>}
+                  {profile.gender && <div className="profile-detail-item gender-detail"><span className="detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg></span><div><small>Пол</small><strong>{genderText}</strong></div></div>}
+                  {profile.looking_for && <div className="profile-detail-item looking-detail"><span className="detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span><div><small>Ищет</small><strong>{lookingForText}</strong></div></div>}
+                  {profile.course && <div className="profile-detail-item"><span className="detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z" /><path d="M5 17a3 3 0 0 1 3-3h10" /></svg></span><div><small>Курс</small><strong>{profile.course}</strong></div></div>}
+                  {profile.faculty && <div className="profile-detail-item"><span className="detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18" /></svg></span><div><small>Факультет</small><strong>{profile.faculty}</strong></div></div>}
                 </div>
               </div>
 
               {profileHobbies.length > 0 && (
                 <div className="profile-section profile-hobbies-section">
                   <div className="profile-section-heading"><h3>Увлечения</h3><span>{profileHobbies.length}</span></div>
-                  <div className="profile-hobbies">{profileHobbies.map((hobby) => <div className="hobby-tag" key={hobby}>✨ {hobby}</div>)}</div>
+                  <div className="profile-hobbies">{profileHobbies.map((hobby) => <div className="hobby-tag" key={hobby}>{hobby}</div>)}</div>
                 </div>
               )}
 
@@ -378,12 +379,11 @@ function Profile({ user, onAdmin, onProfileUpdated, theme = "neon", onThemeChang
                 {onAchievements && <button type="button" className="profile-menu-row" onClick={onAchievements}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0Z" /><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6M10 17h4" /></svg></span><span className="profile-menu-label">Достижения</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>}
                 {onSupport && <button type="button" className="profile-menu-row" onClick={onSupport}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.8M12 17h.01" /></svg></span><span className="profile-menu-label">Помощь</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>}
                 <button type="button" className="profile-menu-row" onClick={() => window.open("https://tbank.ru/cf/AWf42bsf9Ry", "_blank", "noopener,noreferrer")}><span className="profile-menu-icon heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.4-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.8A4.7 4.7 0 0 1 12 6a4.7 4.7 0 0 1 8.8 2.8Z" /></svg></span><span className="profile-menu-label">Поддержать создателя</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
+                <button type="button" className={`profile-menu-row ${profile.is_hidden ? "is-hidden" : ""}`} onClick={handleToggleVisibility} disabled={visibilitySaving}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg></span><span className="profile-menu-label">{visibilitySaving ? "Сохраняем…" : profile.is_hidden ? "Вернуть анкету в поиск" : "Убрать анкету из поиска"}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
               </div>
-              <div className="profile-actions">
-                <button className="profile-primary-button" onClick={() => { setMessage(""); setIsEditing(true); }}>✏️ Редактировать профиль</button>
-                <button type="button" className={`profile-visibility-button ${profile.is_hidden ? "is-hidden" : ""}`} onClick={handleToggleVisibility} disabled={visibilitySaving}>{visibilitySaving ? "Сохраняем…" : profile.is_hidden ? "👁️ Вернуть анкету в поиск" : "🙈 Убрать анкету из поиска"}</button>
-                {profile.is_admin === true && <button className="profile-admin-button" onClick={onAdmin}>🛡️ Панель администратора</button>}
-                <button className="profile-logout-button" onClick={handleLogout}>🚪 Выйти из аккаунта</button>
+              <div className="profile-menu">
+                {profile.is_admin === true && <button type="button" className="profile-menu-row" onClick={onAdmin}><span className="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6Z" /><path d="m9 12 2 2 4-4" /></svg></span><span className="profile-menu-label">Панель администратора</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>}
+                <button type="button" className="profile-menu-row danger" onClick={handleLogout}><span className="profile-menu-icon danger"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9" /></svg></span><span className="profile-menu-label">Выйти из аккаунта</span></button>
               </div>
             </>
           ) : (
