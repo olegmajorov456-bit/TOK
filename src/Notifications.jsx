@@ -59,7 +59,7 @@ function labelFor(item) {
   return "Уведомление ТОК";
 }
 
-function Notifications({ user, theme = "light", onHome, initialFilter = "all" }) {
+function Notifications({ user, theme = "light", onHome, onOpenMessage, initialFilter = "all" }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState(initialFilter === "like" ? "like" : "all");
@@ -115,6 +115,11 @@ function Notifications({ user, theme = "light", onHome, initialFilter = "all" })
     setItems((current) => current.map((item) => ({ ...item, is_read: true })));
   }
 
+  async function handleNotificationClick(item) {
+    if (!item.is_read) await markRead(item);
+    if (item.type === "message") onOpenMessage?.(item);
+  }
+
   const groupedItems = useMemo(() => groupNotifications(items), [items]);
   const unread = useMemo(() => groupedItems.filter((item) => !item.is_read).length, [groupedItems]);
   const filtered = useMemo(() => groupedItems.filter((item) => {
@@ -140,7 +145,7 @@ function Notifications({ user, theme = "light", onHome, initialFilter = "all" })
           <section className="notifications-empty"><div className="notifications-empty-icon"><Icon type="bell" size={29} /></div><h2>{filter === "unread" ? "Всё прочитано" : "Пока тихо"}</h2><p>{filter === "unread" ? "Непрочитанных уведомлений больше нет." : "Новые события появятся здесь автоматически."}</p></section>
         ) : (
           <section className="notifications-list">
-            {filtered.map((item) => <button type="button" key={item.id} className={"notification-page-item " + (item.is_read ? "" : "unread")} onClick={() => !item.is_read && markRead(item)}>
+            {filtered.map((item) => <button type="button" key={item.id} className={"notification-page-item " + (item.is_read ? "" : "unread")} onClick={() => handleNotificationClick(item)}>
               <span className={"notification-page-icon " + item.type}><Icon type={item.type} size={19} /></span>
               <span className="notification-page-copy"><strong>{labelFor(item)}{item.eventCount > 1 ? " · " + item.eventCount + " событий" : ""}</strong><span>{item.body || (item.type === "message" ? "Вам отправили сообщение." : item.type === "like" ? "Кто-то поставил вам лайк." : "Есть новости в ТОК.")}</span><small>{new Date(item.created_at).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</small></span>
               {!item.is_read && <i className="notification-unread-dot" />}
