@@ -8,3 +8,19 @@
 .matches-loading{min-height:calc(100vh - 170px);position:relative}.matches-loading:after{content:"Загружаем чаты";position:absolute;top:calc(50% + 34px);color:#777c88;font-size:11px}
 .tok-theme-light .matches-list{box-shadow:0 16px 42px rgba(31,36,45,.07)}.tok-theme-light .match-card{background:#fff}.tok-theme-light .match-card:hover{background:#fafbfc}.tok-theme-light .match-avatar{box-shadow:0 0 0 3px #fff,0 6px 16px rgba(31,36,45,.1)}.tok-theme-light .match-chat-icon{background:#fff0f4;color:#e83c6d}.tok-theme-light .match-card:hover .match-chat-icon{background:#e83c6d;color:#fff}.tok-theme-light .match-online-dot{box-shadow:0 0 7px rgba(53,180,105,.35)}.tok-theme-light .matches-loading:after{color:#7b818a}
 @media(max-width:600px){.match-card{min-height:80px}.match-chat-icon{width:32px;height:32px}}
+
+/* Center the chat tabs and give refresh a stable square hit target. */
+.matches-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.matches-refresh{
+  width:42px;height:42px;flex:0 0 42px;
+  display:grid;place-items:center;padding:0;
+  border:1px solid #e1e4e9;border-radius:12px;
+  background:#fff;color:#4c535d;font-size:21px;line-height:1;
+  cursor:pointer;transition:background .18s,border-color .18s,color .18s;
+}
+.matches-refresh:hover:not(:disabled){background:#f7f8fa;border-color:#cfd4dc;color:#d93461}
+.matches-refresh:disabled{opacity:.65;cursor:wait}
+.matches-refresh.is-loading{animation:matches-refresh-spin .8s linear infinite}
+@keyframes matches-refresh-spin{to{transform:rotate(360deg)}}
+.tok-theme-neon .matches-refresh{background:#191b28;border-color:#34374a;color:#d8dbe5}
+.tok-theme-neon .matches-refresh:hover:not(:disabled){background:#242634;border-color:#4a4e64;color:#ff7098}

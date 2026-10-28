@@ -85,3 +85,36 @@ html.tok-keyboard-open .chat-messages {
   scroll-padding-bottom: 90px;
   overscroll-behavior: contain;
 }
+
+/* Keep the composer in the chat layout so it never covers the last messages. */
+.chat-messages{padding-bottom:24px}
+.chat-input-area{
+  position:relative;left:auto;bottom:auto;transform:none;
+  flex:0 0 auto;height:auto;min-height:58px;flex-wrap:wrap;
+  margin:0 auto calc(88px + env(safe-area-inset-bottom));
+}
+.chat-reply-preview,.chat-image-preview{
+  position:relative;left:auto;right:auto;bottom:auto;
+  flex:0 0 100%;width:100%;min-width:0;order:-1;margin:0;
+}
+.chat-reply-preview{justify-content:space-between}
+.chat-image-preview{justify-content:space-between}
+.chat-image-preview button{
+  display:grid;place-items:center;flex:0 0 24px;
+  padding:0;line-height:1;
+}
+@media(max-width:600px){
+  .chat-input-area{
+    left:auto;bottom:auto;transform:none;
+    width:calc(100% - 16px);
+    margin-bottom:calc(82px + env(safe-area-inset-bottom));
+  }
+}
+html.tok-keyboard-open .chat-input-area{
+  position:fixed!important;left:50%!important;
+  bottom:calc(8px + var(--tok-keyboard-overlap,0px))!important;
+  transform:translateX(-50%)!important;margin:0 auto!important;
+}
+html.tok-keyboard-open .chat-messages{
+  padding-bottom:90px!important;scroll-padding-bottom:90px;
+}

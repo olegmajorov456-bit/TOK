@@ -78,3 +78,30 @@
 .discovery-common-hobbies{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}.discovery-common-hobbies span{padding:6px 9px;border:1px solid #f0cbd8;border-radius:99px;background:#fff0f4;color:#ca315f;font-size:9px;font-weight:800}
 .tok-theme-light .discovery-sort-toggle{background:#fff;border-color:#dfe2e7}.tok-theme-light .discovery-sort-toggle button{color:#828995}.tok-theme-light .discovery-sort-toggle button.active{background:#fff0f4;color:#d93461}.tok-theme-light .discovery-compatibility{background:#fafbfc;border-color:#e1e4e9;color:#737984}.tok-theme-light .discovery-compatibility strong{color:#555c66}.tok-theme-light .discovery-compatibility.has-common{background:#fff5f8;border-color:#f0c8d5;color:#d93461}.tok-theme-light .discovery-compatibility.has-common strong{color:#c82d5b}.tok-theme-light .discovery-common-hobbies span{background:#fff0f4;border-color:#f0cbd8;color:#ca315f}
 @media(max-width:600px){.discovery-header{gap:8px;align-items:flex-start}.discovery-header-controls{flex-direction:column;align-items:flex-end;gap:6px}.discovery-sort-toggle{max-width:100%}.discovery-sort-toggle button{padding:0 7px;font-size:8px}.discovery-header h1{font-size:25px}.discovery-header p{font-size:10px}.discovery-compatibility{font-size:9px}}
+
+/* Fit profile cards and their actions into short viewports. */
+@media(max-height:760px){
+  .discovery-page{
+    height:calc(100dvh - 76px);min-height:0;overflow:hidden;
+    padding-top:12px;padding-bottom:96px;
+  }
+  .discovery-container{height:100%;min-height:0;display:flex;flex-direction:column}
+  .discovery-header{flex:0 0 auto;margin-bottom:10px}
+  .discovery-card{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}
+  .discovery-photo{height:auto;min-height:0;flex:1 1 0}
+  .discovery-content{flex:0 0 auto;max-height:110px;overflow:auto}
+  .discovery-actions{flex:0 0 auto;padding-top:10px;padding-bottom:10px}
+}
+@media(max-height:620px){
+  .discovery-page{padding-top:8px;padding-bottom:84px}
+  .discovery-header{margin-bottom:6px}
+  .discovery-header h1{font-size:22px}
+  .discovery-header p{margin-top:3px;font-size:10px}
+  .discovery-content{max-height:82px;padding-top:10px}
+  .discovery-actions{padding-top:7px;padding-bottom:7px}
+  .discovery-actions .discovery-button,
+  .tok-theme-light .discovery-actions .discovery-button,
+  .tok-theme-neon .discovery-actions .discovery-button{
+    width:46px!important;height:46px!important;min-width:46px;min-height:46px;flex-basis:46px
+  }
+}

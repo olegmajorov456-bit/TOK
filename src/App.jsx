@@ -239,6 +239,48 @@ function App() {
     setPage("chat");
   }
 
+  async function openNotificationChat(item) {
+    if (!item?.related_id || !item?.actor_id) {
+      setPage("matches");
+      return;
+    }
+
+    const { data: conversation, error: conversationError } = await supabase
+      .from("conversations")
+      .select("id,match_id")
+      .eq("id", item.related_id)
+      .maybeSingle();
+
+    if (conversationError || !conversation?.match_id) {
+      setPage("matches");
+      return;
+    }
+
+    const { data: match, error: matchError } = await supabase
+      .from("matches")
+      .select("*")
+      .eq("id", conversation.match_id)
+      .maybeSingle();
+
+    if (matchError || !match || (match.user1_id !== item.actor_id && match.user2_id !== item.actor_id)) {
+      setPage("matches");
+      return;
+    }
+
+    const { data: otherProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", item.actor_id)
+      .maybeSingle();
+
+    if (profileError) console.warn("Не удалось загрузить профиль отправителя уведомления:", profileError);
+
+    openChat({
+      match,
+      profile: otherProfile || { id: item.actor_id, name: "Пользователь", avatar_url: null },
+    });
+  }
+
   function goHome() {
     setPage("home");
     setSelectedChat(null);
@@ -320,7 +362,7 @@ function App() {
         {page === "confessions" && <Confessions user={session.user} theme={theme} />}
         {page === "interest-rooms" && <InterestRooms user={session.user} theme={theme} onHome={goHome} onPersonal={() => setPage("matches")} />}
         {page === "achievements" && <Achievements user={session.user} theme={theme} />}
-        {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} initialFilter={notificationsInitialFilter} />}
+        {page === "notifications" && <Notifications user={session.user} theme={theme} onHome={goHome} onOpenMessage={openNotificationChat} initialFilter={notificationsInitialFilter} />}
         {page === "profile" && <Profile user={session.user} profile={profile} theme={theme} onThemeChange={setTheme} onHome={goHome} onSupport={() => setPage("support")} onAchievements={() => setPage("achievements")} onAdmin={() => setPage("admin")} onProfileUpdated={(updatedProfile) => { setProfile(updatedProfile); setBlocked(updatedProfile?.is_blocked === true); }} />}
       </main>
       <BottomNav activePage={navActivePage} onHome={() => setPage("home")} onDiscovery={() => setPage("discovery")} onChats={() => setPage("matches")} onProfile={() => setPage("profile")} />

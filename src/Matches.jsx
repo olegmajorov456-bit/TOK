@@ -214,7 +214,7 @@ function Matches({ user, onHome, onOpenChat, onRooms, theme = "light" }) {
       <main className="matches-container">
         <div className="matches-heading">
           <ChatTabs active="personal" onPersonal={() => {}} onRooms={onRooms} />
-          <button type="button" className="matches-refresh" onClick={() => loadMatches(false)} aria-label="Обновить чаты" title="Обновить чаты">↻</button>
+          <button type="button" className={"matches-refresh" + (loading ? " is-loading" : "")} onClick={() => loadMatches(true)} disabled={loading} aria-label="Обновить чаты" title="Обновить чаты">↻</button>
         </div>
 
         {matches.length === 0 ? (
